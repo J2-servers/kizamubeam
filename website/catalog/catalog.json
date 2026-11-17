@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T10:18:12.293Z",
+ "generated": "2026-11-17T10:21:37.526Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -215,6 +215,40 @@
    "file": "org.kizamubeam.stencil-bridges.kzp",
    "sha256": "5c78d59fa47d298c535fae3cfe80f018961c09276b8df9c6377c69200fbee63e",
    "size": 12980
+  },
+  {
+   "id": "org.kizamubeam.street-map",
+   "version": "1.0.0",
+   "name": {
+    "en": "Street map",
+    "de": "Stadtplan",
+    "it": "Mappa stradale"
+   },
+   "description": {
+    "en": "Engravable map of a place from OpenStreetMap: roads, water, railways, parks and buildings on a cut plate.",
+    "de": "Gravierbarer Plan eines Ortes aus OpenStreetMap: Straßen, Wasser, Bahnen, Parks und Gebäude auf einer geschnittenen Platte.",
+    "it": "Mappa incidibile di un luogo da OpenStreetMap: strade, acqua, ferrovie, parchi ed edifici su una lastra tagliata."
+   },
+   "author": "KizamuBeam",
+   "homepage": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/street-map",
+   "devices": 0,
+   "templates": 0,
+   "materials": 0,
+   "assets": 0,
+   "plugins": 1,
+   "runtimes": [
+    "js"
+   ],
+   "pluginApi": 1,
+   "codeSize": 7824,
+   "network": [
+    "nominatim.openstreetmap.org",
+    "overpass-api.de"
+   ],
+   "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/street-map",
+   "file": "org.kizamubeam.street-map.kzp",
+   "sha256": "0b8b278e736334a233e8bc391bbbab169a7a035e2ccf6b963ba674adbbdd50f7",
+   "size": 18614
   }
  ]
 }
