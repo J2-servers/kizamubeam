@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T10:13:33.322Z",
+ "generated": "2026-11-17T10:18:12.293Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -55,7 +55,7 @@
    "codeSize": 5644,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/game-board",
    "file": "org.kizamubeam.game-board.kzp",
-   "sha256": "6c2b71eeca93e6e6b37c295c52095e0840b21aae6dfd7ecdb02eb27b59e917d1",
+   "sha256": "dd9109ba25d0d560e94f06da79916a845c06f6cc83715a023685fc2e7238ada4",
    "size": 14490
   },
   {
@@ -85,7 +85,7 @@
    "codeSize": 149931,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
    "file": "org.kizamubeam.hole-plate.kzp",
-   "sha256": "52b4fc6422db91e42c00c33257222a3cd1d4fc8db321f7f999028e2f3dbcb1e9",
+   "sha256": "45eb024e4048d20c1713f7a187fe09c90a863f9e9745e4ad58fbec0eb02d803b",
    "size": 205487
   },
   {
@@ -117,8 +117,38 @@
    "codeSize": 6149,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/jigsaw",
    "file": "org.kizamubeam.jigsaw.kzp",
-   "sha256": "3804f60835dcefbfacefc5c64e38e3f6fd5c7b7b43c774c005abec3f982ecba0",
+   "sha256": "cc1b3b4b6113aa5bf179b452b20b628f2ec5552edf28eaf946a003ee07ee6b02",
    "size": 14060
+  },
+  {
+   "id": "org.kizamubeam.layered-art",
+   "version": "1.0.0",
+   "name": {
+    "en": "Layered art",
+    "de": "Schichtbild",
+    "it": "Arte a strati"
+   },
+   "description": {
+    "en": "Turns a logo, drawing or photo into stacked plates that are cut and glued on top of each other for depth.",
+    "de": "Macht aus einem Logo, einer Zeichnung oder einem Foto gestapelte Platten, die geschnitten und für Tiefe übereinander geklebt werden.",
+    "it": "Trasforma un logo, un disegno o una foto in pannelli sovrapposti, tagliati e incollati uno sull'altro per dare profondità."
+   },
+   "author": "KizamuBeam",
+   "homepage": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/layered-art",
+   "devices": 0,
+   "templates": 0,
+   "materials": 0,
+   "assets": 0,
+   "plugins": 1,
+   "runtimes": [
+    "js"
+   ],
+   "pluginApi": 1,
+   "codeSize": 12700,
+   "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/layered-art",
+   "file": "org.kizamubeam.layered-art.kzp",
+   "sha256": "b28881e9757a5a98e538d8680f88d8cd4f143ae818943a853850c3735747c532",
+   "size": 25812
   },
   {
    "id": "org.kizamubeam.ruler",
@@ -149,7 +179,7 @@
    "codeSize": 7441,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/ruler",
    "file": "org.kizamubeam.ruler.kzp",
-   "sha256": "d69d2053a08c11a24ba4fa2706ef5dbf70d5c58e52b486ca1e586da27c4e50a5",
+   "sha256": "7e223eac19fc35cfad402b02a51d2669533c4c8b89c4f41e40d51eedf0351d5a",
    "size": 21288
   },
   {
@@ -183,7 +213,7 @@
    "codeSize": 3350,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/stencil-bridges",
    "file": "org.kizamubeam.stencil-bridges.kzp",
-   "sha256": "13d234c2ec6adc05149b189ee7e7670a162c4495beda46ed96c17762e9a01448",
+   "sha256": "5c78d59fa47d298c535fae3cfe80f018961c09276b8df9c6377c69200fbee63e",
    "size": 12980
   }
  ]
