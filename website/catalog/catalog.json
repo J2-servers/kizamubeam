@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T02:13:25.216Z",
+ "generated": "2026-11-17T02:17:16.101Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -87,6 +87,38 @@
    "file": "org.kizamubeam.jigsaw.kzp",
    "sha256": "fe55388db71db806de75a9f45afd54175d5eb36c285a13889abc11f101fc7aad",
    "size": 14038
+  },
+  {
+   "id": "org.kizamubeam.ruler",
+   "version": "1.0.0",
+   "name": {
+    "en": "Rulers and scales",
+    "de": "Lineale und Skalen",
+    "it": "Righelli e scale",
+    "es": "Reglas y escalas",
+    "pt-BR": "Réguas e escalas"
+   },
+   "description": {
+    "en": "Straight rulers (metric or inch), protractors and scale dials with engraved ticks and numbers at their exact positions.",
+    "de": "Gerade Lineale (metrisch oder Zoll), Winkelmesser und Skalenscheiben mit gravierten Strichen und Zahlen an den genauen Positionen.",
+    "it": "Righelli dritti (metrici o in pollici), goniometri e quadranti con tacche e numeri incisi nelle posizioni esatte."
+   },
+   "author": "KizamuBeam",
+   "homepage": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/ruler",
+   "devices": 0,
+   "templates": 0,
+   "materials": 0,
+   "assets": 0,
+   "plugins": 1,
+   "runtimes": [
+    "js"
+   ],
+   "pluginApi": 1,
+   "codeSize": 7419,
+   "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/ruler",
+   "file": "org.kizamubeam.ruler.kzp",
+   "sha256": "585b0967aecb157367c4faa353e04146c10fda0aa6b7dc0896fa0552938be3a6",
+   "size": 21266
   }
  ]
 }
