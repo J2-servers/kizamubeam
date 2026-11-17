@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T02:08:39.345Z",
+ "generated": "2026-11-17T02:13:25.216Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -55,6 +55,38 @@
    "file": "org.kizamubeam.hole-plate.kzp",
    "sha256": "6398509a9566f765ef0ecdeb8f6ad00c9b14e76cf32baee0831b6d6388239387",
    "size": 191603
+  },
+  {
+   "id": "org.kizamubeam.jigsaw",
+   "version": "1.0.0",
+   "name": {
+    "en": "Jigsaw puzzle",
+    "de": "Puzzle",
+    "it": "Puzzle",
+    "es": "Rompecabezas",
+    "pt-BR": "Quebra-cabeça"
+   },
+   "description": {
+    "en": "Jigsaw puzzle generator: interlocking pieces from a seed, each edge cut once, optional frame and piece numbers.",
+    "de": "Puzzle-Generator: ineinandergreifende Teile aus einem Startwert, jede Kante wird nur einmal geschnitten, auf Wunsch mit Rahmen und Teilenummern.",
+    "it": "Generatore di puzzle: pezzi a incastro da un seme, ogni bordo tagliato una sola volta, cornice e numeri dei pezzi a scelta."
+   },
+   "author": "KizamuBeam",
+   "homepage": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/jigsaw",
+   "devices": 0,
+   "templates": 0,
+   "materials": 0,
+   "assets": 0,
+   "plugins": 1,
+   "runtimes": [
+    "js"
+   ],
+   "pluginApi": 1,
+   "codeSize": 6127,
+   "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/jigsaw",
+   "file": "org.kizamubeam.jigsaw.kzp",
+   "sha256": "fe55388db71db806de75a9f45afd54175d5eb36c285a13889abc11f101fc7aad",
+   "size": 14038
   }
  ]
 }
