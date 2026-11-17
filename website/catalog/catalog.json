@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T16:17:21.223Z",
+ "generated": "2026-11-17T17:25:15.043Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -55,7 +55,7 @@
    "codeSize": 5644,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/game-board",
    "file": "org.kizamubeam.game-board.kzp",
-   "sha256": "2d72e3a164d8b65631fac76b4f488d7e29d6ec5152f0dcc11c7d63c5687115b2",
+   "sha256": "f96fa4eaf653d35f9489711ba4f9310ece31b9c400cdfef13e15b2894e38c253",
    "size": 14490
   },
   {
@@ -85,7 +85,7 @@
    "codeSize": 151025,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
    "file": "org.kizamubeam.hole-plate.kzp",
-   "sha256": "f90ca78dca31dd36b5019587c18a6674e778b7dd9a6d5014f7ac7f8695bf0f49",
+   "sha256": "a348f218ce0406c279147d0a2489b08680ebd8cc4d02a3cf663b81998f12069e",
    "size": 206947
   },
   {
@@ -117,7 +117,7 @@
    "codeSize": 6149,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/jigsaw",
    "file": "org.kizamubeam.jigsaw.kzp",
-   "sha256": "21af4273d1913c0a79eeda07acf94f16d82b3b4e20c946f7794cc8f21451bb65",
+   "sha256": "28d94a76efbca25e791056fe787b0ef31573d65c83f54f94bf0c0c8ef3b9bff4",
    "size": 14060
   },
   {
@@ -147,7 +147,7 @@
    "codeSize": 12700,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/layered-art",
    "file": "org.kizamubeam.layered-art.kzp",
-   "sha256": "553aefa396b984fd24f07f0a8f49770e18caa0fec3034fb1c76a3138ed5149ff",
+   "sha256": "1d07e468299630d16ae11441653bfef4d9d39d9d04942bcfc68f065b8c27e549",
    "size": 25812
   },
   {
@@ -179,7 +179,7 @@
    "codeSize": 7441,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/ruler",
    "file": "org.kizamubeam.ruler.kzp",
-   "sha256": "8b5a713355b3d14f72a4166cfb122966c9b0932a8a27d2e65146c8a753e1ea0a",
+   "sha256": "b6e7264d865117346c08ac70fdb791f011d8d1f1d17d2d6418b3b435133cf370",
    "size": 21288
   },
   {
@@ -213,7 +213,7 @@
    "codeSize": 3350,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/stencil-bridges",
    "file": "org.kizamubeam.stencil-bridges.kzp",
-   "sha256": "0c95fcb6ad82a9c3b3f903335558a16d4e0de74ddb2661acf7536985b99bb891",
+   "sha256": "6a432038debf6fab3cf4a58b8e313f41b6039adcda7e367aec2f55e2f514b290",
    "size": 12980
   },
   {
@@ -249,7 +249,7 @@
    ],
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/street-map",
    "file": "org.kizamubeam.street-map.kzp",
-   "sha256": "e756ccf0fc07ad628064166dc83dc3caef4c15a065cc6dae62fb9c2b9d978457",
+   "sha256": "d7c99b973afeebc75dca2a5e4a7c863309c5c49d85e7c6588e7c237042e0fe55",
    "size": 20593
   }
  ]
