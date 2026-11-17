@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T02:17:16.101Z",
+ "generated": "2026-11-17T02:22:01.985Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -25,6 +25,38 @@
    "file": "org.kizamubeam.example.kzp",
    "sha256": "3dfb647e2fb6c1070e9933994c5119a228204f9199e8b2f960f06661b999e900",
    "size": 5031
+  },
+  {
+   "id": "org.kizamubeam.game-board",
+   "version": "1.0.0",
+   "name": {
+    "en": "Chessboard and game boards",
+    "de": "Schachbrett und Spielbretter",
+    "it": "Scacchiera e tavolieri",
+    "es": "Tablero de ajedrez y juegos",
+    "pt-BR": "Tabuleiro de xadrez e jogos"
+   },
+   "description": {
+    "en": "Chessboards, draughts boards and any n × m board: dark squares filled, hatched, crossed or as a small checkerboard, with coordinates on the border.",
+    "de": "Schachbretter, Damebretter und beliebige n × m Bretter: dunkle Felder gefüllt, schraffiert, gekreuzt oder als kleines Schachbrett, mit Koordinaten am Rand.",
+    "it": "Scacchiere, damiere e qualsiasi tavoliere n × m: caselle scure piene, tratteggiate, incrociate o come piccola scacchiera, con coordinate sul bordo."
+   },
+   "author": "KizamuBeam",
+   "homepage": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/game-board",
+   "devices": 0,
+   "templates": 0,
+   "materials": 0,
+   "assets": 0,
+   "plugins": 1,
+   "runtimes": [
+    "js"
+   ],
+   "pluginApi": 1,
+   "codeSize": 5622,
+   "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/game-board",
+   "file": "org.kizamubeam.game-board.kzp",
+   "sha256": "db92a8a6267eb0d6f174ffe922aa680f3b4edfd81d0442d5156554492755e6cc",
+   "size": 14468
   },
   {
    "id": "org.kizamubeam.hole-plate",
