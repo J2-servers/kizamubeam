@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T06:11:27.217Z",
+ "generated": "2026-11-17T06:15:02.350Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -52,11 +52,11 @@
     "js"
    ],
    "pluginApi": 1,
-   "codeSize": 5622,
+   "codeSize": 5644,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/game-board",
    "file": "org.kizamubeam.game-board.kzp",
-   "sha256": "6cd9de9b7c141e30bac8adcecd594b4dbf861c45092a295c2da4a498a6b0e466",
-   "size": 14468
+   "sha256": "3483c1de019bb1e1de18be6e085bf54e0a8beb677e76157ad8a72bf7e51cd8aa",
+   "size": 14490
   },
   {
    "id": "org.kizamubeam.hole-plate",
@@ -82,11 +82,11 @@
     "wasm"
    ],
    "pluginApi": 1,
-   "codeSize": 148803,
+   "codeSize": 149576,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
    "file": "org.kizamubeam.hole-plate.kzp",
-   "sha256": "ac7f2f55eaf37b49824a739e05d511543d5420fd8cbed07cd7fe517086a3784e",
-   "size": 203983
+   "sha256": "28e9e3b52c200750e19b0ef051bcbe3a335e7ef555462c0af35c854ea3d34f73",
+   "size": 205015
   },
   {
    "id": "org.kizamubeam.jigsaw",
@@ -114,11 +114,11 @@
     "js"
    ],
    "pluginApi": 1,
-   "codeSize": 6127,
+   "codeSize": 6149,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/jigsaw",
    "file": "org.kizamubeam.jigsaw.kzp",
-   "sha256": "01651036b3b1de4550809a1093974eb177b037a51ddf5da7eca304417b2a6155",
-   "size": 14038
+   "sha256": "541f0e9643c6a14364a575e7d59744dce0e78ca3884727a4296dbd5b37a97216",
+   "size": 14060
   },
   {
    "id": "org.kizamubeam.ruler",
@@ -146,11 +146,11 @@
     "js"
    ],
    "pluginApi": 1,
-   "codeSize": 7419,
+   "codeSize": 7441,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/ruler",
    "file": "org.kizamubeam.ruler.kzp",
-   "sha256": "8b97ce47e0d1922557a534168790b85fb2a3871389544a1cddc6ab86eb306722",
-   "size": 21266
+   "sha256": "557cd81811f1109e168237539690ac5d079e809076d15d9cbba5a6befaffce26",
+   "size": 21288
   }
  ]
 }
