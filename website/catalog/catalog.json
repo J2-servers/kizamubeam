@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T15:27:14.863Z",
+ "generated": "2026-11-17T15:46:58.040Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -218,7 +218,7 @@
   },
   {
    "id": "org.kizamubeam.street-map",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "name": {
     "en": "Street map",
     "de": "Stadtplan",
@@ -240,15 +240,17 @@
     "js"
    ],
    "pluginApi": 1,
-   "codeSize": 7824,
+   "codeSize": 8079,
    "network": [
     "nominatim.openstreetmap.org",
-    "overpass-api.de"
+    "overpass-api.de",
+    "overpass.private.coffee",
+    "ovp.dresel.systems"
    ],
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/street-map",
    "file": "org.kizamubeam.street-map.kzp",
-   "sha256": "0b8b278e736334a233e8bc391bbbab169a7a035e2ccf6b963ba674adbbdd50f7",
-   "size": 18614
+   "sha256": "0f86d0ce13aa46f84818375ce11cd0b28572337947fe50f8ddeecefacc65100d",
+   "size": 20593
   }
  ]
 }
