@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T01:57:27.276Z",
+ "generated": "2026-11-17T02:04:08.080Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -21,9 +21,40 @@
    "templates": 1,
    "materials": 2,
    "assets": 3,
+   "plugins": 0,
    "file": "org.kizamubeam.example.kzp",
    "sha256": "3dfb647e2fb6c1070e9933994c5119a228204f9199e8b2f960f06661b999e900",
    "size": 5031
+  },
+  {
+   "id": "org.kizamubeam.hole-plate",
+   "version": "1.0.0",
+   "name": {
+    "en": "Hole plate (example plugin)",
+    "de": "Lochplatte (Beispiel-Plugin)",
+    "it": "Piastra forata (plugin di esempio)"
+   },
+   "description": {
+    "en": "Example of a generator plugin in Rust/WebAssembly: a plate with a square or hexagonal pattern of holes.",
+    "de": "Beispiel für ein Generator-Plugin in Rust/WebAssembly: eine Platte mit quadratischem oder sechseckigem Lochmuster.",
+    "it": "Esempio di plugin generatore in Rust/WebAssembly: una piastra con uno schema di fori quadrato o esagonale."
+   },
+   "author": "KizamuBeam",
+   "homepage": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
+   "devices": 0,
+   "templates": 0,
+   "materials": 0,
+   "assets": 0,
+   "plugins": 1,
+   "runtimes": [
+    "wasm"
+   ],
+   "pluginApi": 1,
+   "codeSize": 139522,
+   "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
+   "file": "org.kizamubeam.hole-plate.kzp",
+   "sha256": "9f85eb7b2a1c9a8d434c2c035d6f8607ad9cffe91a5ed297266f999ce35729a3",
+   "size": 191611
   }
  ]
 }
