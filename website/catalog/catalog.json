@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T10:21:37.526Z",
+ "generated": "2026-11-17T10:52:14.620Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -82,11 +82,11 @@
     "wasm"
    ],
    "pluginApi": 1,
-   "codeSize": 149931,
+   "codeSize": 150127,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
    "file": "org.kizamubeam.hole-plate.kzp",
-   "sha256": "45eb024e4048d20c1713f7a187fe09c90a863f9e9745e4ad58fbec0eb02d803b",
-   "size": 205487
+   "sha256": "c1cc32eee3cdbacc53ca5e9c68d4f390a0a8ef402c10b4f7fafa08a86665d2ea",
+   "size": 205751
   },
   {
    "id": "org.kizamubeam.jigsaw",
@@ -117,7 +117,7 @@
    "codeSize": 6149,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/jigsaw",
    "file": "org.kizamubeam.jigsaw.kzp",
-   "sha256": "cc1b3b4b6113aa5bf179b452b20b628f2ec5552edf28eaf946a003ee07ee6b02",
+   "sha256": "9b8e26598c3471d4b6cb5ae94006a7bb469a4d2283ea974df704f2a039c919bb",
    "size": 14060
   },
   {
@@ -213,7 +213,7 @@
    "codeSize": 3350,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/stencil-bridges",
    "file": "org.kizamubeam.stencil-bridges.kzp",
-   "sha256": "5c78d59fa47d298c535fae3cfe80f018961c09276b8df9c6377c69200fbee63e",
+   "sha256": "5cf311a3c066fa90931c8f4fe223ddf9c9fede69d85163b1740aca78a6611483",
    "size": 12980
   },
   {
