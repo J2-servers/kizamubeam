@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T07:17:01.219Z",
+ "generated": "2026-11-17T07:21:42.634Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -151,6 +151,40 @@
    "file": "org.kizamubeam.ruler.kzp",
    "sha256": "a6f6715ba1bb4e9213cee739f6a9d51f42b34d2a0cd4ef78970e178f26c20c57",
    "size": 21288
+  },
+  {
+   "id": "org.kizamubeam.stencil-bridges",
+   "version": "1.0.0",
+   "name": {
+    "en": "Stencil bridges",
+    "de": "Schablonenstege",
+    "it": "Ponti per stencil",
+    "es": "Puentes para plantillas",
+    "pt-BR": "Pontes para estêncil"
+   },
+   "description": {
+    "en": "Bridges for the inner parts of letters and shapes, so they do not fall out of a stencil.",
+    "de": "Stege für die Innenteile von Buchstaben und Formen, damit sie nicht aus der Schablone fallen.",
+    "it": "Ponti per le parti interne di lettere e forme, così non cadono dallo stencil.",
+    "es": "Puentes para las partes interiores de letras y formas, para que no se caigan de la plantilla.",
+    "pt-BR": "Pontes para as partes internas de letras e formas, para que não caiam do estêncil."
+   },
+   "author": "KizamuBeam",
+   "homepage": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/stencil-bridges",
+   "devices": 0,
+   "templates": 0,
+   "materials": 0,
+   "assets": 0,
+   "plugins": 1,
+   "runtimes": [
+    "js"
+   ],
+   "pluginApi": 1,
+   "codeSize": 3350,
+   "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/stencil-bridges",
+   "file": "org.kizamubeam.stencil-bridges.kzp",
+   "sha256": "d9b5c8a2434230bbdb9597325788709130cd3e8c7163fc58c8034244cb5d362f",
+   "size": 12980
   }
  ]
 }
