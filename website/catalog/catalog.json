@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T02:04:08.080Z",
+ "generated": "2026-11-17T02:08:39.345Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -50,11 +50,11 @@
     "wasm"
    ],
    "pluginApi": 1,
-   "codeSize": 139522,
+   "codeSize": 139517,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
    "file": "org.kizamubeam.hole-plate.kzp",
-   "sha256": "9f85eb7b2a1c9a8d434c2c035d6f8607ad9cffe91a5ed297266f999ce35729a3",
-   "size": 191611
+   "sha256": "6398509a9566f765ef0ecdeb8f6ad00c9b14e76cf32baee0831b6d6388239387",
+   "size": 191603
   }
  ]
 }
