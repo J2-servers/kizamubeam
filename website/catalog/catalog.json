@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T02:42:24.579Z",
+ "generated": "2026-11-17T03:14:11.568Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -55,7 +55,7 @@
    "codeSize": 5622,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/game-board",
    "file": "org.kizamubeam.game-board.kzp",
-   "sha256": "81c75d534f9599565ca61dd78a3b84d2b7f5fca2ef9f2be893221a59f1874133",
+   "sha256": "ef22581c8175ee02a830b457f1b36cb1ea989f0f7fbdfb60cfb5b16873c7beea",
    "size": 14468
   },
   {
@@ -82,11 +82,11 @@
     "wasm"
    ],
    "pluginApi": 1,
-   "codeSize": 140448,
+   "codeSize": 145100,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
    "file": "org.kizamubeam.hole-plate.kzp",
-   "sha256": "902be65731330822648701654aea53a002e3d3b13450adcd9955f8cb1d0e76ff",
-   "size": 192843
+   "sha256": "a0b79bf327fcbc297623d0bfc939ecb9f03da3e0d1d38fb68360771164d8973c",
+   "size": 199047
   },
   {
    "id": "org.kizamubeam.jigsaw",
@@ -117,7 +117,7 @@
    "codeSize": 6127,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/jigsaw",
    "file": "org.kizamubeam.jigsaw.kzp",
-   "sha256": "d4e05a3ace2fe0b58b8f85e71fed5f9854c6ecbeabb729e3fec2580185e3f2ff",
+   "sha256": "df05c41da4ca82e9a2d0ec9d86c84f7e49ff986a0dfb967b88a4e7ca0c89c721",
    "size": 14038
   },
   {
@@ -149,7 +149,7 @@
    "codeSize": 7419,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/ruler",
    "file": "org.kizamubeam.ruler.kzp",
-   "sha256": "b91cf0c8cd48b8946f1bd02822139a7585a891686e4efd35fcc687ed8eb13697",
+   "sha256": "02c2a3e373999fc972f949bd9ea64616c82f27d6e411e26f28e8a0cf9bd0e544",
    "size": 21266
   }
  ]
