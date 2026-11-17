@@ -1,7 +1,7 @@
 {
  "format": "kizamubeam-catalog",
  "version": 1,
- "generated": "2026-11-17T07:12:19.101Z",
+ "generated": "2026-11-17T07:17:01.219Z",
  "packs": [
   {
    "id": "org.kizamubeam.example",
@@ -55,7 +55,7 @@
    "codeSize": 5644,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/game-board",
    "file": "org.kizamubeam.game-board.kzp",
-   "sha256": "f98365e7618ac2dff1ecae61ed01ba83a2ccaa505f2032abb0081f716b5f112c",
+   "sha256": "1c003a50640588a1441620e565e82d80a7b270609ce08c4ef4e37fce559be50e",
    "size": 14490
   },
   {
@@ -85,7 +85,7 @@
    "codeSize": 149931,
    "source": "https://github.com/KizamuBeam/kizamubeam/tree/main/plugins/hole-plate",
    "file": "org.kizamubeam.hole-plate.kzp",
-   "sha256": "ab447e7e3dc108df8e2fad0517c86176fb757d818ddefba9bd10a414d66f013f",
+   "sha256": "0128cc67a44f29c56d9d43ad4deab54c1e89dec10d05d5e98e7012f187671dcd",
    "size": 205487
   },
   {
