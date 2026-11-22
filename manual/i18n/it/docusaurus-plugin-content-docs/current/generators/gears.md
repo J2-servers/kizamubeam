@@ -19,6 +19,8 @@ I generatori di ingranaggi creano veri denti a evolvente, generati come li tagli
 | **Kerf** | Larghezza del taglio laser; il contorno viene spostato verso l’esterno della metà, l’alesaggio verso l’interno. |
 | **Alesaggio** | Nessuno, **Arrotondato**, **Albero a D (piatto)** con la misura sul piatto, oppure **Con cava per linguetta** con larghezza e profondità della cava. |
 
+![Finestra di creazione dell’ingranaggio: 24 denti, modulo 2, angolo di pressione 20°, gioco, kerf e un alesaggio con cava per linguetta; l’anteprima mostra l’ingranaggio e, sotto, le circonferenze primitiva, di testa, di piede e di base](/img/gear-dialog-en.webp)
+
 In **Avanzate**:
 
 - **Spostamento del profilo x**: i valori positivi rinforzano il piede dei denti ed evitano il sottotaglio sugli ingranaggi piccoli; la distanza tra gli assi cambia di x × modulo.
@@ -29,6 +31,8 @@ Gioco e kerf sono separati di proposito: il gioco crea spazio tra i denti di due
 ## Coppia di ingranaggi
 
 **Coppia di ingranaggi** crea due ingranaggi abbinati alla giusta distanza tra gli assi, come un unico assieme. Nella [vista 3D](../features/construction-3d.md#3d-view) ingranano e possono girare.
+
+![Coppia di ingranaggi con 16 e 40 denti e una piastra di base con due fori per gli assi sulla pagina; nella vista 3D i due ingranaggi ingranano sulla piastra](/img/gear-pair-3d-en.webp)
 
 | Campo | Significato |
 |---|---|
@@ -42,6 +46,8 @@ Gioco e kerf sono separati di proposito: il gioco crea spazio tra i denti di due
 ## Cremagliera
 
 Una **Cremagliera** è un ingranaggio dritto che ingrana con un ingranaggio cilindrico: la rotazione diventa un moto lineare.
+
+![Finestra di creazione della cremagliera: 16 denti, modulo 2, angolo di pressione 20°, gioco, kerf e un’altezza del dorso di 8 mm; sotto l’anteprima la lunghezza di 100,68 mm, il passo e la posizione della linea primitiva](/img/rack-dialog-en.webp)
 
 | Campo | Significato |
 |---|---|

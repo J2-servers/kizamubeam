@@ -14,6 +14,8 @@ Extension packs (`.kzp` files) add **device presets, templates, material library
 2. Either pick a pack from the **official catalogue** and install it with one click, or click **Install …** and choose a `.kzp` file. You can also drag a `.kzp` file onto the workspace.
 3. The dialog lists what the pack contains and whether it is an update. Confirm to install.
 
+![Install extension dialog for the Example pack 1.1.0: it lists a device preset, a template and two materials, and notes that the file is not signed](/img/extension-install-en.webp)
+
 After installing:
 
 - templates appear under **File → New from template … → From extensions**,
@@ -22,6 +24,8 @@ After installing:
 - motifs and design elements appear in the library.
 
 Removing a pack in the same window removes its entries again.
+
+![Extensions window: under Installed the Example pack with the buttons Switch off and Remove, below it the offline option and the catalogue with its verified signature and an Install button for each pack](/img/extensions-window-en.webp)
 
 ## Safety
 

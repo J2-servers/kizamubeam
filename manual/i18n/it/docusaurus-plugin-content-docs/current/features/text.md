@@ -12,6 +12,8 @@ Scegli lo strumento **Testo** (Ctrl+T) e fai clic sull’area di lavoro per iniz
 
 La **barra del testo** sotto la barra delle modifiche numeriche contiene tutte le opzioni del testo: font, altezza, grassetto, corsivo, maiuscolo, spaziatura tra lettere e righe, allineamento, larghezza e altezza massime, unione, testo su percorso e testo variabile.
 
+![Un’insegna con un titolo e una casella di testo con ritorno a capo; la casella è selezionata e la barra del testo mostra il font, un’altezza di 11 mm, l’allineamento centrato, l’interlinea, una larghezza massima di 240 mm e il pulsante A capo attivo](/img/text-toolbar-en.webp)
+
 | Opzione | Effetto |
 |---|---|
 | **Unisci** | Fonde le lettere sovrapposte in un unico contorno, per font corsivi o spaziatura stretta. |
@@ -36,6 +38,8 @@ Se un progetto usa un font che manca su questo computer, KizamuBeam propone di s
 
 Seleziona un testo e una forma, poi scegli **Strumenti → Funzioni testo → Applica percorso al testo** (o **Sul percorso** nella barra del testo). Il testo segue la linea, la curva, il rettangolo, l’ellisse o il poligono. Nella barra del testo imposti lo scostamento lungo la curva, la distanza dalla curva e il lato su cui sta il testo.
 
+![Testo su percorso: una scritta segue un cerchio dentro un distintivo rotondo, un secondo testo segue una linea ondulata; le due forme guida sono sul livello strumento T1 e, per il testo selezionato, la barra del testo mostra lo scostamento, la distanza, il cambio di lato e la rimozione del percorso](/img/text-on-path-en.webp)
+
 Testo e forma restano collegati: se modifichi o sposti la forma, il testo la segue. Anche la forma viene lavorata, a meno che non si trovi su un livello strumento (T1/T2) o sia nascosta. **Strumenti → Funzioni testo → Rimuovi percorso dal testo** li separa di nuovo.
 
 ## Testo variabile e numeri di serie
@@ -50,7 +54,17 @@ Il testo variabile compila dei segnaposto quando viene creato il lavoro, per num
 
 La finestra **Testo variabile** (**Strumenti → Funzioni testo → Testo variabile …**) imposta il numero corrente, inizio, fine, passo e se avanza automaticamente dopo ogni lavoro o file G-code salvato. Il numero è anche la riga del file CSV. Ogni oggetto può avere un proprio scostamento, così una pagina può contenere più numeri consecutivi.
 
+![Finestra Testo variabile con il numero corrente 42, inizio, fine, passo 4 e avanzamento automatico; l’elenco sotto mostra come i segnaposto di questa pagina diventano Serial no. da 0042 a 0045 e la data, come sulle quattro targhette sull’area di lavoro](/img/variable-text-en.webp)
+
 **Consolida testo variabile** trasforma il contenuto attuale in testo fisso.
+
+### Prova di lotto
+
+Prima che parta una serie, la **Prova di lotto** (Cassetta degli attrezzi, **Strumenti → Funzioni testo → Prova di lotto …** o il pulsante nella finestra **Testo variabile**) mostra ogni pezzo singolarmente: il suo numero, il pezzo disegnato come verrebbe inciso, il contenuto inserito e che cosa non va.
+
+Vengono segnalati un campo vuoto, una riga o una colonna che il file CSV non ha, un’istruzione del cliente rimasta nel nome, emoji e caratteri invisibili, caratteri che il carattere tipografico scelto non ha e lo stesso pezzo due volte. **Mostra** porta quel numero sull’area di lavoro. L’intervallo si imposta con **Da** e **a**; **Solo i pezzi con problemi** nasconde il resto. Prima dell’avvio di un lavoro, lo stesso controllo viene eseguito per i numeri che quel lavoro consuma, insieme al controllo della costruzione — anche salvare un file G-code o `.rd` conta come avvio, perché consuma numeri. **Impostazioni → Laser → Controlla prima dell’incisione e chiedi conferma se ci sono problemi** disattiva entrambi.
+
+![Finestra Prova di lotto per targhette da un file CSV, con i cinque pezzi con problemi su sette: ogni riga mostra il numero, il nome e il numero d’ordine disegnati come contorni, come verrebbero incisi, il contenuto inserito e i rilievi — un campo vuoto al numero 2, un’istruzione del cliente al 3, un emoji al 4, caratteri mancanti nel carattere tipografico al 5 e lo stesso contenuto due volte al 6](/img/batch-proof-it.webp)
 
 Per un’intera serie di pagine da una tabella vedi [Modelli e libreria](templates-library.md#series-from-a-table).
 
@@ -64,8 +78,12 @@ Apri **Codice QR** nella Casella degli strumenti (o cercalo lì). Un doppio clic
 
 Scegli la correzione degli errori (L, M, Q, H) e la dimensione in mm. **Immagine negativa** lavora lo sfondo inclusa la zona di rispetto, per materiali scuri. I moduli vengono fusi in contorni chiusi, quindi metti il codice su un livello **Riempimento** per inciderlo. Un doppio clic su un codice QR lo modifica.
 
+![Finestra di creazione del codice QR: tipo testo / indirizzo web con un indirizzo web come contenuto, correzione degli errori M, dimensione di 30 mm, le opzioni per l’immagine negativa e il testo variabile e l’anteprima del codice](/img/qr-code-dialog-en.webp)
+
 ## Codici a barre
 
 **Casella degli strumenti → Testo e dati → Codice a barre** crea codici Code 128, EAN-13, EAN-8, UPC-A, Code 39 e ITF, con cifra di controllo dove il formato la prevede. Imposta larghezza e altezza delle barre, mostra il testo leggibile sotto le barre e riduci la larghezza delle barre per compensare la larghezza del raggio. **Immagine negativa** lavora gli spazi invece delle barre. La finestra avvisa quando le barre diventano troppo sottili per il laser.
+
+![Finestra di creazione del codice a barre: tipo Code 128 con il contenuto SN-2026-0042, larghezza 40 mm, altezza 15 mm, testo leggibile sotto le barre, riduzione della larghezza delle barre e le opzioni per l’immagine negativa e il testo variabile; l’anteprima mostra il codice, con moduli di 0,256 mm](/img/barcode-dialog-en.webp)
 
 Anche codici QR e codici a barre accettano testo variabile e parametri del progetto, per esempio un numero di serie come Code 128.

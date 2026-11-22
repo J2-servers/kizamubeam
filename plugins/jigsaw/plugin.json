@@ -21,7 +21,7 @@
       "kind": "assembly",
       "runtime": "js",
       "code": "@dist/jigsaw.js",
-      "icon": "grid",
+      "icon": "jigsaw",
       "dialog": { "version": 1 },
       "preview": { "center": true },
       "params": [

@@ -10,6 +10,8 @@ description: Arrange windows and toolbars, change language and theme, and move y
 
 **Edit → Settings …** holds all application-wide preferences in one window, with a sidebar (General, Appearance, Workspace and snapping, Mouse and keyboard, Machines and services, Extensions and fonts) and a search across all of them. Changes take effect with **OK**; **Cancel** discards them, and **Defaults** resets the current section.
 
+![Settings window with the search field, the sidebar of sections and the Appearance section: theme and four text size sliders](/img/settings-window-en.webp)
+
 Settings that also have a menu entry (language, theme, snapping, grid and so on) are the same values: changing one place changes the other.
 
 ## Language and theme
@@ -28,11 +30,15 @@ The tool windows (Cuts / Layers, Objects, Laser, Move, Console, Material, Camera
 - Drag it onto the left edge, next to the tools toolbar, to dock it on the left.
 - Drag it onto the workspace to make it a floating window. ⇥ or a double-click on its header docks it again.
 
+![Rearranged tool windows: Objects and History docked on the left, Cuts / Layers and Material as tabs on the right above the Laser window, and the Move window floating over the workspace](/img/window-layout-en.webp)
+
 The dividers between windows can be dragged. ▾ or a double-click on a header collapses a group, × on a tab hides the window. The **Window** menu shows and hides all windows and bars.
 
 ## Toolbars
 
 Open **Window → Toolbars**, or right-click a toolbar shell, to customize the existing toolbars: add or remove available items, reorder them, insert separators and choose the icon size. The Numeric Edits and Text toolbars also use this layout system; their fields still edit the same feature values.
+
+![Customize Toolbars dialog: toolbar choice, icon size, rows and columns, the list of available actions on the left and the entries of the main toolbar on the right](/img/customize-toolbars-en.webp)
 
 Drag a toolbar's grip to move it, dock it at any of the four edges or float it inside the app. The edge determines its orientation: horizontal at the top/bottom, vertical at the sides. Floating bars keep their last orientation. Drop near a row boundary to insert a new row between existing rows. Adjust the number of rows or columns inside a bar in the customizer; content that does not fit scrolls internally. Other bars and the workspace settle over 150 ms, unless reduced motion is enabled.
 

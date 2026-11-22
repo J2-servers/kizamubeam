@@ -12,6 +12,8 @@ Tutto ciò che disegni in KizamuBeam è una forma vettoriale modificabile. Quest
 
 Gli strumenti di disegno si trovano nella barra Strumenti a sinistra e nel menu **Strumenti**.
 
+![Area di lavoro con un rettangolo, un’ellisse, una stella, un’onda a mano libera e il contorno di una casa che viene disegnato con lo strumento Linee e curve, attivo nella barra Strumenti](/img/drawing-tools-en.webp)
+
 | Strumento | Scorciatoia | Come si usa |
 |---|---|---|
 | **Disegna linee** | Ctrl+L | Fai clic per gli angoli; fai clic e trascina per una curva di Bézier. Un clic sul punto iniziale chiude la forma; doppio clic, Invio o clic destro termina. |
@@ -56,6 +58,8 @@ La **barra delle modifiche numeriche** in alto mostra posizione, dimensioni e ro
 ## Modificare i nodi
 
 Scegli **Modifica nodi** (Ctrl+`) per cambiare la forma dei percorsi. Con più percorsi o forme selezionati, i nodi di tutti si modificano insieme.
+
+![Modifica nodi su una forma a cuore: quattro nodi con le maniglie delle curve, un nodo selezionato, e in alto nella barra i pulsanti Linea, Curva, Angolo, Liscio ed Elimina](/img/node-editing-en.webp)
 
 | Azione | Come |
 |---|---|

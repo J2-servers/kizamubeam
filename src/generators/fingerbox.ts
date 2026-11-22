@@ -131,7 +131,7 @@ export function fingerboxPoses(raw: Params): AsmPoses | null {
 }
 
 export const FINGERBOX: Generator = {
-  id: 'box-divided', version: 3, kind: 'assembly', icon: 'box',
+  id: 'box-divided', version: 3, kind: 'assembly', icon: 'boxDivided',
   preview: { center: true },
   onChange(key, old, p) {
     // Changing the compartment count keeps the user's ratios: cut or extended with 1, asking before values are dropped

@@ -31,6 +31,8 @@ Mehr dazu unter [Passung kalibrieren](../features/materials-tests.md#calibrate-f
 5. Mit kalibriertem Material übernimmt der Dialog Schnittfuge und Spiel schon. Sonst trägst du sie selbst ein.
 6. Klicke auf **Erstellen**.
 
+![Dialog Box erstellen mit den Werten dieses Tutorials: Außenmaß, Breite 100, Tiefe 80, Höhe 50, Materialdicke 2,9 mm und Geschlossen (Deckel mit Zinken); die Vorschau zeigt die sechs Platten](/img/finger-box-dialog-de.webp)
+
 Die sechs Wände erscheinen kompakt angeordnet auf der Seite. Sie sind ein parametrisches Teil: Ein Doppelklick auf eine beliebige Wand ändert später die Größe.
 
 ## 3. Den Namen auf den Deckel gravieren
@@ -40,6 +42,8 @@ Die sechs Wände erscheinen kompakt angeordnet auf der Seite. Sie sind ein param
 3. Leg den Text auf einen eigenen Layer: Klicke eine andere Farbe in der Palette an und stelle diesen Layer im Layer-Fenster auf **Füllen**.
 4. Wähle Text und Deckel aus und zentriere sie mit **C** und **E** aufeinander.
 5. Gruppiere den Text mit dem Deckel (Ctrl+G), damit er mitwandert, wenn die Box neu angeordnet wird.
+
+![Die sechs Platten der Box auf der Seite; der Name Emma sitzt mitten auf dem Deckel, auf einem eigenen Layer Gravur mit dem Modus Füllen, der im Layer-Fenster vor dem Layer Schnitt steht](/img/finger-box-name-on-lid-de.webp)
 
 ## 4. Die Box in 3D prüfen
 

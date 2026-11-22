@@ -85,13 +85,13 @@ function clean(paths: ClipperLib.Paths): ClipperLib.Paths {
   return out;
 }
 
-/** Fläche um d mm wachsen (d > 0) oder schrumpfen lassen, runde Ecken */
-export function grow(polys: Poly[], d: number): Poly[] {
+/** Fläche um d mm wachsen (d > 0) oder schrumpfen lassen; runde Ecken, mit `miter` spitze (Rechteck bleibt Rechteck) */
+export function grow(polys: Poly[], d: number, miter = false): Poly[] {
   const paths = clean(toPaths(polys));
   if (!paths.length) return [];
   if (Math.abs(d) < 1e-6) return fromPaths(paths);
   const co = new ClipperOffset(2, 0.02 * SCALE);
-  co.AddPaths(paths, JoinType.jtRound, EndType.etClosedPolygon);
+  co.AddPaths(paths, miter ? JoinType.jtMiter : JoinType.jtRound, EndType.etClosedPolygon);
   const out: ClipperLib.Paths = [];
   co.Execute(out, d * SCALE);
   return fromPaths(out);
@@ -100,6 +100,52 @@ export function grow(polys: Poly[], d: number): Poly[] {
 /** Flächeninhalt nach Gerade-Ungerade (mm²) */
 export function regionArea(polys: Poly[]): number {
   return clean(toPaths(polys)).reduce((s, p) => s + ClipperLib.Clipper.Area(p), 0) / (SCALE * SCALE);
+}
+
+export interface LeftoverOptions {
+  /** Was um jedes belegte Teil herum verloren geht: halber Teileabstand, mindestens die halbe Schnittbreite (mm) */
+  grow: number;
+  /** Kleinstes noch brauchbares Reststück: Schmaleres als diese Breite fällt weg, und Stücke unter
+   *  der Fläche eines Quadrats dieser Breite auch (mm; 0 = nichts wegwerfen) */
+  minWidth: number;
+}
+
+/**
+ * Was von der Platte übrig bleibt: die Plattenfläche ohne die belegten Teile (jedes um `grow` mm gewachsen).
+ * Schmale Zungen fallen weg — erst schrumpfen, dann wieder wachsen (morphologisches Öffnen) mit spitzen Ecken,
+ * damit aus einem Rechteck wieder ein Rechteck wird. Zu kleine Stücke fallen ganz weg; Löcher darin bleiben,
+ * auch wenn sie klein sind. So ist das Ergebnis immer KLEINER als die Wirklichkeit, nie größer: Wer später
+ * darauf verschachtelt, wird nicht enttäuscht.
+ */
+export function leftover(area: Poly[], used: Poly[][], o: LeftoverOptions): Poly[] {
+  const sheet = clean(toPaths(area));
+  if (!sheet.length) return [];
+  const belegt: ClipperLib.Paths = [];
+  for (const u of used) belegt.push(...toPaths(o.grow > 0 ? grow(u, o.grow) : u));
+  let rest = sheet;
+  if (belegt.length) {
+    const c = new Clipper();
+    c.AddPaths(sheet, PolyType.ptSubject, true);
+    c.AddPaths(belegt, PolyType.ptClip, true);
+    rest = [];
+    c.Execute(ClipType.ctDifference, rest, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
+  }
+  if (!rest.length) return [];
+  const w = Math.max(0, o.minWidth);
+  if (w > 0) {
+    const eng = grow(fromPaths(rest), -w / 2, true);
+    if (!eng.length) return [];
+    rest = clean(toPaths(grow(eng, w / 2, true)));
+    if (!rest.length) return [];
+  }
+  // Zu kleine Stücke weg — aber nur ganze Stücke (Außenkonturen). Ein Loch bleibt immer, sonst würde
+  // das Reststück größer gemeldet, als es ist.
+  const minA = w * w * SCALE * SCALE;
+  const außen = rest.filter((p) => Clipper.Orientation(p));
+  const löcher = rest.filter((p) => !Clipper.Orientation(p));
+  const bleibt = minA > 0 ? außen.filter((p) => Math.abs(Clipper.Area(p)) >= minA) : außen;
+  const innen = löcher.filter((h) => h.length && bleibt.some((p) => Clipper.PointInPolygon(h[0], p) !== 0));
+  return fromPaths([...bleibt, ...innen]);
 }
 
 /**
@@ -167,8 +213,13 @@ interface PartPrep {
 /** Belegung einer Platte */
 class Grid {
   occ: Uint8Array;
-  /** Je Zelle: Spalte der letzten belegten Zelle bis hierher in derselben Zeile (−1 = keine) */
-  prev: Int32Array;
+  /**
+   * Je Zelle: Spalte der letzten belegten Zelle bis hierher in derselben Zeile, um EINS erhöht (0 = keine).
+   * Die Verschiebung um eins spart das Vorzeichen: So reichen 2 Byte statt 4, und die Grade kostet 3 Byte
+   * je Zelle statt 5 — bei gleichem Speicher passen also 1,7-mal so viele Zellen hinein, und feinere Zellen
+   * sind genau das, was den Abstand zwischen den Teilen genauer macht.
+   */
+  prev: Uint16Array | Int32Array;
   free: number;
   usable: number;
   covered = 0;
@@ -176,16 +227,17 @@ class Grid {
   memo = new Map<string, number>();
   constructor(readonly W: number, readonly H: number, src?: Grid) {
     this.occ = src ? src.occ.slice() : new Uint8Array(W * H);
-    this.prev = src ? src.prev.slice() : new Int32Array(W * H);
+    // Uint16 trägt Spalten bis 65534 (die Platte müsste über 65 Meter breit sein, um das zu sprengen)
+    this.prev = src ? src.prev.slice() : W < 65535 ? new Uint16Array(W * H) : new Int32Array(W * H);
     this.free = src ? src.free : 0;
     this.usable = src ? src.usable : 0;
   }
   refreshRow(j: number) {
     const W = this.W,
       base = j * W;
-    let last = -1;
+    let last = 0;
     for (let i = 0; i < W; i++) {
-      if (this.occ[base + i]) last = i;
+      if (this.occ[base + i]) last = i + 1;
       this.prev[base + i] = last;
     }
   }
@@ -221,7 +273,7 @@ class Grid {
           const row = r.rows[rr];
           const base = (py + rr) * W + px;
           for (let s = 0; s < row.length; s += 2) {
-            const q = prev[base + row[s + 1]];
+            const q = prev[base + row[s + 1]] - 1;
             if (q >= px + row[s]) {
               hit = q - row[s] + 1;
               hot = rr;

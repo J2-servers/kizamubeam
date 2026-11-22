@@ -2,6 +2,7 @@
 import { Editor } from './editor';
 import { check, numField, select } from './arrayDialogs';
 import { h } from './dom';
+import { optionPicture } from './optionArt';
 import { computeHinge, DEFAULT_HINGE, HINGE_KINDS, HingeKind, HingeOptions, suggestHinge } from './hinges';
 import { library } from './materials';
 import { dec, t } from './i18n';
@@ -87,9 +88,11 @@ export function openHingeDialog(ed: Editor) {
     },
   }, t('Werte vorschlagen'));
 
+  const kindSel = select('hinge-kind', st.kind, HINGE_KINDS, (v) => (st.kind = v));
   const body = [
     h('label', { for: 'hinge-kind' }, t('Muster')),
-    select('hinge-kind', st.kind, HINGE_KINDS, (v) => (st.kind = v)),
+    kindSel,
+    optionPicture(kindSel, 'hinge'),
     h('label', { for: 'hinge-thickness' }, t('Materialdicke (mm)')),
     h('span', { class: 'hinge-inline' }, num('thickness', t('Nur für „Werte vorschlagen“')), suggest),
     ...when(is('straight', 'wave', 'diamond', 'honeycomb', 'triangle', 'cross'),

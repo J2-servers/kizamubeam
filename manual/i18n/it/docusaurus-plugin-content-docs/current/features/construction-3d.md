@@ -17,6 +17,8 @@ Lo strumento **Giunzione** (il pulsante Giunzione nella barra Strumenti, o **Cas
 3. Fai clic sul secondo bordo rettilineo. Riceve la controparte o le asole. Se il secondo “bordo” è una singola linea disegnata, la linea viene sostituita dalle asole: così metti una mortasa in mezzo a un pannello.
 4. Imposta le opzioni nella finestra e conferma.
 
+![Strumento Giunzione: due bordi di due pannelli sono contrassegnati con 1 e 2, la finestra è impostata su incastro a pettine con spessore, larghezza dei denti, kerf e gioco, e l’anteprima arancione mostra i denti](/img/joint-tool-dialog-en.webp)
+
 Il risultato resta un percorso normale e modificabile. La giunzione ricorda lo spessore del materiale, così [Ridimensiona asole](#resize-slots-to-the-material) può aggiornarla in seguito.
 
 | Tipo | Uso |
@@ -44,6 +46,8 @@ Entrambi i pannelli ricevono delle asole, e accanto vengono creati gli anelli co
 ## Cerniere viventi {#living-hinges}
 
 **Casella degli strumenti → Giunzioni e piegatura → Cerniera vivente** riempie una forma chiusa selezionata con un motivo di tagli, così il pannello si piega in quel punto. Motivi: tagli dritti, onde, rombi, nido d’ape, triangoli, intreccio e spirale. La finestra mostra un’anteprima dal vivo e parte da valori adatti allo spessore del materiale. I tagli sono linee esatte e curve di Bézier.
+
+![Finestra Cerniera vivente con motivo, lunghezza dei tagli, larghezza dei ponti, interlinea e margine; la striscia al centro di una copertina mostra l’anteprima dei tagli](/img/living-hinge-dialog-en.webp)
 
 Metti l’area della cerniera sul livello di taglio del pezzo. Compensato e MDF si piegano meglio perpendicolarmente alla venatura dello strato esterno; prova prima su un ritaglio.
 
@@ -77,6 +81,8 @@ Puoi preparare più tagli su bordi diversi prima di applicarli. **Applica** è u
 - Le altre forme chiuse sui livelli di taglio stanno in piano con uno spessore regolabile; le forme annidate diventano fori.
 - I modelli a strati, a nervature e a dischi da [modelli 3D](../generators/index.md) vengono mostrati montati.
 
+![Finestra Vista 3D accanto ai pezzi piani di una scatola a incastri: la scatola è mostrata montata, con le incisioni sulla parete anteriore e laterale](/img/view3d-assembly-en.webp)
+
 Ruota la vista con il mouse o usa le viste predefinite (3D, dall’alto, frontale). Il cursore **Esplodi** allontana i pezzi tra loro. Senza selezione la vista mostra tutta la pagina; un pezzo selezionato porta sempre con sé il suo intero assieme.
 
 **Collisioni**: dove due pezzi si compenetrano (per esempio con un accoppiamento forzato o un’asola troppo stretta) l’area diventa rossa, e la riga di stato indica i pezzi e il volume.
@@ -96,6 +102,8 @@ Spunta **Mockup** nella finestra 3D per nascondere la griglia e i segni rossi de
 ## Controllare il progetto prima del taglio {#check-the-design-before-cutting}
 
 **Laser → Controlla progetto** (o **Finestra → Controllo del progetto**) cerca problemi nella pagina corrente e segna ogni risultato sull’area di lavoro. Un clic su un risultato seleziona gli oggetti e ingrandisce il punto; dove possibile, un pulsante lo corregge in un passo di annullamento.
+
+![Finestra Controllo del progetto con un errore e cinque avvisi (fuori dall’area di lavoro, linea doppia, contorno aperto, ponte stretto, incisione senza pezzo) e i pulsanti per correggerli; ogni risultato è segnato sull’area di lavoro](/img/design-check-en.webp)
 
 Trova, tra l’altro:
 

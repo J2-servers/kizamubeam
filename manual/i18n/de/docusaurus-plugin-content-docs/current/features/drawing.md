@@ -12,6 +12,8 @@ Alles, was du in KizamuBeam zeichnest, ist eine bearbeitbare Vektorform. Diese S
 
 Die Zeichenwerkzeuge liegen in der Werkzeugleiste links und im Menü **Werkzeuge**.
 
+![Arbeitsfläche mit Rechteck, Ellipse, Stern, einer Freihand-Welle und einem Hausumriss, der gerade mit dem Werkzeug Linien zeichnen entsteht; es ist in der Werkzeugleiste aktiv](/img/drawing-tools-de.webp)
+
 | Werkzeug | Kürzel | So geht's |
 |---|---|---|
 | **Linien zeichnen** | Ctrl+L | Klicken setzt Ecken, Klicken und Ziehen erzeugt eine Bézierkurve. Ein Klick auf den Startpunkt schließt die Form; Doppelklick, Enter oder Rechtsklick beendet. |
@@ -56,6 +58,8 @@ Die **Eigenschaftenleiste** oben zeigt Position, Größe und Drehung der Auswahl
 ## Knoten bearbeiten
 
 Mit **Knoten bearbeiten** (Ctrl+`) änderst du die Form von Pfaden. Sind mehrere Pfade oder Formen ausgewählt, lassen sich die Knoten aller zusammen bearbeiten.
+
+![Knoten bearbeiten an einer Herzform: vier Knoten mit ihren Kurvengriffen, ein Knoten ausgewählt, oben in der Leiste die Schaltflächen Gerade, Kurve, Ecke, Glatt und Löschen](/img/node-editing-de.webp)
 
 | Aktion | So geht's |
 |---|---|

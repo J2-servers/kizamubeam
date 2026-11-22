@@ -1698,6 +1698,7 @@ export const EDIT_TOOLS: ToolDef[] = [
         w: num(a, 'width', { def: sheet === 'material' ? undefined : d.w, min: 1 }),
         h: num(a, 'height', { def: sheet === 'material' ? undefined : d.h, min: 1 }),
         x: num(a, 'x', { def: 0 }), y: num(a, 'y', { def: 0 }),
+        rest: bool(a, 'keep_rest', d.rest), restMin: num(a, 'rest_min', { def: d.restMin, min: 0 }),
         gap: num(a, 'gap', { def: d.gap, min: 0 }), margin: num(a, 'margin', { def: d.margin, min: 0 }),
         rotStep: num(a, 'rotation_step', { def: d.rotStep, min: 0, max: 180 }),
         corner: oneOf(a, 'corner', ['bl', 'br', 'tl', 'tr'] as const, d.corner),

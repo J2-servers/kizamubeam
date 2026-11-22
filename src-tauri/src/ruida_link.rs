@@ -52,6 +52,10 @@ pub trait RuidaTransport: Send {
 
     /// Sendet einen unverwürfelten Tastenbefehl (`A5 50/51 ...`) über den Tastenport (oder als `A7` über den Datenport).
     fn send_key(&mut self, key_cmd: &[u8], magic: u8) -> Result<(), String>;
+
+    /// Sendet einen Befehl, auf den die Steuerung mit Text antwortet (`E8 01` → `E8 01 <nr> <name> 00`), und gibt
+    /// die unverwürfelte Antwort zurück.
+    fn query_text(&mut self, plain: &[u8], magic: u8, timeout: Duration) -> Result<Vec<u8>, String>;
 }
 
 pub struct UdpTransport {
@@ -188,6 +192,40 @@ impl RuidaTransport for UdpTransport {
             self.send_cmd(&cmd, magic, QUERY_TIMEOUT)
         }
     }
+
+    fn query_text(&mut self, plain: &[u8], magic: u8, timeout: Duration) -> Result<Vec<u8>, String> {
+        self.drain_stale();
+        let pkt = packet(plain, magic);
+        let want_ack = swizzle_byte(ACK, magic);
+        let want_nak = swizzle_byte(NAK, magic);
+        let _ = self.data.set_read_timeout(Some(timeout));
+        let mut buf = [0u8; 512];
+        for _ in 0..2 {
+            self.data
+                .send(&pkt)
+                .map_err(|e| format!("UDP-Abfrage fehlgeschlagen: {e}"))?;
+            let deadline = Instant::now() + timeout;
+            while Instant::now() < deadline {
+                match self.data.recv(&mut buf) {
+                    Ok(1) if buf[0] == want_ack => continue,
+                    Ok(1) if buf[0] == want_nak => break,
+                    Ok(n) if n >= 2 => {
+                        let raw = checked_payload(&buf[..n]).unwrap_or(&buf[..n]);
+                        let reply = unswizzle(raw, magic);
+                        if reply.len() >= 2 && reply[..2] == plain[..2] {
+                            return Ok(reply);
+                        }
+                    }
+                    Ok(_) => continue,
+                    Err(e) if matches!(e.kind(), ErrorKind::WouldBlock | ErrorKind::TimedOut) => {
+                        break;
+                    }
+                    Err(e) => return Err(format!("UDP-Empfang fehlgeschlagen: {e}")),
+                }
+            }
+        }
+        Err(format!("Keine Antwort der Ruida-Steuerung auf {}.", ruida::hex(plain)))
+    }
 }
 
 pub struct SerialRuidaTransport<P: Read + Write + Send> {
@@ -272,6 +310,42 @@ impl<P: Read + Write + Send> RuidaTransport for SerialRuidaTransport<P> {
         }
         self.send_cmd(&cmd, magic, QUERY_TIMEOUT)
     }
+
+    fn query_text(&mut self, plain: &[u8], magic: u8, timeout: Duration) -> Result<Vec<u8>, String> {
+        let want_ack = swizzle_byte(ACK, magic);
+        self.port
+            .write_all(&swizzle(plain, magic))
+            .and_then(|_| self.port.flush())
+            .map_err(|e| format!("USB-Abfrage fehlgeschlagen: {e}"))?;
+        let deadline = Instant::now() + timeout;
+        let mut acc = Vec::with_capacity(32);
+        let mut buf = [0u8; 64];
+        while Instant::now() < deadline {
+            match self.port.read(&mut buf) {
+                Ok(n) if n > 0 => {
+                    for &b in &buf[..n] {
+                        if acc.is_empty() && b == want_ack {
+                            continue;
+                        }
+                        acc.push(unswizzle_byte(b, magic));
+                    }
+                    if ruida::file_name_reply_done(&acc) {
+                        return Ok(acc);
+                    }
+                }
+                Ok(_) => std::thread::sleep(Duration::from_millis(5)),
+                Err(e) if matches!(e.kind(), ErrorKind::WouldBlock | ErrorKind::TimedOut) => {
+                    std::thread::sleep(Duration::from_millis(5));
+                }
+                Err(e) => return Err(format!("USB-Lesen fehlgeschlagen: {e}")),
+            }
+        }
+        if acc.is_empty() {
+            Err(format!("Keine Antwort der Ruida-Steuerung über USB auf {}.", ruida::hex(plain)))
+        } else {
+            Err(format!("Unvollständige Antwort der Ruida-Steuerung über USB: {}", ruida::hex(&acc)))
+        }
+    }
 }
 
 pub struct RuidaStreamer<T: RuidaTransport, E: Events> {
@@ -281,6 +355,8 @@ pub struct RuidaStreamer<T: RuidaTransport, E: Events> {
     cfg: RuidaConfig,
     magic: u8,
     card_id: Option<u32>,
+    /// Die Steuerung beantwortet die Z-Position (beim Verbinden einmal geprüft); dann wird sie mitgelesen
+    z_poll: bool,
     /// Letzte bekannte Maschinenposition in KizamuBeam-Bettkoordinaten (mm, vorne links = 0,0)
     mpos: [f64; 3],
     /// Benutzer-Ursprung (Work Coordinate Offset) in Bettkoordinaten
@@ -303,20 +379,30 @@ impl<T: RuidaTransport, E: Events> RuidaStreamer<T, E> {
         };
         let mut detected_magic = candidates[0];
         let mut detected_card = None;
+        // Literal cause of the last failed query (USB or UDP), so the message says what the controller side answered
+        let mut last_err = String::from("keine gültige Karten-ID");
         for &m in &candidates {
-            if let Ok(payload) = transport.read_mem(mem::CARD_ID, m, Duration::from_millis(600)) {
-                if let Some(id) = u35(&payload) {
-                    detected_magic = m;
-                    detected_card = Some(id as u32);
-                    break;
+            match transport.read_mem(mem::CARD_ID, m, Duration::from_millis(600)) {
+                Ok(payload) => {
+                    if let Some(id) = u35(&payload) {
+                        detected_magic = m;
+                        detected_card = Some(id as u32);
+                        break;
+                    }
                 }
+                Err(e) => last_err = e,
             }
         }
+        let z_poll = detected_card.is_some()
+            && transport
+                .read_mem(mem::POS_Z, detected_magic, QUERY_TIMEOUT)
+                .ok()
+                .and_then(|b| ruida::mm(&b))
+                .is_some();
         if detected_card.is_none() {
-            return Err(
-                "Keine Antwort von der Ruida-Steuerung (Port 50200). Bitte IP-Adresse und Verbindung prüfen."
-                    .into(),
-            );
+            return Err(format!(
+                "Keine Antwort von der Ruida-Steuerung ({last_err}). USB: Kabel und Schnittstelle prüfen; Netzwerk: IP-Adresse und UDP-Port (Standard 50200) prüfen."
+            ));
         }
         Ok(Self {
             transport,
@@ -325,6 +411,7 @@ impl<T: RuidaTransport, E: Events> RuidaStreamer<T, E> {
             cfg,
             magic: detected_magic,
             card_id: detected_card,
+            z_poll,
             mpos: [0.0, 0.0, 0.0],
             wco: [0.0, 0.0, 0.0],
             state_name: "Idle",
@@ -394,6 +481,16 @@ impl<T: RuidaTransport, E: Events> RuidaStreamer<T, E> {
             self.mpos[0] = bx;
             self.mpos[1] = by;
         }
+        if self.z_poll {
+            if let Some(z) = self
+                .transport
+                .read_mem(mem::POS_Z, self.magic, QUERY_TIMEOUT)
+                .ok()
+                .and_then(|b| ruida::mm(&b))
+            {
+                self.mpos[2] = z;
+            }
+        }
         self.emit_status();
     }
 
@@ -461,17 +558,19 @@ impl<T: RuidaTransport, E: Events> RuidaStreamer<T, E> {
             return;
         }
         if line == "$$" {
-            if let Ok(bx) = self.transport.read_mem(mem::BED_X, self.magic, QUERY_TIMEOUT) {
-                if let Some(w) = ruida::mm(&bx) {
-                    self.cfg.bed_w = w;
-                    self.events.line(&format!("$130={w:.3}"));
-                }
+            // Nur lesen (DA 00): Arbeitsbereich, Höchstgeschwindigkeiten/-beschleunigungen, Karte und Version
+            let magic = self.magic;
+            let transport = &mut self.transport;
+            let events = &self.events;
+            let bed = ruida::machine_params_report(
+                |addr| transport.read_mem(addr, magic, QUERY_TIMEOUT),
+                |l| events.line(&l),
+            );
+            if let Some(w) = bed[0] {
+                self.cfg.bed_w = w;
             }
-            if let Ok(by) = self.transport.read_mem(mem::BED_Y, self.magic, QUERY_TIMEOUT) {
-                if let Some(h) = ruida::mm(&by) {
-                    self.cfg.bed_h = h;
-                    self.events.line(&format!("$131={h:.3}"));
-                }
+            if let Some(h) = bed[1] {
+                self.cfg.bed_h = h;
             }
             self.events.line("ok");
             return;
@@ -497,11 +596,39 @@ impl<T: RuidaTransport, E: Events> RuidaStreamer<T, E> {
             return;
         }
         if let Some(rest) = line.strip_prefix("RUIDA_START_FILE ") {
-            if let Ok(num) = rest.trim().parse::<u16>() {
-                let cmd = ruida::select_and_start_file_cmd(num);
-                let _ = self.transport.send_cmd(&cmd, self.magic, PACKET_TIMEOUT);
-                self.poll_status();
+            match rest.trim().parse::<u16>() {
+                Ok(num) => {
+                    let cmd = ruida::select_and_start_file_cmd(num);
+                    match self.transport.send_cmd(&cmd, self.magic, PACKET_TIMEOUT) {
+                        Ok(()) => self.events.line(&format!("[Ruida] Datei {num} gestartet.")),
+                        Err(e) => self.events.line(&format!("[Ruida] Start fehlgeschlagen: {e}")),
+                    }
+                    self.poll_status();
+                }
+                Err(e) => self.events.line(&format!("[Ruida] Start fehlgeschlagen: {e}")),
             }
+            self.events.line("ok");
+            return;
+        }
+        if let Some(rest) = line.strip_prefix("RUIDA_DELETE_FILE ") {
+            match rest.trim().parse::<u16>() {
+                Ok(num) if (1..=99).contains(&num) => {
+                    let cmd = ruida::delete_file_cmd(num);
+                    match self.transport.send_cmd(&cmd, self.magic, PACKET_TIMEOUT) {
+                        Ok(()) => self.events.line(&format!("[Ruida] Datei {num} gelöscht.")),
+                        Err(e) => self.events.line(&format!("[Ruida] Löschen fehlgeschlagen: {e}")),
+                    }
+                }
+                Ok(num) => self.events.line(&format!(
+                    "[Ruida] Löschen fehlgeschlagen: Dateinummer {num} außerhalb 1–99"
+                )),
+                Err(e) => self.events.line(&format!("[Ruida] Löschen fehlgeschlagen: {e}")),
+            }
+            self.events.line("ok");
+            return;
+        }
+        if line == "RUIDA_LIST_FILES" {
+            self.list_files();
             self.events.line("ok");
             return;
         }
@@ -542,7 +669,63 @@ impl<T: RuidaTransport, E: Events> RuidaStreamer<T, E> {
             self.events.line("ok");
             return;
         }
+        // Relativer Z-Jog aus dem Bewegen-Fenster (`$J=G91 G21 Z… F…`) → `D9 02 02 <µm>`
+        if let Some(dz) = ruida::parse_z_jog(line) {
+            if let Err(e) = self.transport.send_cmd(&ruida::z_jog_cmd(dz), self.magic, PACKET_TIMEOUT) {
+                self.events.line(&format!("[Ruida] Z-Fahrt fehlgeschlagen: {e}"));
+            }
+            self.poll_status();
+            self.events.line("ok");
+            return;
+        }
+        // Other Z/A moves (absolute Z, rotary jog) have no Ruida command here: say so in the console instead of a silent "ok"
+        if (line.starts_with("$J=") || line.starts_with("G0 ") || line.starts_with("G1 "))
+            && line.split_whitespace().any(|t| t.starts_with('Z') || t.starts_with('A'))
+        {
+            self.events.line(&format!(
+                "[Ruida] Z/A-Achse wird über diese Verbindung noch nicht gefahren, ignoriert: {line}"
+            ));
+        }
         self.events.line("ok");
+    }
+
+    /// Dateien im Speicher der Steuerung: Anzahl (`DA 00 02 05`), dann je Datei der Name (`E8 01 <nr>`).
+    /// Antwortzeilen: `[Ruida] Dateien im Speicher: n`, `[Ruida] Datei k: NAME`; Fehler mit der wörtlichen Meldung.
+    fn list_files(&mut self) {
+        let count = match self.transport.read_mem(mem::DOC_COUNT, self.magic, QUERY_TIMEOUT) {
+            Ok(p) => match u35(&p) {
+                Some(n) => n,
+                None => {
+                    self.events.line(&format!(
+                        "[Ruida] Dateiliste nicht gelesen: unerwartete Antwort {}",
+                        ruida::hex(&p)
+                    ));
+                    return;
+                }
+            },
+            Err(e) => {
+                self.events.line(&format!("[Ruida] Dateiliste nicht gelesen: {e}"));
+                return;
+            }
+        };
+        self.events.line(&format!("[Ruida] Dateien im Speicher: {count}"));
+        if count > 99 {
+            self.events.line(&format!(
+                "[Ruida] Die Steuerung meldet {count} Dateien; gelesen werden die Nummern 1–99."
+            ));
+        }
+        for k in 1..=count.min(99) as u16 {
+            match self.transport.query_text(&ruida::file_name_cmd(k), self.magic, PACKET_TIMEOUT) {
+                Ok(reply) => match ruida::parse_file_name_reply(&reply, k) {
+                    Some(name) => self.events.line(&format!("[Ruida] Datei {k}: {name}")),
+                    None => self.events.line(&format!(
+                        "[Ruida] Datei {k}: unerwartete Antwort {}",
+                        ruida::hex(&reply)
+                    )),
+                },
+                Err(e) => self.events.line(&format!("[Ruida] Datei {k}: Name nicht gelesen: {e}")),
+            }
+        }
     }
 
     /// Übersetzt einfache G0/G1-Zeilen (z. B. aus `frameGCode`) in unverwürfelte Ruida-Befehle.

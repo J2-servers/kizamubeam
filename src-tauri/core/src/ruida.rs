@@ -191,6 +191,22 @@ pub mod mem {
     pub const POS_U: u32 = 0x0251;
     pub const CARD_ID: u32 = 0x02FE;
     pub const MAINBOARD: u32 = 0x02FF;
+    // Read-only machine parameters (EduTech wiki "Ruida", list of known properties;
+    // MeerK40t `ruida/emulator.py` `mem_lookup`). KizamuBeam never writes these (`DA 01`).
+    /// G0 Velocity (µm/s; MeerK40t emulator: 200000 = 200 mm/s)
+    pub const G0_VELOCITY: u32 = 0x0005;
+    /// Axis Max Velocity 1/2/3 (X, Y, Z; µm/s)
+    pub const MAX_VEL_X: u32 = 0x0023;
+    pub const MAX_VEL_Y: u32 = 0x0033;
+    pub const MAX_VEL_Z: u32 = 0x0043;
+    /// Axis Max Acc 1/2/3 (X, Y, Z; µm/s²)
+    pub const MAX_ACC_X: u32 = 0x0025;
+    pub const MAX_ACC_Y: u32 = 0x0035;
+    pub const MAX_ACC_Z: u32 = 0x0045;
+    /// Axis Range 3 (Z travel, µm)
+    pub const BED_Z: u32 = 0x0046;
+    /// Total Doc Number: count of files stored in controller memory
+    pub const DOC_COUNT: u32 = 0x0205;
 }
 
 pub const STATUS_JOB_RUNNING: u32 = 0x0000_0001;
@@ -274,6 +290,9 @@ pub struct RuidaLayer {
     /// 24-bit BGR color (`(b << 16) | (g << 8) | r`)
     #[serde(default)]
     pub color: u32,
+    /// Work mode of this part: 0 = cut, 1 = scan one-way, 2 = scan both ways (`CA 41 <part> <mode>`)
+    #[serde(default)]
+    pub scan: u8,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -303,6 +322,12 @@ pub struct RuidaParams {
     /// Upload into internal controller memory (`0xE8 0x02`) without immediate execution
     #[serde(default)]
     pub upload: bool,
+    /// Image raster moves in the controller's scan mode: `[from, to, part]` (move indices `from..to`, sorted)
+    #[serde(default)]
+    pub scan: Vec<[u32; 3]>,
+    /// Z offset changes `[move index, z mm]` (machine direction, relative to the height at the start)
+    #[serde(default)]
+    pub z: Vec<(u32, f64)>,
 }
 
 /// Sanitize a document name to a valid Ruida 8-character uppercase ASCII identifier (`[A-Z0-9_-]`).
@@ -362,6 +387,176 @@ pub fn select_and_start_file_cmd(file_num: u16) -> Vec<u8> {
 /// Build unscrambled Ruida command to delete all stored files in controller memory (`0xE8 0x00 0x00 0x00`).
 pub fn delete_all_files_cmd() -> [u8; 4] {
     [0xE8, 0x00, 0x00, 0x00]
+}
+
+/// Ask for the name of stored file `file_num` (`E8 01 <u14>`, "Document Name"; the controller answers
+/// `E8 01 <u14> <name> 00`, see MeerK40t `ruida/emulator.py`).
+pub fn file_name_cmd(file_num: u16) -> [u8; 4] {
+    let [hi, lo] = encode_i14(file_num.clamp(1, 99) as i32);
+    [0xE8, 0x01, hi, lo]
+}
+
+/// Name from an unscrambled `E8 01 <u14> <name> 00` reply for file `file_num`.
+pub fn parse_file_name_reply(plain: &[u8], file_num: u16) -> Option<String> {
+    if plain.len() < 4 || plain[0] != 0xE8 || plain[1] != 0x01 || u14(&plain[2..4])? != file_num as u32 {
+        return None;
+    }
+    let name: String = plain[4..]
+        .iter()
+        .take_while(|&&b| b != 0 && b < 0x80)
+        .map(|&b| b as char)
+        .collect();
+    Some(name.trim().to_string())
+}
+
+/// Whether an unscrambled reply to `E8 01` is complete (zero after the name).
+pub fn file_name_reply_done(plain: &[u8]) -> bool {
+    plain.len() >= 5 && plain[0] == 0xE8 && plain[1] == 0x01 && plain[4..].contains(&0)
+}
+
+/// Delete stored file `file_num` (`E8 00 <u14 first> <u14 last>`; first = 0 would delete all, so 1..=99 only).
+/// Layout from MeerK40t `ruida/emulator.py` ("Delete Document v1 v2").
+pub fn delete_file_cmd(file_num: u16) -> [u8; 6] {
+    let [hi, lo] = encode_i14(file_num.clamp(1, 99) as i32);
+    [0xE8, 0x00, hi, lo, hi, lo]
+}
+
+/// Relative Z rapid move for jogging (`D9 02 <option 02 = no origin> <i35 µm>`). MeerK40t `rdjob.py`
+/// `rapid_move_z` / `RAPID_OPTION_NONE`; its driver sends relative steps with this option (`move_rel`).
+pub fn z_jog_cmd(dz_mm: f64) -> [u8; 8] {
+    let v = encode_i35(js_round(dz_mm * 1000.0) as i64);
+    [0xD9, 0x02, 0x02, v[0], v[1], v[2], v[3], v[4]]
+}
+
+/// Z axis move inside a job (`80 08 <i35 µm>`, "Axis Z Move": EduTech wiki "Ruida"; MeerK40t `rdjob.py` adds
+/// the value to Z, i.e. relative).
+pub fn z_move_cmd(dz_um: i64) -> [u8; 7] {
+    let v = encode_i35(dz_um);
+    [0x80, 0x08, v[0], v[1], v[2], v[3], v[4]]
+}
+
+/// Z step of a relative jog line (`$J=G91 G21 Z0.5 F60`, from `zJogLines`); `None` for anything else.
+pub fn parse_z_jog(line: &str) -> Option<f64> {
+    let body = line.strip_prefix("$J=")?;
+    let toks: Vec<&str> = body.split_whitespace().collect();
+    if !toks.contains(&"G91") || toks.iter().any(|t| t.starts_with('X') || t.starts_with('Y')) {
+        return None;
+    }
+    toks.iter()
+        .find_map(|t| t.strip_prefix('Z').and_then(|s| s.parse::<f64>().ok()))
+        .filter(|v| v.is_finite() && *v != 0.0)
+}
+
+/// Hex dump of bytes (for messages that must show what the controller literally answered).
+pub fn hex(data: &[u8]) -> String {
+    data.iter().map(|b| format!("{b:02X}")).collect::<Vec<_>>().join(" ")
+}
+
+/// Read-only report of the machine parameters. `read` reads one memory address (`DA 00`) and returns the
+/// reply payload or the literal transport error; `emit` gets each console line as soon as it is known: first the
+/// GRBL-style `$130=` … lines the device dialog understands (bed, then max rate, then acceleration), then the
+/// `[Ruida] …` lines. Returns the bed size, when read.
+pub fn machine_params_report<F, E>(mut read: F, mut emit: E) -> [Option<f64>; 2]
+where
+    F: FnMut(u32) -> Result<Vec<u8>, String>,
+    E: FnMut(String),
+{
+    let mut notes = Vec::new();
+    let val = |read: &mut F, addr: u32, label: &str, notes: &mut Vec<String>| -> Option<f64> {
+        match read(addr) {
+            Ok(p) => match i35(&p) {
+                Some(v) => Some(v as f64 / 1000.0),
+                None => {
+                    notes.push(format!("[Ruida] {label}: unerwartete Antwort {}", hex(&p)));
+                    None
+                }
+            },
+            Err(e) => {
+                notes.push(format!("[Ruida] {label} nicht gelesen: {e}"));
+                None
+            }
+        }
+    };
+    // GRBL numbering so the device dialog fills bed, rapid (mm/min) and acceleration
+    let bx = val(&mut read, mem::BED_X, "Arbeitsbereich X", &mut notes);
+    let by = val(&mut read, mem::BED_Y, "Arbeitsbereich Y", &mut notes);
+    for (k, v) in [("130", bx), ("131", by)] {
+        if let Some(v) = v {
+            emit(format!("${k}={v:.3}"));
+        }
+    }
+    let vx = val(&mut read, mem::MAX_VEL_X, "Höchstgeschwindigkeit X", &mut notes);
+    let vy = val(&mut read, mem::MAX_VEL_Y, "Höchstgeschwindigkeit Y", &mut notes);
+    for (k, v) in [("110", vx), ("111", vy)] {
+        if let Some(v) = v.filter(|v| *v > 0.0) {
+            emit(format!("${k}={:.3}", v * 60.0));
+        }
+    }
+    let ax = val(&mut read, mem::MAX_ACC_X, "Höchstbeschleunigung X", &mut notes);
+    let ay = val(&mut read, mem::MAX_ACC_Y, "Höchstbeschleunigung Y", &mut notes);
+    for (k, v) in [("120", ax), ("121", ay)] {
+        if let Some(v) = v.filter(|v| *v > 0.0) {
+            emit(format!("${k}={v:.3}"));
+        }
+    }
+    let bz = val(&mut read, mem::BED_Z, "Arbeitsbereich Z", &mut notes);
+    let vz = val(&mut read, mem::MAX_VEL_Z, "Höchstgeschwindigkeit Z", &mut notes);
+    let az = val(&mut read, mem::MAX_ACC_Z, "Höchstbeschleunigung Z", &mut notes);
+    let g0 = val(&mut read, mem::G0_VELOCITY, "Eilgang (G0)", &mut notes);
+    match read(mem::CARD_ID) {
+        Ok(p) => match u35(&p) {
+            Some(id) => emit(format!(
+                "[Ruida] Steuerung: {}, Karten-ID 0x{:08X}",
+                card_name(id as u32),
+                id as u32
+            )),
+            None => notes.push(format!("[Ruida] Karten-ID: unerwartete Antwort {}", hex(&p))),
+        },
+        Err(e) => notes.push(format!("[Ruida] Karten-ID nicht gelesen: {e}")),
+    }
+    match read(mem::MAINBOARD) {
+        Ok(p) => {
+            let text: String = p
+                .iter()
+                .take_while(|&&b| b != 0)
+                .map(|&b| b as char)
+                .collect();
+            let printable = text.len() >= 2 && text.chars().all(|c| (' '..='~').contains(&c));
+            if printable {
+                emit(format!("[Ruida] Mainboard-Version: {}", text.trim()));
+            } else if let Some(v) = u35(&p) {
+                emit(format!("[Ruida] Mainboard-Version: 0x{:08X}", v as u32));
+            } else {
+                notes.push(format!("[Ruida] Mainboard-Version: unerwartete Antwort {}", hex(&p)));
+            }
+        }
+        Err(e) => notes.push(format!("[Ruida] Mainboard-Version nicht gelesen: {e}")),
+    }
+    let f = |v: Option<f64>| v.map_or_else(|| "?".to_string(), |v| format!("{v:.3}"));
+    emit(format!(
+        "[Ruida] Arbeitsbereich: X {} mm, Y {} mm, Z {} mm",
+        f(bx),
+        f(by),
+        f(bz)
+    ));
+    emit(format!(
+        "[Ruida] Höchstgeschwindigkeit: X {} mm/s, Y {} mm/s, Z {} mm/s",
+        f(vx),
+        f(vy),
+        f(vz)
+    ));
+    emit(format!(
+        "[Ruida] Höchstbeschleunigung: X {} mm/s², Y {} mm/s², Z {} mm/s²",
+        f(ax),
+        f(ay),
+        f(az)
+    ));
+    emit(format!("[Ruida] Eilgang (G0): {} mm/s", f(g0)));
+    for n in notes {
+        emit(n);
+    }
+    emit("[Ruida] Nur gelesen: KizamuBeam schreibt keine Maschinenparameter.".into());
+    [bx, by]
 }
 
 fn default_origin() -> String {
@@ -524,7 +719,10 @@ pub fn write_plain(mv: &Moves, p: &RuidaParams) -> Vec<u8> {
         out.extend(encode_i35(max_y));
     }
 
-    // 3. Layer table
+    // 3. Layer table. With scan parts every part also gets its work mode (`CA 41 <part> <mode>`,
+    // LibLaserCut `Ruida.java`: 00 cut, 01 one-way x-sweep, 02 both-ways x-sweep); jobs without images stay unchanged.
+    let has_scan = !p.scan.is_empty();
+    let mut part_mode: HashMap<u8, u8> = HashMap::new();
     let mut layer_min: HashMap<i16, f64> = HashMap::new();
     for l in &p.layers {
         let idx = (l.index.max(0) & 0x1F) as u8;
@@ -541,16 +739,38 @@ pub fn write_plain(mv: &Moves, p: &RuidaParams) -> Vec<u8> {
         push_layer_power(&mut out, idx, min_p, max_p, &p.laser);
         out.extend([0xCA, 0x06, idx]);
         out.extend(encode_u35(l.color & 0x00FF_FFFF));
+        let mode = if l.scan <= 2 { l.scan } else { 0 };
+        part_mode.insert(idx, mode);
+        if has_scan {
+            out.extend([0xCA, 0x41, idx, mode]);
+        }
     }
 
     // 4. Moves & cuts
     let mut cur_pos: Option<[i64; 2]> = None;
     let mut cur_layer: i16 = i16::MIN;
+    let mut cur_part: i32 = i32::MIN;
     let mut cur_speed: i64 = -1;
     let mut cur_power: i32 = -1;
     let mut air_on = false;
+    let mut scan_k = 0usize;
+    let mut z_k = 0usize;
+    let mut cur_z: i64 = 0;
 
     for i in 0..n {
+        // Z offset of the layer/pass before its first move (`80 08`, relative to the start height)
+        while z_k < p.z.len() && p.z[z_k].0 as usize <= i {
+            let zt = um(p.z[z_k].1);
+            if zt != cur_z {
+                out.extend(z_move_cmd(zt - cur_z));
+                cur_z = zt;
+            }
+            z_k += 1;
+        }
+        while scan_k < p.scan.len() && i >= p.scan[scan_k][1] as usize {
+            scan_k += 1;
+        }
+        let scan_part = (scan_k < p.scan.len() && i >= p.scan[scan_k][0] as usize).then(|| p.scan[scan_k][2]);
         let [rx, ry] = pts[i];
         if cur_pos == Some([rx, ry]) {
             continue;
@@ -563,9 +783,20 @@ pub fn write_plain(mv: &Moves, p: &RuidaParams) -> Vec<u8> {
                 out.extend(encode_i35(start_um[1]));
                 cur_pos = Some(start_um);
             }
-            if mv.layer[i] != cur_layer {
+            let part = scan_part.map_or(mv.layer[i] as i32, |sp| sp as i32);
+            if part != cur_part {
+                cur_part = part;
                 cur_layer = mv.layer[i];
-                let idx = (cur_layer.max(0) & 0x1F) as u8;
+                let idx = (part.max(0) & 0x1F) as u8;
+                if has_scan {
+                    // Current work mode before the layer number (LibLaserCut: `ca01` 00 cut, 01 both ways, 02 one way)
+                    let m = match part_mode.get(&idx).copied().unwrap_or(0) {
+                        2 => 0x01,
+                        1 => 0x02,
+                        _ => 0x00,
+                    };
+                    out.extend([0xCA, 0x01, m]);
+                }
                 out.extend([0xCA, 0x02, idx]);
                 let want_air = p.air.contains(&cur_layer);
                 if want_air != air_on {
@@ -584,7 +815,8 @@ pub fn write_plain(mv: &Moves, p: &RuidaParams) -> Vec<u8> {
             let pw_pct = (mv.s[i] as f64 * 100.0).clamp(0.0, 100.0);
             let pw_14 = js_round(pw_pct * 16383.0 / 100.0) as i32;
             if pw_14 != cur_power {
-                let min_pct = if cur_power == -1 {
+                // Scan runs keep one power for the whole run (min = max, as MeerK40t and LibLaserCut write rasters)
+                let min_pct = if cur_power == -1 && scan_part.is_none() {
                     layer_min
                         .get(&cur_layer)
                         .copied()
@@ -632,6 +864,10 @@ pub fn write_plain(mv: &Moves, p: &RuidaParams) -> Vec<u8> {
 
     if air_on {
         out.extend([0xCA, 0x01, 0x12]);
+    }
+    // Z back to the start height before the end of the job (like the G-code `zInserts` end)
+    if cur_z != 0 {
+        out.extend(z_move_cmd(-cur_z));
     }
     if p.return_home && cur_pos.is_some_and(|c| c != start_um) {
         out.push(0x88);
@@ -1290,9 +1526,12 @@ mod tests {
                 power: 75.0,
                 min_power: 20.0,
                 color: 0xFF0000,
+                scan: 0,
             }],
             filename: None,
             upload: false,
+            scan: vec![],
+            z: vec![],
         };
 
         let rd = write(&mv, &params);
@@ -1330,6 +1569,122 @@ mod tests {
         assert!(up_dec.upload);
         assert_eq!(up_dec.filename.as_deref(), Some("TESTJOB"));
         assert_eq!(up_dec.cuts.len(), 4);
+    }
+
+    /// One raster line in the controller's scan mode with a Z offset. The expected bytes were built with
+    /// MeerK40t's own opcode constants and encoders (`meerk40t/ruida/rdjob.py`: encode32, encode14,
+    /// encode_power, encode_speed), the work-mode bytes from LibLaserCut `Ruida.java` (`ca01` 01 and
+    /// `ca41 <part> 02` for a both-ways x-sweep) and the Z opcode from the EduTech wiki (`80 08`).
+    #[test]
+    fn scan_layer_with_z_matches_reference_bytes() {
+        // emitScanlines for one line at y = 10, runs [10, 11] at 70 % and [11, 12] at 40 %, 1 mm overscan
+        let x = [9.0, 10.0, 11.0, 12.0, 13.0];
+        let y = [10.0; 5];
+        let f = [0.0f32, 6000.0, 6000.0, 6000.0, 6000.0];
+        let s = [0.0f32, 0.0, 0.7, 0.4, 0.0];
+        let layer = [0i16; 5];
+        let t = [0.0; 5];
+        let mv = Moves { x0: 0.0, y0: 0.0, x: &x, y: &y, s: &s, f: &f, layer: &layer, t: &t };
+        let params = RuidaParams {
+            x0: 0.0,
+            y0: 0.0,
+            bed_w: 600.0,
+            bed_h: 400.0,
+            origin: "bottom-left".into(),
+            start_from: "absolute".into(),
+            magic: 0x88,
+            laser: "1".into(),
+            return_home: false,
+            air: vec![],
+            layers: vec![RuidaLayer { index: 0, speed: 6000.0, power: 70.0, min_power: 10.0, color: 0, scan: 2 }],
+            filename: None,
+            upload: false,
+            scan: vec![[0, 5, 0]],
+            z: vec![(0, -1.5)],
+        };
+        #[rustfmt::skip]
+        let want: Vec<u8> = vec![
+            0xD8, 0x10,                                                  // REF_POINT_2 (absolute)
+            0xE7, 0x03, 0, 0, 0, 0x46, 0x28, 0, 0, 0, 0x4E, 0x10,        // PROCESS_TOP_LEFT 9000 µm, 10000 µm
+            0xE7, 0x07, 0, 0, 0, 0x65, 0x48, 0, 0, 0, 0x4E, 0x10,        // PROCESS_BOTTOM_RIGHT 13000 µm, 10000 µm
+            0xC9, 0x04, 0x00, 0, 0, 0x06, 0x0D, 0x20,                    // SPEED_LASER_1_PART 0, 100 mm/s
+            0xC6, 0x31, 0x00, 0x0C, 0x66,                                // MIN_POWER_1_PART 0, 10 %
+            0xC6, 0x32, 0x00, 0x59, 0x4C,                                // MAX_POWER_1_PART 0, 70 %
+            0xCA, 0x06, 0x00, 0, 0, 0, 0, 0,                             // LAYER_COLOR_PART 0
+            0xCA, 0x41, 0x00, 0x02,                                      // WORK_MODE_PART 0: scan both ways
+            0x80, 0x08, 0x0F, 0x7F, 0x7F, 0x74, 0x24,                    // Axis Z Move -1500 µm
+            0x88, 0, 0, 0, 0x46, 0x28, 0, 0, 0, 0x4E, 0x10,              // MOVE_ABS_XY to the overscan start
+            0x8A, 0x07, 0x68,                                            // MOVE_REL_X +1000 µm (overscan)
+            0xCA, 0x01, 0x01,                                            // work mode: scan both ways
+            0xCA, 0x02, 0x00,                                            // LAYER_NUMBER_PART 0
+            0xC9, 0x02, 0, 0, 0x06, 0x0D, 0x20,                          // SPEED_LASER_1 100 mm/s
+            0xC6, 0x01, 0x59, 0x4C, 0xC6, 0x02, 0x59, 0x4C,              // MIN/MAX_POWER_1 70 % (one power per run)
+            0xAA, 0x07, 0x68,                                            // CUT_REL_X +1000 µm
+            0xC6, 0x01, 0x33, 0x19, 0xC6, 0x02, 0x33, 0x19,              // MIN/MAX_POWER_1 40 %
+            0xAA, 0x07, 0x68,                                            // CUT_REL_X +1000 µm
+            0x8A, 0x07, 0x68,                                            // MOVE_REL_X +1000 µm (overscan)
+            0x80, 0x08, 0, 0, 0, 0x0B, 0x5C,                             // Axis Z Move +1500 µm (back)
+            0xD7,                                                        // END_OF_FILE
+        ];
+        assert_eq!(hex(&write_plain(&mv, &params)), hex(&want));
+
+        // Without scan ranges and Z the job is written exactly as before (no CA 41 / CA 01 / 80 08)
+        let mut plain = params.clone();
+        plain.scan.clear();
+        plain.z.clear();
+        let old = write_plain(&mv, &plain);
+        assert!(!old.windows(2).any(|w| w == [0xCA, 0x41] || w == [0x80, 0x08]));
+        assert!(!old.windows(3).any(|w| w == [0xCA, 0x01, 0x01]));
+    }
+
+    #[test]
+    fn file_memory_z_jog_and_param_commands() {
+        assert_eq!(file_name_cmd(3), [0xE8, 0x01, 0x00, 0x03]);
+        assert_eq!(file_name_cmd(130), [0xE8, 0x01, 0x00, 99]);
+        let reply = [0xE8, 0x01, 0x00, 0x03, b'B', b'O', b'X', b'1', 0x00];
+        assert!(file_name_reply_done(&reply));
+        assert!(!file_name_reply_done(&reply[..6]));
+        assert_eq!(parse_file_name_reply(&reply, 3).as_deref(), Some("BOX1"));
+        assert_eq!(parse_file_name_reply(&reply, 4), None);
+        assert_eq!(delete_file_cmd(2), [0xE8, 0x00, 0x00, 0x02, 0x00, 0x02]);
+        assert_eq!(delete_file_cmd(0), [0xE8, 0x00, 0x00, 0x01, 0x00, 0x01], "0 would delete all");
+        assert_eq!(z_jog_cmd(0.5), [0xD9, 0x02, 0x02, 0, 0, 0, 0x03, 0x74]);
+        assert_eq!(z_jog_cmd(-0.1)[..3], [0xD9, 0x02, 0x02]);
+        assert_eq!(i35(&z_jog_cmd(-0.1)[3..]), Some(-100));
+        assert_eq!(parse_z_jog("$J=G91 G21 Z-0.5 F60"), Some(-0.5));
+        assert_eq!(parse_z_jog("$J=G91 G21 X10 F3000"), None);
+        assert_eq!(parse_z_jog("$J=G90 G21 Z5 F60"), None, "absolute Z is not a jog step");
+        assert_eq!(parse_z_jog("G0 Z1"), None);
+
+        // Read-only parameter report from fake memory (values as the MeerK40t emulator would answer)
+        let mut lines: Vec<String> = Vec::new();
+        let bed = machine_params_report(|addr| {
+            let v: i64 = match addr {
+                mem::BED_X => 600_000,
+                mem::BED_Y => 400_000,
+                mem::BED_Z => 50_000,
+                mem::MAX_VEL_X | mem::MAX_VEL_Y => 500_000,
+                mem::MAX_ACC_X | mem::MAX_ACC_Y => 8_000_000,
+                mem::G0_VELOCITY => 200_000,
+                mem::CARD_ID => 0x6545_6545,
+                mem::MAINBOARD => return Ok(b"RDV8.01\0".to_vec()),
+                mem::MAX_VEL_Z => return Err("Keine Antwort auf USB-Speicherabfrage.".into()),
+                _ => 0,
+            };
+            Ok(encode_i35(v).to_vec())
+        }, |l| lines.push(l));
+        assert_eq!(bed, [Some(600.0), Some(400.0)]);
+        // The device dialog's values come first (it listens only for a moment)
+        assert_eq!(lines[..6], ["$130=600.000", "$131=400.000", "$110=30000.000", "$111=30000.000", "$120=8000.000", "$121=8000.000"]);
+        let all = lines.join("\n");
+        for want in ["$130=600.000", "$131=400.000", "$110=30000.000", "$111=30000.000", "$120=8000.000", "$121=8000.000"] {
+            assert!(lines.iter().any(|l| l == want), "{want} fehlt in\n{all}");
+        }
+        assert!(all.contains("[Ruida] Steuerung: RDC6445G, Karten-ID 0x65456545"), "{all}");
+        assert!(all.contains("[Ruida] Mainboard-Version: RDV8.01"), "{all}");
+        assert!(all.contains("Z 50.000 mm"), "{all}");
+        assert!(all.contains("[Ruida] Höchstgeschwindigkeit Z nicht gelesen: Keine Antwort auf USB-Speicherabfrage."), "{all}");
+        assert!(all.contains("schreibt keine Maschinenparameter"), "{all}");
     }
 
     #[test]

@@ -3,7 +3,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { build } from 'esbuild';
-const source = new URL('../src/', import.meta.url).pathname;
+import { fileURLToPath } from 'node:url';
+const source = fileURLToPath(new URL('../src/', import.meta.url));
 const observers = [];
 const forbidden = [];
 const deny = (name) => () => { forbidden.push(name); throw Error(`Forbidden offline operation: ${name}`); };

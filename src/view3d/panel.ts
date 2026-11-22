@@ -4,7 +4,7 @@
 // Teile, die mit dem Verbindungs-Werkzeug verbunden wurden, werden über die gemerkten Verbindungen zusammengesetzt.
 // Gezeigt wird die Auswahl (eine gewählte Baugruppe immer ganz), ohne Auswahl alles auf der Seite.
 import type { Editor } from '../editor';
-import type { GenShape, Mat, Obj } from '../model';
+import type { GenShape, Mat, MultiLayerAssembly, MultiLayerPlate, Obj } from '../model';
 import { IDENT, inv, isCutLayer, leaves, mul, visibleLeaves } from '../model';
 import { boundsOf } from '../geom';
 import { region } from '../ops';
@@ -80,12 +80,20 @@ function collectMultiLayers(ed: Editor, selected: Obj[] | null, fallback: Materi
   const used = new Set<number>();
   const items: Placement[] = [];
   let count = 0;
+  /** Stacks mounted on a box plate: built after the box (collectScene, mountStacks) */
+  const mounted: { a: MultiLayerAssembly; live: { p: MultiLayerPlate; root: { o: Obj; page: number } }[] }[] = [];
   for (const a of ed.doc.multiLayerAssemblies ?? []) {
-    if (wanted && !a.plates.some((p) => wanted.has(p.object))) continue;
+    if (wanted && !a.plates.some((p) => wanted.has(p.object)) && !(a.mount !== undefined && wanted.has(a.mount))) continue;
     const live = a.plates.map((p) => ({ p, root: roots.get(p.object) })).filter((x): x is { p: typeof a.plates[number]; root: { o: Obj; page: number } } => !!x.root);
     if (!live.length) continue;
     if (!wanted && live.every((x) => x.root.o.hidden)) continue;
     count++;
+    if (a.mount !== undefined && roots.has(a.mount)) {
+      for (const { root } of live) for (const [leaf] of leaves([root.o])) used.add(leaf.id);
+      mounted.push({ a, live });
+      ids.push(`ml:${a.id}`);
+      continue;
+    }
     const first = solids.length;
     let z = 0;
     for (let pi = 0; pi < live.length; pi++) {
@@ -113,7 +121,55 @@ function collectMultiLayers(ed: Editor, selected: Obj[] | null, fallback: Materi
     ids.push(`ml:${a.id}`);
     items.push({ parts: solids.slice(first), order: Math.min(...live.map((x) => x.p.object)) });
   }
-  return { solids, ids, used, count, items };
+  return { solids, ids, used, count, items, mounted };
+}
+
+/**
+ * Stacks mounted on a box plate: each plate of the stack lies on the face of that plate that looks into the box, at its
+ * place on the workspace (mated plates keep workspace coordinates as local coordinates), one on top of the other.
+ * The solids join the group of the box, so spreading the view apart moves them together.
+ */
+function mountStacks(ed: Editor, mounted: ReturnType<typeof collectMultiLayers>['mounted'], groups: ViewSolid[][], fallback: MaterialLook, places: Map<string, CanvasPlace>): ViewSolid[] {
+  const out: ViewSolid[] = [];
+  for (const { a, live } of mounted) {
+    const group = groups.find((g) => g.some((s) => s.key === 'm' + a.mount));
+    const base = group?.find((s) => s.key === 'm' + a.mount);
+    if (!group || !base) continue;
+    // Inside of the box: the side of the base plate where the other plates of its group are
+    const mid = (s: ViewSolid) => {
+      const b = solidBounds(s);
+      return [0, 1, 2].map((i) => (b.min[i] + b.max[i]) / 2);
+    };
+    const c = mid(base);
+    const others = group.filter((s) => s !== base).map(mid);
+    const toward = others.length ? others.reduce((sum, o) => sum + [0, 1, 2].reduce((d, i) => d + (o[i] - c[i]) * base.pose.n[i], 0), 0) : 1;
+    const side = toward >= 0 ? 1 : -1;
+    const n = base.pose.n;
+    let z = 0;
+    for (let pi = 0; pi < live.length; pi++) {
+      const { p, root } = live[pi];
+      const paths: Paths = [];
+      for (const [leaf, m] of leaves([root.o])) {
+        if (!isCutLayer(ed.layer(leaf.layer)) || leaf.shape.kind === 'text' || leaf.shape.kind === 'image') continue;
+        if (leaf.shape.kind === 'path' && leaf.shape.mark) continue;
+        paths.push(...region({ ...leaf, m }));
+      }
+      // Lower face of this plate, measured from the face of the base plate that carries the stack
+      const s0 = side > 0 ? base.th + z : -(z + p.thickness);
+      const pose = { o: [base.pose.o[0] + n[0] * s0, base.pose.o[1] + n[1] * s0, base.pose.o[2] + n[2] * s0] as typeof n, u: base.pose.u, v: base.pose.v, n };
+      let part = 0;
+      for (const { outer, holes } of islands(paths)) {
+        const key = `ml:${a.id}:${pi}:${part++}`;
+        const polys = [outer, ...holes].map((q) => q.map((v) => ({ x: v.X / SCALE, y: v.Y / SCALE })));
+        const s: ViewSolid = { key, label: p.name, polys, pose, th: p.thickness, group: base.group, layer: root.o.layer, look: resolveLook(p.look ?? fallback) };
+        out.push(s);
+        group.push(s);
+        places.set(key, { page: root.page, toLocal: IDENT });
+      }
+      z += p.thickness;
+    }
+  }
+  return out;
 }
 
 /**
@@ -172,6 +228,7 @@ export function collectScene(ed: Editor, th: number, marks = true, fallback: Mat
   const shown = [...(sel.length ? leaves(roots) : visibleLeaves(roots))];
   const all = shown.filter(([o]) => !multi.used.has(o.id));
   const mated = collectMates(ed, all, th, places);
+  const stacked = mountStacks(ed, multi.mounted, mated.groups, fallback, places);
   for (const g of mated.groups) {
     solids.push(...g);
     ids.push(...g.map((x) => x.key));
@@ -180,7 +237,7 @@ export function collectScene(ed: Editor, th: number, marks = true, fallback: Mat
   /** Blöcke der Ansicht, die sich nicht überdecken dürfen (siehe spreadApart) */
   const items: Placement[] = [...multi.items];
   /** Platten, in die Formen Löcher und Kerben schneiden dürfen */
-  const targets: ViewSolid[] = [...multi.solids];
+  const targets: ViewSolid[] = [...multi.solids, ...stacked];
   mated.groups.forEach((g, i) => items.push({ parts: g, order: mated.orders[i] }));
   for (const [o, m] of all) {
     if (mated.used.has(o.id)) continue;

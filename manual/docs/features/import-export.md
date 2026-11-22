@@ -10,6 +10,8 @@ description: Bring in SVG, DXF, PDF, Illustrator and LightBurn files, and export
 
 **File → Import …** (Ctrl+I), dragging files onto the workspace, or pasting with Ctrl+V from other programs all work the same way. Colours are mapped to the nearest palette colour, which means the nearest layer, and several objects arrive as a group.
 
+![An imported SVG file on the workspace: a key rack arrives as one selected group, and its four colours have become four layers in the Cuts / Layers window](/img/import-svg-en.webp)
+
 ### SVG
 
 Paths (including arcs), rectangles, circles, ellipses, lines, polygons, `use` references, transforms, CSS classes and embedded images. The size comes from `width`, `height` and `viewBox`. **Text in SVG files is skipped**: convert text to paths in your drawing program before saving.
@@ -48,6 +50,8 @@ See [Images and tracing](images.md).
 | **DXF** | The current page in mm, one DXF layer per used layer with name and colour. Curves are exported as exact splines. Images cannot go into DXF. |
 | **PDF** | All pages, each at bed size 1:1, every layer as its own PDF layer, fill layers filled, images embedded. |
 | **Illustrator (`.ai`)** | The same PDF-compatible file; opens in Illustrator, Inkscape and Affinity. |
+
+![File menu with the Export submenu open: Export as SVG, DXF, PDF and Illustrator file (AI)](/img/export-menu-en.webp)
 
 Texts are exported as outlines.
 

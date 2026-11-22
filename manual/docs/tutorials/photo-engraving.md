@@ -16,11 +16,15 @@ In this tutorial you engrave a portrait or a pet photo on a piece of light wood,
 2. Scale it to the size you want, for example 100 mm wide. Lock the aspect ratio so the picture is not distorted.
 3. Put the image on its own layer by clicking a palette colour.
 
+![An imported picture, scaled to a width of 100 mm and placed on its own layer Photo; the workspace shows it rastered the way it will be lasered, and the numeric toolbar shows its size, the resolution of 254 DPI and the buttons Adjust, Trace and Remove BG](/img/photo-import-en.webp)
+
 ## 2. Prepare the image
 
 1. **Remove the background** if the subject should stand alone: **Tools → Image → Remove Background …**. Click the background in the preview, adjust the tolerance and tick **Crop to subject**.
 2. **Adjust the image**: **Tools → Image → Adjust Image …**. Wood darkens quickly, so most photos need more brightness and contrast than you would expect. Raise the contrast until the face has clear light and dark areas, and sharpen a little. Use the comparison with the original and the 1:1 view.
 3. To give the photo a shape, draw an ellipse or a rounded rectangle over it, select both and choose **Tools → Image → Apply mask to image**.
+
+![Adjust Image dialog for the picture: brightness raised to 14, contrast to 32, sharpen 70 %, the image mode Atkinson, a line interval of 0.1 mm (254 DPI) and the overscan; the preview on the left shows the rastered result](/img/photo-adjust-image-en.webp)
 
 ## 3. Choose an image mode
 

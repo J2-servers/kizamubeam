@@ -16,11 +16,15 @@ In diesem Tutorial gravierst du ein Porträt oder ein Haustierfoto auf ein Stüc
 2. Skaliere es auf die gewünschte Größe, etwa 100 mm Breite. Lass das Seitenverhältnis gesperrt, damit das Bild nicht verzerrt wird.
 3. Leg das Bild mit einem Klick auf eine Palettenfarbe auf einen eigenen Layer.
 
+![Ein importiertes Bild, auf 100 mm Breite skaliert und auf einem eigenen Layer Foto; die Arbeitsfläche zeigt es gerastert, so wie es gelasert wird, und die Eigenschaftenleiste zeigt seine Größe, die Auflösung von 254 DPI und die Schaltflächen Anpassen, Nachzeichnen und Freistellen](/img/photo-import-de.webp)
+
 ## 2. Das Bild vorbereiten
 
 1. **Hintergrund entfernen**, wenn das Motiv frei stehen soll: **Werkzeuge → Bild → Hintergrund entfernen …**. Klicke in der Vorschau auf den Hintergrund, stelle die Toleranz ein und hake **Auf das Motiv zuschneiden** an.
 2. **Bild anpassen**: **Werkzeuge → Bild → Bild anpassen …**. Holz wird schnell dunkel, deshalb brauchen die meisten Fotos mehr Helligkeit und Kontrast, als man erwartet. Erhöhe den Kontrast, bis das Gesicht klare helle und dunkle Bereiche hat, und schärfe etwas nach. Nutze den Vergleich mit dem Original und die 1:1-Ansicht.
 3. Für eine Form zeichnest du eine Ellipse oder ein abgerundetes Rechteck über das Foto, wählst beide aus und dann **Werkzeuge → Bild → Maske auf Bild anwenden**.
+
+![Dialog Bild anpassen für das Bild: Helligkeit auf 14, Kontrast auf 32, Schärfen 70 %, der Bildmodus Atkinson, 0,1 mm Zeilenabstand (254 DPI) und der Überfahrweg; die Vorschau links zeigt das gerasterte Ergebnis](/img/photo-adjust-image-de.webp)
 
 ## 3. Einen Bildmodus wählen
 

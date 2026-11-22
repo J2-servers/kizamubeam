@@ -17,6 +17,8 @@ The **Joint** tool (the Joint button in the tools toolbar, or **Toolbox → Join
 3. Click the second straight edge. It gets the counterpart or the slots. If the second "edge" is a single drawn line, the line is replaced by slots, which is how you put a mortise in the middle of a panel.
 4. Set the options in the dialog and confirm.
 
+![Joint tool: two edges of two plates are marked 1 and 2, the dialog is set to finger joint with material thickness, finger width, kerf and clearance, and the orange preview shows the fingers](/img/joint-tool-dialog-en.webp)
+
 The result stays an ordinary, editable path. The joint remembers the material thickness, so [Resize slots](#resize-slots-to-the-material) can update it later.
 
 | Type | Use |
@@ -44,6 +46,8 @@ Both panels get slots, and knuckles with pin holes are created next to them. The
 ## Living hinges
 
 **Toolbox → Joints and Bending → Living Hinge** fills a selected closed shape with a cut pattern, so the board bends in that area. Patterns: straight cuts, waves, diamonds, honeycomb, triangles, weave and spiral. The dialog shows a live preview and starts with values that suit the material thickness. The cuts are exact lines and Bézier curves.
+
+![Living Hinge dialog with pattern, cut length, bridge width, line interval and margin; the strip in the middle of a cover shows the preview of the cuts](/img/living-hinge-dialog-en.webp)
 
 Put the hinge area on the cut layer of the part. Plywood and MDF bend best across the grain of the top veneer; test on an offcut first.
 
@@ -77,6 +81,8 @@ You can stage several cuts across different edges before you apply them. **Apply
 - Other closed shapes on cut layers lie flat with an adjustable thickness; nested shapes become holes.
 - Layered, rib and disc models from [3D models](../generators/index.md) are shown assembled.
 
+![3D View window next to the flat parts of a finger-jointed box: the box is shown assembled, with the engravings on the front and side wall](/img/view3d-assembly-en.webp)
+
 Turn the view with the mouse, or use the preset views (3D, top, front). The **Explode** slider pulls the parts apart. With nothing selected, the view shows the whole page; a selected part always brings its whole assembly.
 
 **Collisions**: where two parts intersect (for example with a press fit or a slot that is too narrow), the area turns red, and the status line names the parts and the volume.
@@ -96,6 +102,8 @@ Tick **Mockup** in the 3D window to hide the grid and the red collision marks an
 ## Check the design before cutting
 
 **Laser → Check Design** (or **Window → Design Check**) looks for problems on the current page and marks every finding on the workspace. Click a finding to select the objects and zoom to the spot; where possible, a button fixes it in one undo step.
+
+![Design Check window listing one error and five warnings (outside the work area, duplicate line, open outline, narrow bridge, engraving on no part) with fix buttons; every finding is marked on the workspace](/img/design-check-en.webp)
 
 It finds, among other things:
 

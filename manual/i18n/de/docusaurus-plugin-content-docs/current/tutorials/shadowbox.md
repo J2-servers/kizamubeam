@@ -40,6 +40,8 @@ Kopiere den Rahmen für die Schichten 2 bis 5 (Ctrl+C, Ctrl+V) und leg die Kopie
 
 Halte jede Schicht als eine geschlossene Kontur: Prüfe, ob Teile, die zusammenhalten sollen, den Rahmen wirklich berühren. Lose Inseln würden herausfallen.
 
+![Die fünf Schichten der Shadowbox nebeneinander auf einem Arbeitsbereich von 600 × 400 mm: die geschlossene Rückwand, der Himmel mit ausgeschnittenem Mond und Sternen, die Berge, drei Tannen aus der Bibliothek auf einem Hügel und der vordere Rahmen](/img/shadowbox-layers-de.webp)
+
 ## 4. Stapeln
 
 1. Wähle alle fünf Schichten aus.
@@ -48,6 +50,8 @@ Halte jede Schicht als eine geschlossene Kontur: Prüfe, ob Teile, die zusammenh
 4. Klicke auf **Erstellen**.
 
 Öffne **Fenster → 3D-Ansicht**. Die Schichten liegen bündig gestapelt, und du kannst die Ansicht drehen, um die Tiefe zu beurteilen. Verdeckt eine Schicht zu viel von der dahinter, ändere die Formen und sieh erneut nach. Um Reihenfolge oder Dicke später zu ändern, wähle die Schichten aus und starte **Mehrlagenarbeit** erneut. Mehr unter [Mehrlagenarbeit](../generators/multilayer.md).
+
+![Die fünf Schichten auf der Seite und die 3D-Ansicht mit dem fertigen Stapel: vorn ein Rahmen aus Holz, grüne Bäume, graue Berge und ein blauer Himmel, durch dessen Mond die helle Rückwand zu sehen ist](/img/shadowbox-3d-de.webp)
 
 ## 5. Schneiden und verleimen
 

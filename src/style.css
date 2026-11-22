@@ -2,10 +2,21 @@
   --bg: #e4e6ea;
   --panel: #f4f5f7;
   --line: #c3c7ce;
+  /* Rand von Bedienelementen (Knopf, Feld, Auswahl): WCAG 2.2 AA 1.4.11 verlangt 3:1 gegen den Hintergrund
+     daneben. --line ist die Trennlinie zwischen Flaechen und darf schwach sein; ein Bedienelement darf nicht.
+     Gemessen: #7b8493 auf --bg 3,02:1, auf --panel 3,4:1, auf --field/weiss 3,8:1. */
+  --line-control: #7b8493;
   --text: #1f2328;
-  --muted: #69707a;
+  /* gemessen: auf --bg 4,59:1, auf --title 4,53:1, auf --surface-2 4,52:1, auf weiss 5,3:1 */
+  --muted: #616670;
   --accent: #2f6fe8;
   --accent-soft: #dbe6fb;
+  /* Flaeche eines gefuellten Knopfes mit weisser Schrift (gemessen 4,64:1); --accent bleibt fuer Linien und Text */
+  --accent-solid: #2e6ee8;
+  /* Fehler und Warnung: bis jetzt standen fuenf verschiedene Rot im Code und --danger war nie definiert.
+     Gemessen auf dem schwaechsten Grund (--bg): #bc382a 4,51:1 und #96581b 4,51:1; auf weiss 5,6 und 5,2. */
+  --danger: #bc382a;
+  --warn: #96581b;
   --field: #ffffff;
   /* Flächen für Menüs, Tabellen, Knöpfe */
   --surface: #ffffff;
@@ -36,10 +47,17 @@
     --bg: #1b1e23;
     --panel: #24282e;
     --line: #3a4049;
+    /* gemessen: #6e7a8b auf --surface 3,00:1, auf --panel 3,4:1, auf --field 3,9:1 */
+    --line-control: #6e7a8b;
     --text: #e3e6ea;
     --muted: #9aa2ad;
     --accent: #5b93f5;
     --accent-soft: #2a3a57;
+    /* weisse Schrift auf --accent misst im Dunkeln nur 3,03:1; dieser Ton misst 4,61:1 */
+    --accent-solid: #216df2;
+    /* gemessen auf --surface: #e17a7a 4,53:1, #d9832d 4,52:1 */
+    --danger: #e17a7a;
+    --warn: #d9832d;
     --field: #1c1f24;
     --surface: #2c3138;
     --surface-2: #262a30;
@@ -59,10 +77,14 @@
   --bg: #1b1e23;
   --panel: #24282e;
   --line: #3a4049;
+  --line-control: #6e7a8b;
   --text: #e3e6ea;
   --muted: #9aa2ad;
   --accent: #5b93f5;
   --accent-soft: #2a3a57;
+  --accent-solid: #216df2;
+  --danger: #e17a7a;
+  --warn: #d9832d;
   --field: #1c1f24;
   --surface: #2c3138;
   --surface-2: #262a30;
@@ -154,6 +176,30 @@ body {
 .menu > button:hover,
 .menu.open > button {
   background: var(--accent-soft);
+}
+/* „Produkt erstellen“ direkt nach „Hilfe“: ein Knopf, kein Menü (öffnet das eigene Fenster, src/criar/) */
+.menubar-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: none;
+  padding: 0 10px;
+  height: 23px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+.menubar-create:hover {
+  background: var(--accent-soft);
+}
+.menubar-create-icon {
+  display: inline-flex;
+}
+.menubar-create-icon svg {
+  width: 15px;
+  height: 15px;
 }
 .menu-items {
   display: none;
@@ -303,18 +349,25 @@ body {
 }
 input[type='text'],
 input[type='number'],
-select {
+select,
+textarea {
   font: inherit;
   color: var(--text);
   background: var(--field);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-control);
   border-radius: 3px;
   height: var(--ty-control-height);
   padding: 0 4px;
 }
+/* Fokus: ein Ring, der ueberall gilt und gemessen 4,2:1 (hell) bzw. 4,9:1 (dunkel) gegen die Flaeche
+   schafft — WCAG 2.2 AA 2.4.7. Der alte Ring aus --accent-soft misst 1,26:1 hell und 1,45:1 dunkel
+   und war damit praktisch unsichtbar. */
+:where(button, [role='button'], input, select, textarea, a[href], summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
 input[type='text']:focus,
 select:focus {
-  outline: 2px solid var(--accent-soft);
   border-color: var(--accent);
 }
 #numbar input.num,
@@ -601,6 +654,18 @@ select:focus {
   background: var(--accent);
   border-color: var(--accent);
 }
+/* Das Bild bleibt 9 px; die FLAECHE zum Klicken waechst unsichtbar auf 25 px (WCAG 2.2 AA 2.5.8).
+   Dasselbe beim Ursprungs-Raster und beim Schliessen-Knopf der Dialoge. */
+.anchor button,
+.origin-grid button {
+  position: relative;
+}
+.anchor button::after,
+.origin-grid button::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
 /* Anker-Raster behalten die 9-px-Basis (kein 24-px-Touch-Minimum der Leisten-Views) */
 .toolbar-view .anchor button {
   min-width: 0;
@@ -847,6 +912,14 @@ table.layers {
   border-collapse: collapse;
   background: var(--surface);
   border: 1px solid var(--line);
+  /* Ohne feste Breiten rechnete der Browser die Spalten nach dem Inhalt und schob die letzte
+     („Zeig.“) aus dem Panel: Der Kopf stand abgeschnitten da, ohne Rollbalken. */
+  table-layout: fixed;
+}
+table.layers th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 table.layers th {
   font-weight: 500;
@@ -866,6 +939,11 @@ table.layers tr.active td {
 table.layers select {
   height: calc(20px * var(--ty-interface));
   padding: 0 2px;
+  /* Im schmalen Dock ist die Zelle 37 px breit, die Auswahl war aber 80 px: Die Zeile lief ueber
+     „Fuellen 3000 0%“ hinweg und war nicht mehr zu lesen (gemessen 22.11.2026). */
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 .swatch {
   display: inline-flex;
@@ -887,7 +965,7 @@ table.layers select {
 .layer-tools button,
 .btn {
   font: inherit;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-control);
   background: var(--surface);
   border-radius: 3px;
   padding: 3px 8px;
@@ -895,7 +973,18 @@ table.layers select {
 }
 .layer-tools button:disabled,
 .btn:disabled {
-  opacity: 0.45;
+  /* Nur Deckkraft liess einen gesperrten Primaerknopf weiter wie der Hauptknopf aussehen und
+     im dunklen Design Icon-Knoepfe ganz verschwinden. Gesperrt ist jetzt eine eigene Form. */
+  opacity: 1;
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.btn.primary:disabled {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--muted);
 }
 .form {
   display: grid;
@@ -983,8 +1072,11 @@ table.layers select {
   gap: 4px;
 }
 .laser-grid .btn {
-  min-height: 42px;
-  overflow-wrap: anywhere;
+  min-height: 48px;
+  /* „anywhere“ partia a palavra no meio („Enquadramen|to“). Zwischen Woertern trennen, und wo die
+     Sprache es erlaubt mit Silbentrennung. */
+  overflow-wrap: break-word;
+  hyphens: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1022,6 +1114,11 @@ table.layers select {
   font: 600 calc(10px * var(--ty-interface)) system-ui, sans-serif;
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.9);
   padding: 0;
+}
+/* Helles Farbfeld: schwarze Zahl statt weisser (src/ui.ts labelOnColor, gemessen) */
+#palette button.on-light {
+  color: #000;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.9);
 }
 #palette button.tool {
   flex: 1.3;
@@ -1124,6 +1221,8 @@ dialog > .dlg-bar .ib {
 dialog > .dlg-bar .dlg-close {
   margin-left: auto;
   margin-right: -6px;
+  min-width: 24px;
+  min-height: 24px;
 }
 .preview-dialog > .dlg-bar {
   margin-bottom: 0;
@@ -1231,8 +1330,8 @@ dialog kbd {
   margin-top: 12px;
 }
 .btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-solid);
+  border-color: var(--accent-solid);
   color: #fff;
 }
 dialog::backdrop {
@@ -1404,7 +1503,7 @@ label.check {
   background: #e8a020;
 }
 .dot.error {
-  background: #e03030;
+  background: var(--danger);
 }
 .conn-row {
   display: flex;
@@ -1494,7 +1593,7 @@ label.check {
   align-items: center;
 }
 .laser-msg.error {
-  color: #d03030;
+  color: var(--danger);
 }
 .move-pos {
   color: var(--muted);
@@ -1545,7 +1644,7 @@ label.check {
   color: var(--muted);
 }
 .console-log .error {
-  color: #d03030;
+  color: var(--danger);
 }
 .console-input input {
   width: 100%;
@@ -1589,6 +1688,16 @@ label.check {
 .device-dialog .form .conn-row {
   margin: 0;
   flex-wrap: wrap;
+}
+/* Galvo (JCZ): one value per galvo side by side */
+.device-dialog .form .jcz-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-items: center;
+}
+.device-dialog .form .jcz-pair input {
+  min-width: 0;
 }
 .device-dialog .form .conn-row .btn {
   white-space: nowrap;
@@ -1881,6 +1990,55 @@ table.devices .actions {
 .devices-dialog .conn-row select {
   flex: 1;
 }
+/* Aus LightBurn importieren */
+.lb-import-dialog {
+  width: min(760px, 92vw);
+}
+.lb-import-dialog .lb-list {
+  max-height: 60vh;
+  overflow: auto;
+  margin: 6px 0;
+}
+.lb-dev {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+.lb-dev.off {
+  opacity: 0.7;
+}
+.lb-dev .lb-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+}
+.lb-dev .lb-dup {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: auto;
+}
+.lb-dev .muted {
+  color: var(--muted);
+}
+.lb-dev details summary {
+  cursor: pointer;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.lb-notes {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  overflow-wrap: anywhere;
+}
+.lb-notes li.lb-missing b {
+  color: var(--muted);
+}
+.lb-import-dialog .lb-result:empty {
+  display: none;
+}
 
 /* Kamera */
 .camera-tab .form {
@@ -1905,7 +2063,7 @@ table.devices .actions {
 }
 .note.error,
 .cal-result.error {
-  color: #e03030;
+  color: var(--danger);
 }
 .camera-dialog {
   width: min(1200px, 94vw);
@@ -2293,7 +2451,7 @@ table.layers td:nth-child(2) {
   display: none !important;
 }
 .note.error {
-  color: #d03030;
+  color: var(--danger);
 }
 .hinge-inline {
   display: flex;
@@ -2343,7 +2501,7 @@ table.layers td:nth-child(2) {
 .agent-status.error,
 .agent-state.error,
 .agent-log .error {
-  color: #d03030;
+  color: var(--danger);
 }
 .agent-dialog {
   width: min(640px, 92vw);
@@ -2446,7 +2604,7 @@ table.layers td:nth-child(2) {
   white-space: pre-wrap;
 }
 .note.error {
-  color: #d03030;
+  color: var(--danger);
 }
 .device-dialog .form .wide,
 .device-dialog .form textarea.script {
@@ -2476,7 +2634,7 @@ table.layers td:nth-child(2) {
 .qr-preview {
   width: 160px;
   height: 160px;
-  border: 1px solid var(--border, #888);
+  border: 1px solid var(--line-control);
   image-rendering: pixelated;
   flex: none;
 }
@@ -2507,7 +2665,7 @@ table.layers td:nth-child(2) {
 }
 .vt-preview code,
 .vt-codes code {
-  background: var(--surface2, rgba(128, 128, 128, 0.15));
+  background: var(--surface-2);
   padding: 0 3px;
   border-radius: 3px;
 }
@@ -3133,15 +3291,15 @@ body.dock-resizing #canvas {
   margin-bottom: 6px;
 }
 .gen-dialog .invalid {
-  color: var(--danger, #c0392b);
+  color: var(--danger);
 }
 .gen-dialog input.invalid {
-  outline: 1px solid var(--danger, #c0392b);
+  outline: 1px solid var(--danger);
 }
 .gen-preview {
   width: 240px;
   height: 240px;
-  border: 1px solid var(--border, #888);
+  border: 1px solid var(--line-control);
   color: var(--text);
   flex: none;
 }
@@ -3200,7 +3358,7 @@ body.dock-resizing #canvas {
   margin-top: 0;
 }
 .gen-issues .error {
-  color: var(--danger, #c0392b);
+  color: var(--danger);
 }
 .gen-dialog .note,
 .gen-guard p {
@@ -3286,8 +3444,8 @@ body.dock-resizing #canvas {
   border-color: var(--accent);
 }
 .gen-steps button.invalid {
-  border-color: var(--warn, #d9822b);
-  color: var(--warn, #d9822b);
+  border-color: var(--warn);
+  color: var(--warn);
 }
 .gen-step .jig-panel:first-child {
   margin-top: 0;
@@ -3471,12 +3629,12 @@ body.dock-resizing #canvas {
 }
 .param-problems .error,
 .param-dialog .error {
-  color: #c03030;
+  color: var(--danger);
   margin-top: 4px;
 }
 .param-row input.invalid,
 .param-dialog input.invalid {
-  outline: 1px solid #c03030;
+  outline: 1px solid var(--danger);
 }
 .param-spacer {
   flex: 1;
@@ -3532,7 +3690,7 @@ input.bound {
   margin-top: 6px;
 }
 .param-dialog .note.error {
-  color: #c03030;
+  color: var(--danger);
 }
 
 /* Vorlagen */
@@ -3728,7 +3886,7 @@ input.bound {
   font-variant-numeric: tabular-nums;
 }
 .setup-status.error {
-  color: #d03030;
+  color: var(--danger);
 }
 .setup-main {
   display: grid;
@@ -3872,10 +4030,10 @@ input.bound {
   border-left-color: #d08700;
 }
 .setup-finding.error .icon {
-  background: #d03030;
+  background: var(--danger);
 }
 .setup-finding.error {
-  border-left-color: #d03030;
+  border-left-color: var(--danger);
 }
 .setup-finding .title {
   font-weight: 600;
@@ -3989,11 +4147,13 @@ input.bound {
   border-radius: 50%;
   background: #2f8fe8;
 }
-.chk-row.lvl-error .chk-dot {
-  background: #e02020;
+.chk-row.lvl-error .chk-dot,
+.bp-row.lvl-error .chk-dot {
+  background: var(--danger);
 }
-.chk-row.lvl-warn .chk-dot {
-  background: #ff8a00;
+.chk-row.lvl-warn .chk-dot,
+.bp-row.lvl-warn .chk-dot {
+  background: var(--warn);
 }
 .chk-text {
   flex: 1;
@@ -4071,7 +4231,7 @@ input.bound {
   width: min(560px, 96vw);
 }
 .packs-dialog .error {
-  color: var(--danger, #c0392b);
+  color: var(--danger);
 }
 .packs-dialog .error:empty {
   display: none;
@@ -4132,13 +4292,13 @@ input.bound {
   color: var(--accent);
 }
 .pack-badge.unverified {
-  border-color: var(--danger, #c0392b);
-  color: var(--danger, #c0392b);
+  border-color: var(--danger);
+  color: var(--danger);
 }
 /* Plugins that fetch data from the internet (#280) */
 .pack-badge.network {
-  border-color: var(--warn, #d9822b);
-  color: var(--warn, #d9822b);
+  border-color: var(--warn);
+  color: var(--warn);
 }
 .pack-net {
   margin-top: 4px;
@@ -4397,7 +4557,7 @@ input.bound {
   width: 460px;
   max-width: 100%;
   margin: 8px 0;
-  border: 1px solid var(--border, #888);
+  border: 1px solid var(--line-control);
   cursor: pointer;
 }
 .wp-list {
@@ -4720,6 +4880,87 @@ input.bound {
   padding: 4px;
   box-sizing: border-box;
 }
+/* Werkzeugkasten: Beispielbilder der Kacheln (src/appArt.json, gezeichnet von scripts/build-app-art.ts).
+   Die Bilder tragen nur Klassen; ihre Farben stehen hier. Die Holztöne sind hell und dunkel dieselben. */
+:root {
+  --art-w1: #f6e3c0; --art-w2: #eacf9f; --art-w3: #dcbb84;
+  --art-e1: #bd8f60; --art-e2: #a3774a; --art-e3: #8a5f38;
+  --art-line: #6e4a2a; --art-burn: #8c5b31;
+  --art-ghost: #8a919c; --art-paper: #ffffff; --art-paper-line: #aab1bc;
+  --art-dark: #3d4450; --art-metal: #cfd5dd; --art-metal-line: #7b8490; --art-warn: #d9483b;
+  --art-ink: #3d4450;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --art-ghost: #a7afbb; --art-paper: #f1f3f5; --art-ink: #d4d8de;
+  }
+}
+:root[data-theme='dark'] {
+  --art-ghost: #a7afbb; --art-paper: #f1f3f5; --art-ink: #d4d8de;
+}
+.app-pic,
+.app-pic .art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.art * { fill: none; fill-rule: evenodd; stroke: none; stroke-linejoin: round; stroke-linecap: round; }
+/* Zugeschnittenes Teil: Fläche im Licht, im Halbschatten, im Schatten; Schnittkanten in drei Tönen */
+.art .w { fill: var(--art-w1); stroke: var(--art-line); stroke-width: 1.1; }
+.art .w2 { fill: var(--art-w2); stroke: var(--art-line); stroke-width: 1.1; }
+.art .w3 { fill: var(--art-w3); stroke: var(--art-line); stroke-width: 1.1; }
+.art .ns { stroke: none; }
+.art .e1 { fill: var(--art-e1); }
+.art .e2 { fill: var(--art-e2); }
+.art .e3 { fill: var(--art-e3); }
+.art .o { stroke: var(--art-line); stroke-width: 1.1; }
+.art .o2 { stroke: var(--art-line); stroke-width: 2.4; }
+/* Gravur (Fläche, feine Linie, Linie, fette Linie), Schnittlinie, Hilfslinie */
+.art .b { fill: var(--art-burn); }
+.art .bt { stroke: var(--art-burn); stroke-width: 0.8; }
+.art .bl { stroke: var(--art-burn); stroke-width: 1.3; }
+.art .bb { stroke: var(--art-burn); stroke-width: 2.6; }
+.art .c { stroke: var(--art-line); stroke-width: 1.3; }
+.art .g { stroke: var(--art-ghost); stroke-width: 1.1; stroke-dasharray: 3 2.6; }
+/* Was das Werkzeug tut (Akzent: Linie, feine Linie, gestrichelt, Fläche), Laserbahn und Warnung */
+.art .a { stroke: var(--accent); stroke-width: 1.7; }
+.art .at { stroke: var(--accent); stroke-width: 1.1; }
+.art .ad { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3.2 2.8; }
+.art .af { fill: var(--accent); }
+.art .x { stroke: var(--art-warn); stroke-width: 1.5; }
+.art .xf { fill: var(--art-warn); }
+/* Papier, Foto oder Bildschirm (mit heller Linie darauf); dunkles Detail darauf; Maschinenteil */
+.art .k { fill: var(--art-paper); stroke: var(--art-paper-line); stroke-width: 1; }
+.art .kl { stroke: var(--art-paper); stroke-width: 2.2; }
+.art .d { fill: var(--art-dark); }
+.art .dl { stroke: var(--art-dark); stroke-width: 1.3; }
+.art .m { fill: var(--art-metal); stroke: var(--art-metal-line); stroke-width: 1.1; }
+/* Direkt auf der Kachel gezeichnet (Skizzenlinie, Bildpunkte, Riemen): folgt dem Design */
+.art .i { stroke: var(--art-ink); stroke-width: 1.3; }
+.art .if { fill: var(--art-ink); }
+.art .r { stroke: var(--art-ink); stroke-width: 3.2; }
+/* Beispielbild der gewählten Option in einem Dialog (src/optionArt.json, Feld 96 × 64): unter dem Auswahlfeld,
+   in der Spalte der Felder */
+.opt-art {
+  grid-column: 2;
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 96 / 64;
+  border-radius: 8px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.opt-art .art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* „Bild anpassen“ ist der höchste dieser Dialoge: in niedrigen Fenstern wird das Bild des Bildmodus kleiner,
+   damit der Dialog weiter ohne Rollen auf den Bildschirm passt (ab etwa 765 px Fensterhöhe volle Größe) */
+.adjust-dialog .opt-art {
+  max-width: clamp(96px, calc((100vh - 630px) * 1.5), 200px);
+}
+/* Ende Beispielbilder */
 .app-new {
   position: absolute;
   top: -5px;
@@ -4784,7 +5025,7 @@ input.bound {
   max-width: 100%;
   height: 200px;
   margin-top: 10px;
-  border: 1px solid var(--border, #888);
+  border: 1px solid var(--line-control);
 }
 
 /* Fenster „Schriften“ (Font-Manager) */
@@ -4891,7 +5132,7 @@ input.bound {
 }
 .pc-result.error,
 .pc-info.error {
-  color: var(--danger, #c0392b);
+  color: var(--danger);
 }
 .pc-dialog .form {
   grid-template-columns: 170px 90px;
@@ -5047,7 +5288,7 @@ input.jig-count {
 .slot-tool-body { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(260px, 340px); flex: 1; min-height: 0; gap: 12px; overflow: auto; }
 .slot-tool-preview { min-width: 0; min-height: 180px; display: flex; flex-direction: column; gap: 6px; }
 .slot-tool-canvas { width: 100%; height: 100%; min-height: 140px; flex: 1; background: #20252c; touch-action: none; }
-.slot-tool-canvas:focus-visible { outline: 2px solid var(--accent, #6bafff); outline-offset: -2px; }
+.slot-tool-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .slot-tool-settings { overflow: auto; min-height: 0; padding: 2px; }
 .slot-tool-settings > select { max-width: 100%; }
 .slot-projection-dialog > .note { margin: 0; }
@@ -5058,13 +5299,13 @@ input.jig-count {
 .slot-icon-button { width: 34px; height: 34px; min-width: 34px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
 .slot-icon-button svg, .slot-feature-visibility svg { width: 22px; height: 22px; pointer-events: none; }
 .slot-feature-visibility { width: 30px; height: 30px; min-width: 30px; padding: 4px; display: inline-flex; align-items: center; justify-content: center; color: inherit; background: transparent; border: 0; cursor: pointer; }
-.slot-feature-visibility:hover { background: var(--hover, #394859); }
+.slot-feature-visibility:hover { background: var(--accent-soft); }
 .slot-draft-note { color: #ffe277; }
-.slot-feature-toolbar .btn[aria-pressed="true"], .slot-inline-buttons .btn[aria-pressed="true"] { outline: 2px solid var(--accent, #6bafff); outline-offset: -2px; }
+.slot-feature-toolbar .btn[aria-pressed="true"], .slot-inline-buttons .btn[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: -2px; }
 .slot-features-body { display: grid; grid-template-columns: minmax(150px, 200px) minmax(180px, 1fr) minmax(250px, 330px); flex: 1; min-height: 0; gap: 10px; }
 .slot-feature-tree { overflow: auto; min-height: 120px; border: 1px solid var(--line); padding: 4px; }
 .slot-feature-tree [role="treeitem"] { padding: 5px; cursor: pointer; overflow-wrap: anywhere; }
-.slot-feature-tree [aria-selected="true"] { background: var(--hover, #394859); outline: 1px solid var(--accent, #6bafff); }
+.slot-feature-tree [aria-selected="true"] { background: var(--accent-soft); outline: 1px solid var(--accent); }
 .slot-feature-tree [aria-invalid="true"] { color: #ec986d; }
 .slot-feature-tree [role="group"] { padding-left: 14px; }
 .slot-feature-properties h4 { margin: 10px 0; }
@@ -5077,7 +5318,7 @@ input.jig-count {
 @media (max-width: 500px) { .slot-features-body { grid-template-columns: 1fr; } .slot-feature-tree { max-height: 140px; } }
 @media (max-width: 700px) { .slot-tool-body { grid-template-columns: 1fr; overflow: auto; } .slot-tool-preview { min-height: 240px; } .slot-tool-settings { overflow: visible; } }
 /* Transient overlap chooser: names are inserted as text, never HTML. */
-.overlap-picker { position:fixed; z-index:10000; display:flex; flex-direction:column; max-height:min(60vh,420px); max-width:min(90vw,460px); overflow:auto; padding:6px; background:var(--panel, #252830); color:var(--fg, #eee); border:1px solid #8090a0; border-radius:5px; box-shadow:0 4px 18px #0006; }
+.overlap-picker { position:fixed; z-index:10000; display:flex; flex-direction:column; max-height:min(60vh,420px); max-width:min(90vw,460px); overflow:auto; padding:6px; background:var(--panel); color:var(--text); border:1px solid #8090a0; border-radius:5px; box-shadow:0 4px 18px #0006; }
 .overlap-picker > div { padding:5px; font-weight:600; }
 .overlap-picker button { text-align:left; white-space:normal; overflow-wrap:anywhere; padding:6px; flex:none; }
 .overlap-picker button:hover, .overlap-picker button:focus-visible { outline:2px solid #e0218a; outline-offset:-2px; }
@@ -5090,7 +5331,7 @@ input.jig-count {
 
 /* Remote KizamuBeam (host mode, pairing, remote jobs) */
 .remote-status.error {
-  border-color: #d03030;
+  border-color: var(--danger);
 }
 .remote-confirm {
   width: min(520px, 95vw);
@@ -5422,4 +5663,88 @@ label.settings-label input {
   align-items: center;
 }
 /* Tool-window drag handles (toolWindow.ts): keyboard-focusable via tabindex. */
-dialog h3[tabindex]:focus-visible { outline: 2px solid var(--accent, #6bafff); outline-offset: 2px; }
+dialog h3[tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Chargenprüfung (batchProofDialog.ts) ---------- */
+.bp-dialog {
+  margin: auto;
+  width: min(860px, 94vw);
+  max-width: 94vw;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+}
+.bp-dialog .vt-inline {
+  margin-bottom: 4px;
+}
+.bp-dialog .vt-inline input[type='text'] {
+  width: 72px;
+}
+.bp-bar {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+}
+.bp-dialog .chk-summary {
+  white-space: normal;
+}
+.bp-list {
+  flex: 1;
+  min-height: 120px;
+  overflow-y: auto;
+  margin: 0 -4px;
+}
+.bp-list .empty {
+  padding: 10px 6px;
+  color: var(--muted);
+}
+.bp-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.bp-row.cur {
+  background: var(--accent-soft);
+}
+.bp-row.lvl-ok .chk-dot {
+  background: var(--muted);
+}
+.bp-n {
+  flex: none;
+  min-width: 48px;
+  font-variant-numeric: tabular-nums;
+}
+.bp-art {
+  flex: none;
+  display: grid;
+  gap: 2px;
+}
+.bp-canvas {
+  width: 220px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+.bp-text {
+  flex: 1;
+  min-width: 0;
+}
+.bp-value {
+  font-size: calc(12px * var(--ty-technical));
+  overflow-wrap: anywhere;
+}
+.bp-who {
+  color: var(--muted);
+}
+.bp-msg {
+  font-size: calc(11px * var(--ty-supporting));
+  overflow-wrap: anywhere;
+}
+.bp-msg.lvl-error::before {
+  content: '⚠ ';
+}
+.bp-msg.lvl-warn::before {
+  content: '• ';
+}

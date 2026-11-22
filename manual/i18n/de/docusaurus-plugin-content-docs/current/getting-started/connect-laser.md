@@ -43,6 +43,8 @@ Controller mit WLAN oder Ethernet, etwa FluidNC oder Ruida DSP, erreichst du üb
 
 Gib die Adresse des Controllers ein, zum Beispiel `192.168.1.50` oder `fluidnc.local`. **Suchen …** neben dem Adressfeld findet FluidNC-Controller in deinem Netzwerk.
 
+![Geräteeinstellungen, Reiter Verbindung: Anschluss WLAN (Telnet), USB-Schnittstelle, Baudrate, die Adresse fluidnc.local mit der Schaltfläche Suchen und die Netzwerk-Ports](/img/device-connection-settings-de.webp)
+
 :::tip Wackeliges WLAN
 Bei FluidNC kannst du einen Job auf die SD-Karte oder den Flash-Speicher des Controllers laden und dort starten (**Laser → FluidNC**). Bei Ruida legt **In Steuerung speichern …** einen benannten `.rd`-Job im internen Speicher des Controllers ab. Ein Netzwerkabbruch stoppt den Job dann nicht mehr.
 :::
@@ -50,6 +52,8 @@ Bei FluidNC kannst du einen Job auf die SD-Karte oder den Flash-Speicher des Con
 ## Mehrere Geräte
 
 Jeder Laser wird als Gerät mit eigenem Arbeitsbereich, eigener Verbindung und eigenen Einstellungen gespeichert. Du wechselst oben im Fenster Laser oder unter **Laser → Gerät → Geräte …**. Gerätevorlagen gibt es für viele verbreitete Laser (zum Beispiel Swiitol, Ortur, Atomstack, Sculpfun, xTool, Creality Falcon, Two Trees, Longer, Comgrow, OMTech und Ruida); die Arbeitsfläche zeigt immer das Bett des gewählten Geräts.
+
+![Dialog Geräte mit drei Lasern samt Steuerung und Arbeitsbereich, darunter die Liste der Gerätevorlagen für ein neues Gerät](/img/devices-dialog-de.webp)
 
 ## Ohne Laser
 

@@ -14,13 +14,15 @@ import { jobOutputsOff, jobOutputsOn } from './fluidnc';
 import { parkedObjs } from './parking';
 import { addPt, boxesOf, buildContainment, containsStrict, emptyBox } from './polyTopology';
 import { ruidaParamsForJob, sanitizeRuidaFilename, writeRuida } from './ruida';
+import type { JczSettings } from './jcz/contract';
+import { DEFAULT_JCZ, normalizeJcz } from './jcz/settings';
 export { sanitizeRuidaFilename };
 
 // ---------- Geräte und Firmware ----------
 
 export type StartFrom = 'absolute' | 'user' | 'current';
 
-export type Firmware = 'fluidnc' | 'grbl' | 'grblhal' | 'marlin' | 'smoothie' | 'xtool' | 'ruida';
+export type Firmware = 'fluidnc' | 'grbl' | 'grblhal' | 'marlin' | 'smoothie' | 'xtool' | 'ruida' | 'jcz';
 export type RuidaOrigin = 'top-right' | 'top-left' | 'bottom-left' | 'bottom-right';
 export type RuidaMagic = 'auto' | '88' | '11' | '38';
 export type RuidaLaser = '1' | '2' | 'both';
@@ -105,7 +107,19 @@ export const FIRMWARES: Record<Firmware, FirmwareInfo> = {
     read: 'ruida',
     overrides: false,
   },
+  // Galvo fiber laser with a JCZ/EZCad board (LightBurn "JCZFiber"): no G-code at all. Jobs go as polylines in field
+  // coordinates through the jcz_* commands (src/jcz/, machine.ts); these G-code fields are never sent.
+  jcz: {
+    label: 'JCZ / EZCad (Galvo fibra)',
+    sMax: 100, sync: true, realtime: false, poll: null, laserOn: [], frameOn: [], footer: [],
+    home: '', unlock: null, jog: () => [], setOrigin: '', clearOrigin: null, read: null, overrides: false,
+  },
 };
+
+/** Galvo device with a JCZ/EZCad board (marks through jcz_* instead of G-code) */
+export const isJcz = (d: Pick<Device, 'fw'>) => d.fw === 'jcz';
+/** Device.jczBoard for the simulator instead of a board */
+export const JCZ_SIM = 'sim';
 
 /** Controller sends real-time status reports on `?` (GRBL family, Smoothieware); otherwise it is polled as a line */
 export const liveStatus = (fw: FirmwareInfo): boolean => fw.realtime && !fw.poll;
@@ -243,6 +257,10 @@ export interface Device {
   ruidaOrigin?: RuidaOrigin;
   /** Aktive Laserröhre bei Ruida (1, 2 oder beide) */
   ruidaLaser?: RuidaLaser;
+  /** Galvo settings (fw 'jcz'): lens field, corrections, laser source, delays, red light, ports */
+  jcz?: JczSettings;
+  /** Galvo board to connect to: its USB serial, '' = the first board found, 'sim' = simulator (no laser) */
+  jczBoard?: string;
 }
 
 export const DEFAULT_DEVICE: Device = {
@@ -308,8 +326,19 @@ export function newDevice(preset: Partial<Device> & { fw: Firmware }): Device {
     rotary: { ...DEFAULT_ROTARY, ...preset.rotary },
     pointerOffset: { ...DEFAULT_DEVICE.pointerOffset, ...preset.pointerOffset },
     ...(preset.laser ? { laser: { ...preset.laser } } : {}),
+    ...(preset.fw === 'jcz' ? jczBed(normalizeJcz(preset.jcz ?? DEFAULT_JCZ)) : {}),
     id: `d${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
   };
+}
+
+/** Galvo device: settings complete, work area = lens field (the design area is the field), absolute coordinates */
+export function jczBed(jcz: JczSettings): Pick<Device, 'jcz' | 'bedW' | 'bedH' | 'startFrom'> {
+  return { jcz, bedW: jcz.field, bedH: jcz.field, startFrom: 'absolute' };
+}
+
+/** Stored galvo device: fill in missing settings (older or imported data); other devices stay as they are */
+export function withJcz(d: Device): Device {
+  return d.fw === 'jcz' ? { ...d, ...jczBed(normalizeJcz(d.jcz)) } : d;
 }
 
 export interface DeviceStore {
@@ -334,7 +363,7 @@ export function loadDevices(): DeviceStore {
           migrated.optTravel = false;
         }
         delete (migrated as { optimize?: boolean }).optimize;
-        return migrated;
+        return withJcz(migrated);
       });
       if (st.devices.length) {
         if (!st.devices.some((d) => d.id === st.current)) st.current = st.devices[0].id;
@@ -564,6 +593,8 @@ export class Moves {
   z = new Float32Array(1024);
   /** Z-Versatz für die folgenden push-Aufrufe */
   zCur = 0;
+  /** Image raster ranges [from, to, bidirectional 0/1] (move indices); only the Ruida writer uses them (scan mode) */
+  scan: number[] = [];
   constructor(public x0 = 0, public y0 = 0) {}
   push(x: number, y: number, f: number, s: number, layer: number, cls = MOVE_TRAVEL, sub = -1) {
     if (this.n === this.x.length) {
@@ -579,6 +610,7 @@ export class Moves {
       this.layer = grow(this.layer);
       this.cls = grow(this.cls);
       this.sub = grow(this.sub);
+      this.z = grow(this.z);
     }
     const i = this.n++;
     this.z[i] = this.zCur;
@@ -1954,10 +1986,12 @@ export async function buildJob(inp: JobInput): Promise<Job> {
         }
         // Z per pass from the layer, like for vectors
         if (!useZ && (L.zOffset || L.zStep)) zSkipped = true;
+        const scan0 = mv.n;
         for (let p = 0; p < Math.max(1, IL.passes); p++) {
           mv.zCur = useZ ? L.zOffset + p * L.zStep : 0;
           emitScanlines(mv, lines, { speed: IL.speed, bidirectional: IL.bidirectional, overscan: ov, layer: li }, flip);
         }
+        mv.scan.push(scan0, mv.n, IL.bidirectional ? 1 : 0);
         mv.zCur = 0;
       }
     }

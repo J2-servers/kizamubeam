@@ -24,6 +24,8 @@ Apri **Laser → Dispositivo → Configurazione asse rotante …** (o **Asse rot
 
 **Rotazione di prova** fa girare l’oggetto esattamente una volta con i valori inseriti. Se gira troppo o troppo poco, correggi la corsa per rotazione nella stessa proporzione.
 
+![Finestra dell’asse rotante con l’asse rotante abilitato: tipo Rulli, asse Y, corsa per rotazione 360, diametro del rullo 25 mm, diametro dell’oggetto 80 mm con la circonferenza, le opzioni per oggetto conico e inversione della direzione e il pulsante Rotazione di prova; dietro, sull’area di lavoro, un logo per una tazza](/img/rotary-setup-en.webp)
+
 ## Come funziona
 
 Con l’asse rotante attivo:

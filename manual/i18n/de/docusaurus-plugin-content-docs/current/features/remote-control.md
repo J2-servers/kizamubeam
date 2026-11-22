@@ -26,6 +26,8 @@ Auf dem anderen Rechner:
 2. Klicke auf **Host suchen …**, um Hosts im Netz zu finden, oder gib die Adresse des Hosts ein (über ein VPN wie Tailscale oder WireGuard von Hand).
 3. Klicke auf **Koppeln …**. Der Host zeigt einen 6-stelligen Code; tippe ihn auf diesem Rechner ein.
 
+![Geräteeinstellungen, Reiter Verbindung, an dem Rechner, der den Laser aus der Ferne nutzt: der Anschluss Anderer KizamuBeam (Netzwerk), die Adresse des Hosts, Host-Port 47900 und die Zeile Kopplung mit dem Zustand Nicht gekoppelt und den Schaltflächen Host suchen und Koppeln](/img/remote-pairing-device-de.webp)
+
 Der Host listet alle gekoppelten Rechner und kann sie entfernen oder ihre Rolle ändern:
 
 | Rolle | Darf |

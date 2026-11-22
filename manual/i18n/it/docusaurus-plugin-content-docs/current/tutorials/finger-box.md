@@ -31,6 +31,8 @@ I dettagli sono in [Calibrare l’accoppiamento](../features/materials-tests.md#
 5. Con un materiale calibrato, la finestra usa già il suo kerf e il suo gioco. Altrimenti inseriscili tu.
 6. Fai clic su **Crea**.
 
+![Finestra di creazione della scatola con i valori di questo tutorial: dimensioni esterne, larghezza 100, profondità 80, altezza 50, spessore del materiale 2,9 mm e chiusa (coperchio con dita); l’anteprima mostra i sei pannelli](/img/finger-box-dialog-en.webp)
+
 Le sei pareti compaiono sulla pagina in una disposizione compatta. Sono un’unica parte parametrica: un doppio clic su una parete qualsiasi ne cambia la misura in seguito.
 
 ## 3. Incidere il nome sul coperchio
@@ -40,6 +42,8 @@ Le sei pareti compaiono sulla pagina in una disposizione compatta. Sono un’uni
 3. Metti il testo su un livello a parte: fai clic su un altro colore della tavolozza, poi imposta quel livello su **Riempimento** nella finestra dei livelli.
 4. Seleziona il testo e il coperchio e centrali l’uno sull’altro con **C** ed **E**.
 5. Raggruppa il testo con il coperchio (Ctrl+G), così si sposta insieme quando la scatola viene ridisposta.
+
+![I sei pannelli della scatola sulla pagina; il nome Emma è al centro del coperchio, su un livello a parte chiamato Engrave e impostato su Riempimento, che nella finestra dei livelli viene prima del livello Cut](/img/finger-box-name-on-lid-en.webp)
 
 ## 4. Controllare la scatola in 3D
 

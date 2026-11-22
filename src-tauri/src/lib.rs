@@ -1,6 +1,9 @@
 pub mod agent;
+mod criar;
 mod fluid;
 mod fonts;
+mod jcz;
+mod lbprefs;
 mod library;
 mod machine;
 mod native;
@@ -192,6 +195,8 @@ pub fn run() {
             remote::start(app.handle(), &app.state::<remote::Remote>());
             Ok(())
         })
+        // Ohne Hauptfenster bleibt das Fenster „Produkt erstellen“ nicht allein offen (die App endet wie bisher)
+        .on_window_event(criar::close_with_main)
         .invoke_handler(tauri::generate_handler![
             netcam::netcam_open,
             netcam::netcam_frame,
@@ -212,6 +217,7 @@ pub fn run() {
             fonts::font_remove,
             fonts::font_open_folder,
             machine::machine_ports,
+            lbprefs::lightburn_prefs_read,
             machine::machine_connect,
             machine::machine_disconnect,
             machine::machine_send,
@@ -282,7 +288,18 @@ pub fn run() {
             sync::sync_dir_delete,
             updater::update_supported,
             updater::update_check,
-            updater::update_install
+            updater::update_install,
+            criar::open_criar_window,
+            criar::focus_main_window,
+            criar::criar_open_key_page,
+            jcz::jcz_list,
+            jcz::jcz_connect,
+            jcz::jcz_disconnect,
+            jcz::jcz_status,
+            jcz::jcz_frame,
+            jcz::jcz_mark,
+            jcz::jcz_stop,
+            jcz::jcz_light
         ])
         .run(tauri::generate_context!())
         .expect("Fehler beim Start der Anwendung");

@@ -16,11 +16,15 @@ In questo tutorial incidi un ritratto o la foto di un animale su un pezzo di leg
 2. Ridimensionala alla misura che vuoi, per esempio 100 mm di larghezza. Tieni bloccate le proporzioni, così l’immagine non si deforma.
 3. Metti l’immagine su un livello a parte facendo clic su un colore della tavolozza.
 
+![Un’immagine importata, scalata a 100 mm di larghezza e messa su un livello a parte chiamato Photo; l’area di lavoro la mostra retinata come verrà lavorata al laser, e la barra delle modifiche numeriche ne mostra le dimensioni, la risoluzione di 254 DPI e i pulsanti per modificarla, ricalcarla e rimuovere lo sfondo](/img/photo-import-en.webp)
+
 ## 2. Preparare l’immagine
 
 1. **Rimuovi lo sfondo** se il soggetto deve stare da solo: **Strumenti → Immagine → Rimuovi sfondo …**. Fai clic sullo sfondo nell’anteprima, regola la tolleranza e spunta **Ritaglia al soggetto**.
 2. **Modifica l’immagine**: **Strumenti → Immagine → Modifica immagine …**. Il legno scurisce in fretta, quindi la maggior parte delle foto ha bisogno di più luminosità e contrasto di quanto ti aspetti. Aumenta il contrasto finché il volto ha zone chiare e scure ben distinte, e aumenta un po’ la nitidezza. Usa il confronto con l’originale e la vista 1:1.
 3. Per dare una forma alla foto, disegna un’ellisse o un rettangolo arrotondato sopra di essa, seleziona entrambi e scegli **Strumenti → Immagine → Applica maschera all’immagine**.
+
+![Finestra Modifica immagine: luminosità portata a 14, contrasto a 32, nitidezza 70 %, la modalità immagine Atkinson, un intervallo tra le righe di 0,1 mm (254 DPI) e l’overscan; l’anteprima a sinistra mostra il risultato retinato](/img/photo-adjust-image-en.webp)
 
 ## 3. Scegliere una modalità immagine
 

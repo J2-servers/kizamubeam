@@ -32,6 +32,7 @@ import { openVectorFitDialog } from './vectorDialog';
 import { installEditorContext } from './editorContext';
 import { commandKey, commandMatches } from './commandKeys';
 import { openQrDialog, openVarTextDialog } from './qrDialog';
+import { openBatchProof } from './batchProofDialog';
 import { openBarcodeDialog } from './barcodeDialog';
 import { askGenConvert, openGenDialog } from './generators/dialog';
 import { assignLayerAsk, needsChildLayersQuestion } from './layerAssign';
@@ -40,9 +41,10 @@ import { maybeOfferSetup, openSetupWizard } from './setupWizard';
 import { maybeCheckForUpdates, nightlyBuild, nightlyWarning, openUpdateDialog } from './updateDialog';
 import { openPacksDialog } from './packsDialog';
 import { openGridDialog } from './gridDialog';
-import { buildLaser, frameJob, isPositionPick, openDeviceDialog, openDevicesDialog, openPreview, openRotaryDialog, saveGCode, startJob, togglePositionPick } from './laser';
+import { buildLaser, device as laserDevice, frameJob, onDeviceChange, isPositionPick, openDeviceDialog, openDevicesDialog, openPreview, openRotaryDialog, saveGCode, startJob, togglePositionPick } from './laser';
 import { openLayerDialog, setAdjustOpener } from './layerdialog';
 import { imageLayerFields, liveLayerRaster } from './imageLayerFields';
+import { optionPicture } from './optionArt';
 import { openMaterialTestDialog } from './materialtest';
 import { openTestPhotoDialog } from './testphotoDialog';
 import { BoolBase } from './ops';
@@ -334,6 +336,7 @@ function buildMenu(ed: Editor) {
         [t('Text vom Pfad lösen'), '', () => ed.removePathFromText()],
         'sep',
         [t('Variabler Text …'), '', () => openVarTextDialog(ed)],
+        [t('Chargenprüfung …'), '', () => openBatchProof(ed)],
         [t('Variablen Text festschreiben'), '', () => bakeVarText(ed)],
       ] },
       { sub: t('Bild'), items: [
@@ -540,6 +543,19 @@ function buildMenu(ed: Editor) {
     box.append(btn, list);
     bar.append(box);
   }
+  // Direkt nach „Hilfe“: eigenes Fenster, damit die KI-Arbeit die Maschinensteuerung hier nie stört (src/criar/)
+  bar.append(
+    h(
+      'button',
+      {
+        class: 'menubar-create',
+        title: t('Aus Fotos und einer Beschreibung mit KI ein Produkt aus Laserteilen entwerfen (eigenes Fenster, stört keinen laufenden Auftrag)'),
+        onclick: () => void openCreatorWindow().catch((e) => alert(String(e))),
+      },
+      h('span', { class: 'menubar-create-icon', icon: 'sparkle' }),
+      h('span', {}, t('Produkt erstellen')),
+    ),
+  );
   document.addEventListener('mousedown', (e) => {
     if (openMenu && !openMenu.contains(e.target as Node)) close();
   });
@@ -636,36 +652,36 @@ function buildBars(ed: Editor) {
     { id: 'save', cat: F, icon: 'save', label: t('Speichern'), run: () => saveProject(ed) },
     { id: 'import', cat: F, icon: 'import', label: t('Importieren: Bilder, SVG, DXF, PDF, AI, LightBurn, 3D-Modelle (Ctrl+I)'), run: () => importFile(ed) },
     { id: 'export', cat: F, icon: 'export', label: t('Als SVG exportieren'), run: () => exportSvg(ed) },
-    { id: 'export-dxf', cat: F, short: 'DXF', label: t('Als DXF exportieren'), run: () => exportDxf(ed) },
-    { id: 'export-pdf', cat: F, short: 'PDF', label: t('Als PDF exportieren'), run: () => exportPdf(ed, 'pdf') },
-    { id: 'export-ai', cat: F, short: 'AI', label: t('Als Illustrator-Datei (AI) exportieren'), run: () => exportPdf(ed, 'ai') },
+    { id: 'export-dxf', cat: F, icon: 'exportDxf', short: 'DXF', label: t('Als DXF exportieren'), run: () => exportDxf(ed) },
+    { id: 'export-pdf', cat: F, icon: 'exportPdf', short: 'PDF', label: t('Als PDF exportieren'), run: () => exportPdf(ed, 'pdf') },
+    { id: 'export-ai', cat: F, icon: 'exportAi', short: 'AI', label: t('Als Illustrator-Datei (AI) exportieren'), run: () => exportPdf(ed, 'ai') },
     { id: 'undo', cat: B, icon: 'undo', label: t('Rückgängig (Ctrl+Z)'), run: () => ed.doUndo() },
     { id: 'redo', cat: B, icon: 'redo', label: t('Wiederholen (Ctrl+Y)'), run: () => ed.doRedo() },
     { id: 'cut', cat: B, icon: 'cut', label: t('Ausschneiden (Ctrl+X)'), run: () => ed.cut(), enabled: sel1 },
     { id: 'copy', cat: B, icon: 'copy', label: t('Kopieren (Ctrl+C)'), run: () => ed.copy(), enabled: sel1 },
     { id: 'paste', cat: B, icon: 'paste', label: t('Einfügen (Ctrl+V)'), run: () => ed.paste() },
-    { id: 'duplicate', cat: B, short: t('Dupl.'), label: t('Duplizieren (Ctrl+D)'), run: () => ed.duplicate(), enabled: sel1 },
+    { id: 'duplicate', cat: B, icon: 'duplicate', short: t('Dupl.'), label: t('Duplizieren (Ctrl+D)'), run: () => ed.duplicate(), enabled: sel1 },
     { id: 'delete', cat: B, icon: 'delete', label: t('Löschen (Entf)'), run: () => ed.deleteSel(), enabled: sel1 },
-    { id: 'selectall', cat: B, short: t('Alle'), label: t('Alles auswählen (Ctrl+A)'), run: () => ed.selectAll() },
+    { id: 'selectall', cat: B, icon: 'selectAll', short: t('Alle'), label: t('Alles auswählen (Ctrl+A)'), run: () => ed.selectAll() },
     { id: 'tolines', cat: B, icon: 'tolines', label: t('In Pfad umwandeln (Ctrl+Shift+C)'), run: () => ed.convertSelToPath(), enabled: sel1 },
-    { id: 'closepath', cat: M, short: t('Schließen|Pfad'), label: t('Pfad schließen'), run: () => ed.closeSel(), enabled: sel1 },
-    { id: 'join', cat: M, short: t('Verbinden|Pfade'), label: t('Ausgewählte Formen verbinden (Alt+J)'), run: () => ed.joinSel(), enabled: sel2 },
-    { id: 'breakapart', cat: M, short: t('Zerlegen'), label: t('Zerlegen (Alt+B)'), run: () => ed.breakApartSel(), enabled: sel1 },
-    { id: 'freehand-edit', cat: W, icon:'line', label:t('Freihandpfad bearbeiten …'), run:()=>openFreehandEditDialog(ed), enabled:sel1, on:()=>ed.tool==='freehand-edit' },
+    { id: 'closepath', cat: M, icon: 'closePath', short: t('Schließen|Pfad'), label: t('Pfad schließen'), run: () => ed.closeSel(), enabled: sel1 },
+    { id: 'join', cat: M, icon: 'joinPaths', short: t('Verbinden|Pfade'), label: t('Ausgewählte Formen verbinden (Alt+J)'), run: () => ed.joinSel(), enabled: sel2 },
+    { id: 'breakapart', cat: M, icon: 'breakApart', short: t('Zerlegen'), label: t('Zerlegen (Alt+B)'), run: () => ed.breakApartSel(), enabled: sel1 },
+    { id: 'freehand-edit', cat: W, icon: 'freehandEdit', label:t('Freihandpfad bearbeiten …'), run:()=>openFreehandEditDialog(ed), enabled:sel1, on:()=>ed.tool==='freehand-edit' },
     tool('lasso', 'lasso', t('Lasso-Auswahl')),
-    { id: 'path-islands', cat: M, label: t('Pfadinseln trennen …'), run: () => openPathIslandsDialog(ed), enabled: sel1 },
-    { id: 'reverse', cat: M, short: t('Umkehren'), label: t('Richtung umkehren'), run: () => ed.reverseSel(), enabled: sel1 },
-    { id: 'corners', cat: M, short: t('Ecken'), label: t('Ecken runden oder fasen …'), run: () => openCornerDialog(ed), enabled: sel1 },
+    { id: 'path-islands', cat: M, icon: 'pathIslands', label: t('Pfadinseln trennen …'), run: () => openPathIslandsDialog(ed), enabled: sel1 },
+    { id: 'reverse', cat: M, icon: 'reversePath', short: t('Umkehren'), label: t('Richtung umkehren'), run: () => ed.reverseSel(), enabled: sel1 },
+    { id: 'corners', cat: M, icon: 'corners', short: t('Ecken'), label: t('Ecken runden oder fasen …'), run: () => openCornerDialog(ed), enabled: sel1 },
     { id: 'zoomin', cat: V, icon: 'zoomin', label: t('Vergrößern (+)'), run: () => ed.zoomAt(1.25) },
     { id: 'zoomout', cat: V, icon: 'zoomout', label: t('Verkleinern (-)'), run: () => ed.zoomAt(0.8) },
     { id: 'zoompage', cat: V, icon: 'zoompage', label: t('Ganze Seite (Ctrl+0)'), run: () => ed.zoomPage() },
     { id: 'grid', cat: V, icon: 'grid', label: t('Gitter ein-/ausblenden'), run: () => ed.setGrid({ show: !ed.grid.show }), on: () => ed.grid.show },
     { id: 'camera-overlays', cat: V, icon: 'cameraOverlay', label: t('Alle Kameraüberlagerungen anzeigen'), run: () => toggleCameraOverlays(ed), on: cameraOverlaysVisible,
       dyn: () => ({ icon: cameraOverlaysVisible() ? 'cameraOverlay' : 'cameraOverlayOff' }) },
-    { id: 'gridsettings', cat: V, icon: 'settings', small: true, label: t('Gitter einstellen …'), run: () => openGridDialog(ed) },
+    { id: 'gridsettings', cat: V, icon: 'gridSettings', small: true, label: t('Gitter einstellen …'), run: () => openGridDialog(ed) },
     { id: 'zoomsel', cat: V, icon: 'zoomsel', label: t('Auf Auswahl zoomen'), run: () => ed.zoomSelection(), enabled: sel1 },
     { id: 'view3d', cat: V, icon: 'view3d', label: t('3D-Ansicht: Baugruppen zusammengesteckt ansehen'), run: () => toggleWindow('view3d') },
-    { id: 'wire', cat: V, short: t('Gefüllt'), label: t('Drahtgitter / Gefüllt (Alt+W)'), run: () => ((ed.filled = !ed.filled), ed.emit('view')), on: () => ed.filled },
+    { id: 'wire', cat: V, icon: 'wire', short: t('Gefüllt'), label: t('Drahtgitter / Gefüllt (Alt+W)'), run: () => ((ed.filled = !ed.filled), ed.emit('view')), on: () => ed.filled },
     {
       id: 'theme', cat: V, icon: 'moon', label: t('Dunkles Design'), run: () => applyTheme(ed, isDark() ? 'light' : 'dark'),
       dyn: () => (isDark() ? { icon: 'sun', label: t('Helles Design') } : { icon: 'moon', label: t('Dunkles Design') }),
@@ -716,9 +732,10 @@ function buildBars(ed: Editor) {
     { id: 'barcode', cat: W, icon: 'barcode', label: t('Strichcode erstellen (Code 128, EAN, UPC, Code 39, ITF)'), run: () => openBarcodeDialog(ed) },
     // One action per registered generator (Generator.tile); the toolbox shows the same ones as tiles
     ...GENERATORS.filter((g) => g.tile).map((g) => ({ id: g.id, cat: W, icon: g.icon, label: g.tile!.text(t).action, run: () => openGenerator(ed, g) })),
-    { id: 'multilayer', cat: W, icon: 'stack', label: t('Mehrlagenarbeit aus den ausgewählten Formen erstellen oder bearbeiten'), run: () => openMultiLayerDialog(ed), enabled: sel1 },
+    { id: 'multilayer', cat: W, icon: 'multilayer', label: t('Mehrlagenarbeit aus den ausgewählten Formen erstellen oder bearbeiten'), run: () => openMultiLayerDialog(ed), enabled: sel1 },
     { id: 'vartext', cat: W, icon: 'vartext', short: t('Var. Text'), label: t('Variabler Text …'), run: () => openVarTextDialog(ed) },
-    { id: 'textpath', cat: W, short: t('Auf Pfad'), label: t('Text auf Pfad'), run: () => ed.applyPathToText(), enabled: sel2 },
+    { id: 'batchproof', cat: W, icon: 'batchproof', short: t('Charge'), label: t('Chargenprüfung …'), run: () => openBatchProof(ed) },
+    { id: 'textpath', cat: W, icon: 'textPath', short: t('Auf Pfad'), label: t('Text auf Pfad'), run: () => ed.applyPathToText(), enabled: sel2 },
     {
       id: 'union', cat: M, icon: 'union', label: t('Vereinen (Alt++): alle gewählten Formen verschmelzen, eine Gruppe oder ein Text auch mit sich selbst'),
       run: () => ed.booleanSel('union'), enabled: () => sel2() || (n() === 1 && ['group', 'text'].includes(ed.sel[0].shape.kind)),
@@ -728,7 +745,7 @@ function buildBars(ed: Editor) {
       dyn: () => ({ label: `${t('Abziehen')} (Alt+-): ${BOOL_BASE_HINT[ed.boolBase]}${ed.boolKeep ? t(' (Originale bleiben)') : ''}` }),
     },
     { id: 'intersect', cat: M, icon: 'intersect', label: t('Schnittmenge (Alt+*): nur die gemeinsame Fläche behalten'), run: () => ed.booleanSel('intersect'), enabled: sel2 },
-    { id: 'boolopts', cat: M, icon: 'settings', small: true, label: t('Boolesche Optionen: Basis und Originale behalten'), run: () => openBooleanDialog(ed) },
+    { id: 'boolopts', cat: M, icon: 'boolSettings', small: true, label: t('Boolesche Optionen: Basis und Originale behalten'), run: () => openBooleanDialog(ed) },
     { id: 'outline', cat: M, icon: 'outline', label: t('Außenkontur und Inseln ableiten …'), run: () => void openOutlineDialog(ed), enabled: sel1 },
     { id: 'offset', cat: M, icon: 'offset', label: t('Offset (Alt+O)'), run: () => openOffsetDialog(ed), enabled: sel1 },
     { id: 'warp', cat: M, icon: 'warp', label: t('Verformen: Formen, Text und Bilder biegen, wölben oder perspektivisch verzerren'), run: () => openWarpDialog(ed), enabled: sel1 },
@@ -739,7 +756,7 @@ function buildBars(ed: Editor) {
     { id: 'patternfill', cat: M, icon: 'pattern', label: t('Muster füllen: gewählte Form mit einem nahtlosen Muster aus Vektoren füllen'), run: () => openPatternDialog(ed), enabled: sel1 },
     { id: 'adjust', cat: I, icon: 'adjust', label: t('Bild anpassen …'), run: () => openAdjustDialog(ed), enabled: () => ed.selImages().length > 0 },
     { id: 'trace', cat: I, icon: 'trace', label: t('Bild nachzeichnen (Alt+T)'), run: () => openTraceDialog(ed), enabled: () => ed.selImages().length > 0 },
-    { id: 'addpage', cat: S, short: t('+ Seite'), label: t('Neue Seite'), run: () => ed.addPage() },
+    { id: 'addpage', cat: S, icon: 'addPage', short: t('+ Seite'), label: t('Neue Seite'), run: () => ed.addPage() },
     { id: 'prevpage', cat: S, icon: 'up', label: t('Vorherige Seite (Bild ↑)'), run: () => ed.setPage(ed.doc.page - 1), enabled: () => ed.doc.page > 0 },
     { id: 'nextpage', cat: S, icon: 'down', label: t('Nächste Seite (Bild ↓)'), run: () => ed.setPage(ed.doc.page + 1), enabled: () => ed.doc.page < ed.doc.pages.length - 1 },
     { id: 'check', cat: L, icon: 'check', label: t('Konstruktion prüfen: doppelte Linien, offene Umrisse, schmale Stege, kleine Ausschnitte, Passungen, Steckbarkeit und Arbeitsbereich'), run: () => openCheck() },
@@ -756,11 +773,11 @@ function buildBars(ed: Editor) {
     { id: 'printcut', cat: L, icon: 'printcut', short: t('Print and Cut'), label: t('Print and Cut: gedrucktes Blatt an Passermarken einmessen und passgenau schneiden'), run: () => openPrintCutDialog(ed) },
     { id: 'calibrate', cat: L, icon: 'calibrate', short: t('Passung'), label: t('Passung kalibrieren: Schnittfuge und Steckspiel für ein Material ermitteln'), run: () => openCalibrateDialog(ed) },
     { id: 'devsettings', cat: L, icon: 'devsettings', label: t('Geräteeinstellungen'), run: () => openDeviceDialog(ed) },
-    { id: 'devices', cat: L, short: t('Geräte'), label: t('Geräte …'), run: () => openDevicesDialog(ed) },
+    { id: 'devices', cat: L, icon: 'devices', short: t('Geräte'), label: t('Geräte …'), run: () => openDevicesDialog(ed) },
     { id: 'rotary', cat: L, icon: 'rotary', short: t('Rotary'), label: t('Drehachse (Rotary) …'), run: () => openRotaryDialog() },
     { id: 'slots', cat: M, icon: 'slots', label: t('Schlitze an Materialdicke anpassen …'), run: () => openSlotDialog(ed) },
-    { id: 'slotplace', cat: M, icon: 'slots', label: t('Schlitze / Ausklinkungen platzieren …'), run: () => openSlotPlacementDialog(ed), enabled: () => n() === 1 },
-    { id: 'contouroffset', cat: M, icon: 'offset', label: t('Lokaler Konturversatz …'), run: () => openContourOffsetDialog(ed), enabled: () => n() > 0 },
+    { id: 'slotplace', cat: M, icon: 'slotplace', label: t('Schlitze / Ausklinkungen platzieren …'), run: () => openSlotPlacementDialog(ed), enabled: () => n() === 1 },
+    { id: 'contouroffset', cat: M, icon: 'contourOffset', label: t('Lokaler Konturversatz …'), run: () => openContourOffsetDialog(ed), enabled: () => n() > 0 },
     { id: 'jigfill', cat: A, icon: 'jigfill', label: t('Auf Jig-Fächer legen: gewähltes Design in jedes Fach eines Jigs kopieren, auf Wunsch mit Seriennummer je Fach'), run: () => openJigFillDialog(ed), enabled: sel1 },
     { id: 'workpiece', cat: A, icon: 'workpiece', label: t('Auf Werkstücke übertragen (Kamera) …'), run: () => openWorkpieceDialog(ed), enabled: sel1 },
     { id: 'bgremove', cat: I, icon: 'bgremove', label: t('Hintergrund entfernen …'), run: () => openBackgroundDialog(ed), enabled: () => ed.selImages().length > 0 },
@@ -840,6 +857,11 @@ function openBooleanDialog(ed: Editor) {
   let keep = ed.boolKeep;
   const radio = (value: BoolBase, label: string) =>
     h('label', {}, h('input', { type: 'radio', name: 'bool-base', value, checked: value === base, onchange: () => (base = value) }), label);
+  const bases = h('div', { class: 'radios column' },
+    radio('selection', t('Zuerst gewählte Form')),
+    radio('back', t('Hinterste Form (vordere werden abgezogen)')),
+    radio('front', t('Vorderste Form (hintere werden abgezogen)')),
+  );
   const dlg = h(
     'dialog',
     { class: 'offset-dialog bool-dialog' },
@@ -848,11 +870,8 @@ function openBooleanDialog(ed: Editor) {
       'div',
       { class: 'form' },
       h('label', {}, t('Basis')),
-      h('div', { class: 'radios column' },
-        radio('selection', t('Zuerst gewählte Form')),
-        radio('back', t('Hinterste Form (vordere werden abgezogen)')),
-        radio('front', t('Vorderste Form (hintere werden abgezogen)')),
-      ),
+      bases,
+      optionPicture(bases, 'boolBase'),
       h('label', { for: 'bool-keep' }, t('Originale behalten')),
       h('input', { type: 'checkbox', id: 'bool-keep', checked: keep, onchange: (e: Event) => (keep = (e.target as HTMLInputElement).checked) }),
     ),
@@ -1016,6 +1035,7 @@ function openCornerDialog(ed: Editor) {
   };
   const radio = (value: CornerMode, label: string) =>
     h('label', {}, h('input', { type: 'radio', name: 'corner-mode', value, checked: st.mode === value, onchange: () => ((st.mode = value), setLabel()) }), label);
+  const modes = h('div', { class: 'radios column' }, radio('round', t('Runden')), radio('inverse', t('Innen runden (Bogen um die Ecke)')), radio('chamfer', t('Fasen')));
   const dlg = h(
     'dialog',
     { class: 'offset-dialog corner-dialog' },
@@ -1024,7 +1044,8 @@ function openCornerDialog(ed: Editor) {
       'div',
       { class: 'form' },
       h('label', {}, t('Ecke')),
-      h('div', { class: 'radios column' }, radio('round', t('Runden')), radio('inverse', t('Innen runden (Bogen um die Ecke)')), radio('chamfer', t('Fasen'))),
+      modes,
+      optionPicture(modes, 'corner'),
       rLabel, h('div', { class: 'radios' }, val),
     ),
     info,
@@ -1073,6 +1094,11 @@ function openOffsetDialog(ed: Editor) {
     h('option', { value: 'square', selected: st.join === 'square' }, t('Abgeschrägt')),
   ) as HTMLSelectElement;
   const keep = h('input', { type: 'checkbox', id: 'offset-keep', checked: st.keep, onchange: (e: Event) => (st.keep = (e.target as HTMLInputElement).checked) }) as HTMLInputElement;
+  const dirs = h('div', { class: 'radios' },
+    radio('dir', 'outward', t('Außen'), st.direction, (v) => (st.direction = v)),
+    radio('dir', 'inward', t('Innen'), st.direction, (v) => (st.direction = v)),
+    radio('dir', 'both', t('Beides'), st.direction, (v) => (st.direction = v)),
+  );
   const dlg = h(
     'dialog',
     { class: 'offset-dialog' },
@@ -1082,12 +1108,10 @@ function openOffsetDialog(ed: Editor) {
       { class: 'form' },
       h('label', { for: 'offset-distance' }, t('Abstand (mm)')), dist,
       h('label', {}, t('Richtung')),
-      h('div', { class: 'radios' },
-        radio('dir', 'outward', t('Außen'), st.direction, (v) => (st.direction = v)),
-        radio('dir', 'inward', t('Innen'), st.direction, (v) => (st.direction = v)),
-        radio('dir', 'both', t('Beides'), st.direction, (v) => (st.direction = v)),
-      ),
+      dirs,
+      optionPicture(dirs, 'offsetDir'),
       h('label', { for: 'offset-join' }, t('Ecken')), join,
+      optionPicture(join, 'offsetJoin'),
       h('label', { for: 'offset-keep' }, t('Original behalten')), keep,
     ),
     h('div', { class: 'note' }, t('Orange gestrichelt: Vorschau. Offene Linien bekommen eine geschlossene Kontur im Abstand.')),
@@ -1158,7 +1182,8 @@ function buildLayers(ed: Editor) {
           h('td', {}, h('span', { class: 'swatch', style: `background:${PALETTE[i]}` }, layerLabel(i))),
           h('td', {}, L.name),
           h('td', {}, mode),
-          h('td', {}, String(L.speed)),
+          // Galvo devices (JCZ) work in mm/s like LightBurn; stored is always mm/min
+          h('td', {}, String(laserDevice.fw === 'jcz' ? Math.round((L.speed / 60) * 100) / 100 : L.speed)),
           h('td', {}, `${L.power}%`),
           h('td', {}, air),
           h('td', {}, out),
@@ -1203,12 +1228,19 @@ function buildLayers(ed: Editor) {
       el.value = String(L[key]);
       return el;
     };
+    // Galvo (JCZ): speed shown and entered in mm/s, stored in mm/min
+    const speedField = () => {
+      if (laserDevice.fw !== 'jcz') return [h('label', {}, t('Geschwindigkeit (mm/min)')), num('speed', 1, 100000)];
+      const el = numInput('', (v) => ed.updateLayer(a, { speed: Math.max(1, Math.min(20000, v)) * 60 }));
+      el.value = String(Math.round((L.speed / 60) * 100) / 100);
+      return [h('label', {}, t('Geschwindigkeit (mm/s)')), el];
+    };
     root.append(
       h(
         'div',
         { class: 'form' },
         ...head,
-        h('label', {}, t('Geschwindigkeit (mm/min)')), num('speed', 1, 100000),
+        ...speedField(),
         h('label', {}, t('Max. Leistung (%)')), num('power', 0, 100),
         h('label', {}, t('Min. Leistung (%)')), num('minPower', 0, 100),
         h('label', {}, t('Durchgänge')), num('passes', 1, 100, true),
@@ -1227,6 +1259,8 @@ function buildLayers(ed: Editor) {
     if (ap.vec) root.append(h('div', { class: 'note' }, layerSummary(L)));
   };
   ed.on((w) => (w === 'doc' || w === 'sel') && schedule());
+  // Speed unit follows the device (mm/s for galvo lasers)
+  onDeviceChange(() => schedule());
   let pending = false;
   // Während eines Ziehvorgangs nicht bei jeder Bewegung neu aufbauen
   const schedule = () => {
@@ -1569,6 +1603,21 @@ function openTraceDialog(ed: Editor) {
 /** How long the layer bar waits for a second click before asking about groups on several layers */
 const DOUBLE_CLICK_MS = 300;
 
+/**
+ * Schriftfarbe auf einer farbigen Flaeche: Weiss oder Schwarz, je nachdem, was die 4,5:1 von WCAG 2.2 AA
+ * schafft. Die Zahl auf den hellen Farbfeldern der Palette stand weiss auf Gelb (gemessen 1,31:1) und war
+ * nicht zu lesen; die Grenze 0,1833 ist genau der Punkt, an dem Weiss die 4,5:1 verliert und Schwarz sie hat.
+ */
+export function labelOnColor(hex: string): '#000' | '#fff' {
+  const v = hex.replace('#', '');
+  const ch = (i: number) => {
+    const c = parseInt(v.length === 3 ? v[i] + v[i] : v.slice(2 * i, 2 * i + 2), 16) / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const lum = 0.2126 * ch(0) + 0.7152 * ch(1) + 0.0722 * ch(2);
+  return lum > 0.1833 ? '#000' : '#fff';
+}
+
 function buildPalette(ed: Editor) {
   const root = $('#palette');
   const btns: HTMLButtonElement[] = [];
@@ -1577,7 +1626,7 @@ function buildPalette(ed: Editor) {
   let pending = 0;
   PALETTE.forEach((c, i) => {
     const b = h('button', {
-      class: i >= 30 ? 'tool' : '',
+      class: `${i >= 30 ? 'tool' : ''}${labelOnColor(c) === '#000' ? ' on-light' : ''}`.trim(),
       style: `background:${c}`,
       title: i >= 30 ? t('Werkzeug-Layer {layer} (wird nicht gelasert). Doppelklick: Layer-Einstellungen', { layer: layerLabel(i) }) : t('Layer {layer}: Auswahl zuordnen. Doppelklick: Layer-Einstellungen', { layer: layerLabel(i) }),
       // The second click of a double-click does not assign again (no extra undo step)
@@ -1695,3 +1744,4 @@ import { openSettings } from './settings/dialog';
 import { registerCoreSettings } from './settings/core';
 import { openFreehandEditDialog } from './freehandEditDialog';
 import { openPathIslandsDialog } from './pathIslandsDialog';
+import { openCreatorWindow } from './criar/bridge';

@@ -12,6 +12,8 @@ Questi generatori si basano sulla scatola con giunzioni a dita e si trovano in *
 
 Un cassetto con un mobile aperto sul davanti, un cassetto abbinato e un pannello frontale. Senza mobile ottieni solo il cassetto, per un’apertura che esiste già.
 
+![Le undici parti di un cassetto sulla pagina e la vista 3D con il cursore Esplodi un po’ aperto: il mobile, il cassetto estratto e il pannello frontale con l’incavo per la mano](/img/drawer-3d-en.webp)
+
 | Campo | Significato |
 |---|---|
 | **Larghezza**, **Altezza**, **Profondità** | Misure esterne del mobile. Senza mobile: misure dell’apertura. |
@@ -29,6 +31,8 @@ Un cassetto con un mobile aperto sul davanti, un cassetto abbinato e un pannello
 
 Una griglia di divisori a mezzo incastro che si infilano l’uno nell’altro, per una scatola o un cassetto: per viti, perline, bustine di tè o pedine.
 
+![Inserto divisorio con 4 × 3 scomparti: i cinque divisori a mezzo incastro sulla pagina e, nella vista 3D, infilati l’uno nell’altro a formare una griglia](/img/divider-insert-3d-en.webp)
+
 | Campo | Significato |
 |---|---|
 | **Larghezza interna** / **Profondità interna** | Misure interne della scatola o del cassetto in cui va l’inserto. |
@@ -42,6 +46,8 @@ Una griglia di divisori a mezzo incastro che si infilano l’uno nell’altro, p
 ## Ripiano a incastro
 
 Due fianchi e quanti ripiani vuoi, uniti da incastri a croce: niente colla, niente viti.
+
+![Ripiano a incastro: tre ripiani e due fianchi con i loro incastri a croce sulla pagina e il mobile montato nella vista 3D](/img/shelf-3d-en.webp)
 
 | Campo | Significato |
 |---|---|

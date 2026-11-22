@@ -15,7 +15,11 @@ Il **Lavoro multistrato** (**Casella degli strumenti → Modelli 3D a incastro**
 3. La finestra elenca le forme selezionate dal basso verso l’alto. Dai a ogni pannello un **Nome piastra** e uno **Spessore**, e spostalo con **Sposta su di un livello** / **Sposta giù di un livello**.
 4. **Crea**.
 
+![Finestra di creazione del lavoro multistrato con le tre forme selezionate dal basso verso l’alto (Base, Rim, Star), ognuna con uno spessore di 3 mm, un aspetto del materiale e i pulsanti per spostarla giù o su di un livello; le forme sono selezionate sull’area di lavoro](/img/multilayer-dialog-en.webp)
+
 Le forme restano modificabili. La [vista 3D](../features/construction-3d.md#3d-view) le mostra impilate a filo, con le incisioni e l’[aspetto del materiale](../features/construction-3d.md#material-look) del loro livello, così puoi giudicare bene l’effetto di profondità prima di tagliare.
+
+![Le tre forme affiancate sulla pagina e la vista 3D che le mostra impilate a filo: una base in noce, un bordo in betulla e una stella in ciliegio](/img/multilayer-3d-en.webp)
 
 Per cambiare in seguito ordine o spessori, seleziona i pannelli e avvia di nuovo **Lavoro multistrato**.
 

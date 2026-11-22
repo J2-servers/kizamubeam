@@ -51,6 +51,7 @@ UI texts are written in German in the code inside `t('…')` (placeholders in cu
 | `src/storageMigration.ts` | Copies settings saved under the old name (`laserwerk.*`) to `kizamubeam.*` on first start |
 | `src/dock.ts` | Dockable windows: tabs, groups, floating windows, sizing, show/hide, saved layout |
 | `src/apps.ts`, `src/appsPanel.ts` | Toolbox: tiles with groups, descriptions and keywords, search; window with filters and groups |
+| `src/appArt.ts`, `src/appArt.json` | Example pictures of the toolbox tiles, drawn by `scripts/app-art/` (`npm run build:app-art`) |
 | `src/toolbars.ts` | Customizable toolbars: actions, contents, icon size, customize dialog, show/hide bars |
 | `src/layerdialog.ts` | Cut settings (kerf, tabs, fill, air assist, perforation, lead-in, power ramp, Z, sub-layers) |
 | `src/fonts.ts` | Load font files (system fonts via Rust, fallback font) and convert text to Bézier paths (opentype.js) |

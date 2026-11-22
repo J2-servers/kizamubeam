@@ -12,6 +12,8 @@ Both generators are in **Toolbox → Mechanics**.
 
 A **Pulley** for toothed belts, with the outside diameter calculated from the pitch and the pitch line offset of the belt.
 
+![Create Pulley dialog: belt profile GT2 2 mm, 36 teeth, groove clearance, kerf and a D-shaft bore; the preview shows the pulley with its round grooves, and below it the outside diameter, the pitch diameter and the belt travel per turn](/img/pulley-dialog-en.webp)
+
 | Field | Meaning |
 |---|---|
 | **Belt profile** | GT2 (2, 3 or 5 mm pitch) or HTD (3M, 5M). |
@@ -25,6 +27,8 @@ The grooves are round, with the usual groove depth and width for the profile. A 
 ## Disc cam
 
 A **Cam** turns rotation into a lifting motion of a follower: for automata, toys and simple mechanisms. One revolution is split into rise, dwell at the top, return and dwell at the bottom.
+
+![Create Cam dialog: base circle radius 22 mm, lift 10 mm, rise angle 110°, dwell at top 40°, return angle 110°, the cycloidal motion law and a roller follower; the preview shows the cam, and below it the largest radius, the largest pressure angle and the dwell at the bottom](/img/cam-dialog-en.webp)
 
 | Field | Meaning |
 |---|---|

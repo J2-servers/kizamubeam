@@ -53,7 +53,7 @@
           { "id": "sizes", "label": "step.sizes", "items": ["walls"] }
         ]
       },
-      "icon": "box",
+      "icon": "boxComposer",
       "params": [
         { "key": "width", "type": "length", "min": 20, "max": 2000, "def": 100 },
         { "key": "depth", "type": "length", "min": 20, "max": 2000, "def": 200 },

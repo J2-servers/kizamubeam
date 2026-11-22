@@ -14,6 +14,8 @@ The layer holds **all laser settings**. Objects, including images, never carry t
 
 The **Cuts / Layers** window lists the layers that are in use, with mode, speed, power, air assist and output. Values can be edited right in the table; drag rows to change the order in which the layers are lasered.
 
+![Cuts / Layers window on the right with five layers (Engrave, Cut, Lettering, Score and the tool layer T1), their mode, speed, power and checkboxes; the Cut layer is selected and its values can be edited below the table](/img/layers-window-en.webp)
+
 ## Modes
 
 | Mode | What happens |
@@ -35,6 +37,8 @@ T1 and T2 are never lasered. Use them for construction lines, the outline of a w
 ## Cut settings
 
 Double-click a layer to open its **Cut Settings**. Which fields appear depends on the mode.
+
+![Cut Settings dialog of a layer in Line mode: speed, power, passes and kerf offset, tabs switched on with size and count, and the opened section Lead-in and overcut](/img/cut-settings-line-en.webp)
 
 ### Common to all modes
 
@@ -69,6 +73,8 @@ Double-click a layer to open its **Cut Settings**. Which fields appear depends o
 | **Bi-directional** | Lasers in both directions (faster). |
 | **Overscan (%)** | Runs past the edges with the laser off, so the head is at full speed when it fires. Avoids darker edges. |
 | **Fill style** | **Line by line**, or **Offset fill**: rings that follow the outline inward. |
+
+![Cut Settings dialog of a layer in Fill mode: fill style, line interval, lines per inch, scan angle, overscan, bi-directional and crosshatch](/img/cut-settings-fill-en.webp)
 
 **Defaults** resets the fields to the defaults of the selected mode.
 

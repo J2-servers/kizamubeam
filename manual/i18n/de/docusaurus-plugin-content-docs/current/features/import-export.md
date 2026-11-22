@@ -10,6 +10,8 @@ description: SVG-, DXF-, PDF-, Illustrator- und LightBurn-Dateien hereinholen un
 
 **Datei → Importieren …** (Ctrl+I), Dateien auf die Arbeitsfläche ziehen oder mit Ctrl+V aus anderen Programmen einfügen funktioniert jeweils gleich. Farben werden der nächstgelegenen Palettenfarbe zugeordnet, also dem nächstgelegenen Layer, und mehrere Objekte kommen als Gruppe an.
 
+![Eine importierte SVG-Datei auf der Arbeitsfläche: ein Schlüsselbrett kommt als eine ausgewählte Gruppe an, und seine vier Farben sind im Fenster Schnitte / Layer zu vier Layern geworden](/img/import-svg-de.webp)
+
 ### SVG
 
 Pfade (auch Bögen), Rechtecke, Kreise, Ellipsen, Linien, Polygone, `use`-Verweise, Transformationen, CSS-Klassen und eingebettete Bilder. Die Größe ergibt sich aus `width`, `height` und `viewBox`. **Text in SVG-Dateien wird übersprungen**: Wandle Text im Zeichenprogramm vor dem Speichern in Pfade um.
@@ -48,6 +50,8 @@ Siehe [Bilder und Nachzeichnen](images.md).
 | **DXF** | Die aktuelle Seite in mm, ein DXF-Layer pro verwendetem Layer mit Name und Farbe. Kurven werden als exakte Splines exportiert. Bilder können nicht in DXF. |
 | **PDF** | Alle Seiten, jede in Bettgröße 1:1, jeder Layer als eigene PDF-Ebene, Füll-Layer gefüllt, Bilder eingebettet. |
 | **Illustrator (`.ai`)** | Dieselbe PDF-kompatible Datei; öffnet in Illustrator, Inkscape und Affinity. |
+
+![Menü Datei mit geöffnetem Untermenü Exportieren: als SVG, DXF, PDF und Illustrator-Datei (AI) exportieren](/img/export-menu-de.webp)
 
 Texte werden als Umrisse exportiert.
 

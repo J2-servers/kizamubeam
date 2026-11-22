@@ -17,6 +17,8 @@ Das Werkzeug **Verbindung** (die Verbindungs-Schaltfläche in der Werkzeugleiste
 3. Klicke die zweite gerade Kante an. Sie bekommt das Gegenstück oder die Schlitze. Ist die zweite „Kante“ eine einzelne gezeichnete Linie, wird die Linie durch Schlitze ersetzt; so setzt du einen Schlitz mitten in eine Platte.
 4. Stelle die Optionen im Dialog ein und bestätige.
 
+![Werkzeug Verbindung: zwei Kanten zweier Platten sind mit 1 und 2 markiert, der Dialog steht auf Fingerzinken mit Materialdicke, Fingerbreite, Kerf und Spiel, die orange Vorschau zeigt die Zinken](/img/joint-tool-dialog-de.webp)
+
 Das Ergebnis bleibt ein gewöhnlicher, bearbeitbarer Pfad. Die Verbindung merkt sich die Materialdicke, sodass [Schlitze anpassen](#resize-slots-to-the-material) sie später aktualisieren kann.
 
 | Art | Einsatz |
@@ -44,6 +46,8 @@ Beide Platten bekommen Schlitze, und daneben entstehen Knöchel mit Stiftlöcher
 ## Biegeschnitte {#living-hinges}
 
 **Werkzeugkasten → Verbindungen und Biegen → Biegeschnitte** füllt eine ausgewählte geschlossene Form mit einem Schnittmuster, damit sich die Platte dort biegen lässt. Muster: gerade Schnitte, Wellen, Rauten, Waben, Dreiecke, Flechtmuster und Spirale. Der Dialog zeigt eine Live-Vorschau und beginnt mit Werten, die zur Materialdicke passen. Die Schnitte sind exakte Linien und Bézierkurven.
+
+![Dialog Biegeschnitte mit Muster, Schnittlänge, Stegbreite, Linienabstand und Rand; der Streifen in der Mitte eines Einbands zeigt die Vorschau der Schnitte](/img/living-hinge-dialog-de.webp)
 
 Lege den Biegebereich auf den Schnitt-Layer des Teils. Sperrholz und MDF biegen sich am besten quer zur Faser des Deckfurniers; probiere es zuerst an einem Reststück.
 
@@ -77,6 +81,8 @@ Du kannst mehrere Schnitte an verschiedenen Kanten vorbereiten, bevor du sie anw
 - Andere geschlossene Formen auf Schnitt-Layern liegen flach mit einstellbarer Dicke; verschachtelte Formen werden Löcher.
 - Schicht-, Rippen- und Scheibenmodelle aus [3D-Modellen](../generators/index.md) werden zusammengebaut gezeigt.
 
+![Fenster 3D-Ansicht neben den flachen Teilen einer gezinkten Box: die Box ist zusammengesteckt zu sehen, mit den Gravuren auf Vorder- und Seitenwand](/img/view3d-assembly-de.webp)
+
 Drehe die Ansicht mit der Maus oder nutze die festen Ansichten (3D, oben, vorn). Der Regler **Explosion** zieht die Teile auseinander. Ohne Auswahl zeigt die Ansicht die ganze Seite; ein ausgewähltes Teil bringt immer seine ganze Baugruppe mit.
 
 **Kollisionen**: Wo sich zwei Teile durchdringen (etwa bei einer Presspassung oder einem zu schmalen Schlitz), färbt sich die Stelle rot, und die Statuszeile nennt die Teile und das Volumen.
@@ -96,6 +102,8 @@ Mit **Mockup** im 3D-Fenster verschwinden Raster und rote Kollisionen, und es gi
 ## Vor dem Schneiden prüfen {#check-the-design-before-cutting}
 
 **Laser → Konstruktion prüfen** (oder **Fenster → Prüfung**) sucht auf der aktuellen Seite nach Problemen und markiert jeden Fund auf der Arbeitsfläche. Ein Klick auf einen Fund wählt die Objekte aus und zoomt an die Stelle; wo möglich, behebt eine Schaltfläche das Problem in einem Rückgängig-Schritt.
+
+![Fenster Prüfung mit einem Fehler und fünf Warnungen (außerhalb des Arbeitsbereichs, doppelte Linie, offener Umriss, schmaler Steg, Gravur ohne Teil) samt Schaltflächen zum Beheben; jeder Fund ist auf der Arbeitsfläche markiert](/img/design-check-de.webp)
 
 Gefunden werden unter anderem:
 

@@ -32,7 +32,7 @@
       "kind": "part",
       "runtime": "js",
       "code": "@dist/ruler.js",
-      "icon": "measure",
+      "icon": "ruler",
       "dialog": {
         "version": 1
       },

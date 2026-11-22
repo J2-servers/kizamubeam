@@ -40,6 +40,8 @@ Copia la cornice per gli strati da 2 a 5 (Ctrl+C, Ctrl+V) e metti le copie una a
 
 Mantieni ogni strato come un unico contorno chiuso: controlla che le parti che devono restare unite tocchino davvero la cornice. Le isole staccate cadrebbero.
 
+![I cinque strati della shadowbox affiancati su un’area di lavoro di 600 × 400 mm: il pannello posteriore chiuso, il cielo con luna e stelle ritagliate, le montagne, tre abeti della libreria su una collina e la cornice frontale](/img/shadowbox-layers-en.webp)
+
 ## 4. Sovrapporli
 
 1. Seleziona tutti e cinque gli strati.
@@ -48,6 +50,8 @@ Mantieni ogni strato come un unico contorno chiuso: controlla che le parti che d
 4. Fai clic su **Crea**.
 
 Apri **Finestra → Vista 3D**. Gli strati sono impilati a filo, e puoi ruotare la vista per giudicare la profondità. Se uno strato copre troppo quello dietro, modifica le forme e guarda di nuovo. Per cambiare in seguito ordine o spessore, seleziona gli strati e avvia di nuovo **Lavoro multistrato**. Altro in [Lavoro multistrato](../generators/multilayer.md).
+
+![I cinque strati sulla pagina e la vista 3D con la pila finita: una cornice frontale di legno, alberi verdi, montagne grigie e un cielo blu, con il pannello posteriore chiaro che si vede attraverso la luna](/img/shadowbox-3d-en.webp)
 
 ## 5. Tagliare e incollare
 

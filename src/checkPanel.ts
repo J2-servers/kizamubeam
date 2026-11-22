@@ -138,11 +138,16 @@ export function buildCheckPanel(ed: Editor) {
     if (!force && key === lastKey) return;
     lastKey = key;
     const errors = xs.filter((x) => x.level === 'error').length;
+    // Auf einer leeren Seite ist „Keine Probleme gefunden“ eine falsche Entwarnung: Ein Anfänger liest
+    // daraus, sein Entwurf sei zum Schneiden freigegeben. Es gab schlicht nichts zu prüfen.
+    const nichts = !ed.doc.objs.length;
     summary.textContent = xs.length
       ? [errors ? tn('{n} Fehler|one', '{n} Fehler', errors) : '', serious - errors ? tn('{n} Warnung', '{n} Warnungen', serious - errors) : '', xs.length - serious ? tn('{n} Hinweis', '{n} Hinweise', xs.length - serious) : '']
           .filter(Boolean)
           .join(', ')
-      : t('Keine Probleme gefunden.');
+      : nichts
+        ? t('Nichts zu prüfen: Diese Seite ist leer.')
+        : t('Keine Probleme gefunden.');
     list.replaceChildren(...xs.map(row));
     if (!xs.length)
       list.append(h('div', { class: 'empty' },

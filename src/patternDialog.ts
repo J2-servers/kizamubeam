@@ -6,6 +6,7 @@ import { check, numField, select } from './arrayDialogs';
 import { h } from './dom';
 import { dec, lang, t } from './i18n';
 import { objLabel } from './objectsPanel';
+import { optionPicture } from './optionArt';
 import { DEFAULT_PATTERN_OPTIONS, PatternOptions, patternInfo } from './pattern';
 import {
   edgeLabel, mirrorLabel, outputLabel, PATTERN_EDGES, PATTERN_MIRRORS, PATTERN_OUTPUTS, PATTERN_REPEATS, PatternRecipe, PatternSpec, PatternTile, repeatLabel,
@@ -134,10 +135,16 @@ export function openPatternDialog(ed: Editor, init: PatternDialogInit = {}) {
     checks.push([key, el.querySelector('input') as HTMLInputElement]);
     return el;
   };
+  /** A select with the example picture of its chosen option below it */
+  const pictured = (el: HTMLSelectElement, group: string) => [el, optionPicture(el, group)];
   /** Put the state into the fields again (after choosing a library pattern) */
   const sync = () => {
     for (const [k, el, f] of nums) el.value = dec(String(+((st[k] as number) * f).toFixed(4)));
-    for (const [k, el] of selects) el.value = String(st[k]);
+    for (const [k, el] of selects) {
+      el.value = String(st[k]);
+      // The example picture follows the change event of its select (not bubbling: the caller draws the preview)
+      if (el.value === String(st[k])) el.dispatchEvent(new Event('change'));
+    }
     for (const [k, el] of checks) el.checked = !!st[k];
   };
 
@@ -222,7 +229,7 @@ export function openPatternDialog(ed: Editor, init: PatternDialogInit = {}) {
     ...(roleRows.length ? [h('div', { class: 'pattern-section' }, t('Gewählte Objekte')), ...roleRows] : []),
     h('div', { class: 'pattern-section' }, t('Wiederholung')),
     h('label', { for: 'pattern-repeat' }, t('Anordnung')),
-    sel('repeat', PATTERN_REPEATS.map((r) => [r, repeatLabel(r)])),
+    ...pictured(sel('repeat', PATTERN_REPEATS.map((r) => [r, repeatLabel(r)])), 'patternRepeat'),
     ...when(() => st.repeat === 'brick' || st.repeat === 'halfdrop',
       h('label', { for: 'pattern-shift' }, t('Versatz (%)')),
       num('shift', t('Versatz jeder zweiten Zeile bzw. Spalte in Prozent der Kachel'), 0, 100),
@@ -246,7 +253,7 @@ export function openPatternDialog(ed: Editor, init: PatternDialogInit = {}) {
     h('span', { class: 'checks' }, chk('wrap', t('Kanten umbrechen: Was über den Kachelrahmen ragt, läuft in der Nachbarkachel weiter'))),
     h('div', { class: 'pattern-section' }, t('Zielform und Laser')),
     h('label', { for: 'pattern-edge' }, t('Am Rand')),
-    sel('edge', PATTERN_EDGES.map((e) => [e, edgeLabel(e)])),
+    ...pictured(sel('edge', PATTERN_EDGES.map((e) => [e, edgeLabel(e)])), 'patternEdge'),
     h('label', { for: 'pattern-margin' }, t('Randabstand (mm)')),
     num('margin', t('Abstand des Musters zum Umriss der Zielform und zu ausgesparten Bereichen'), 0),
     h('label', { for: 'pattern-output' }, t('Ergebnis')),

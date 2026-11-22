@@ -8,6 +8,8 @@ description: Una sfera o un paralume fatto di dischi rotondi che si tengono a vi
 
 La **Sfera a dischi** (**Casella degli strumenti → Modelli 3D a incastro**) costruisce una sfera o un paralume con dischi rotondi. I dischi si tengono a vicenda con asole oblique, senza colla.
 
+![I 20 dischi di una sfera a dischi con le loro asole oblique sulla pagina e la vista 3D con la sfera montata](/img/disc-sphere-3d-en.webp)
+
 I dischi stanno sulle direzioni delle facce di un poliedro, scelto in **Layout**. Più dischi danno una sfera più rotonda con più asole; il valore predefinito è l’icosaedro.
 
 | Poliedro | Dischi |
@@ -29,6 +31,8 @@ I dischi stanno sulle direzioni delle facce di un poliedro, scelto in **Layout**
 | **Apertura inferiore** | Foro nel disco inferiore, per esempio per cambiare la lampadina (Avanzate). |
 | **Gioco di accoppiamento** | Larghezza in più delle asole; negativo = accoppiamento a pressione. |
 | **Kerf** | Larghezza del taglio laser. |
+
+![Finestra di creazione della sfera a dischi: diametro 200 mm, disposizione Icosaedro (20 dischi), sovrapposizione 60 %, spessore del materiale 1 mm e un’apertura superiore di 40 mm; l’anteprima mostra i dischi e, sotto, il diametro dei dischi, il numero di incastri, l’angolo tra i dischi e la larghezza delle asole](/img/disc-sphere-dialog-en.webp)
 
 Ogni coppia di dischi che si incrociano condivide una corda, che viene divisa a metà: un disco viene inciso da un’estremità, l’altro dall’altra. Le asole per dischi che si incrociano in obliquo diventano più larghe di conseguenza, e gli angoli acuti all’ingresso delle asole ricevono un piccolo smusso.
 

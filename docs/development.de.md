@@ -51,6 +51,7 @@ Texte stehen im Code auf Deutsch in `t('…')` (Platzhalter in geschweiften Klam
 | `src/storageMigration.ts` | Übernimmt Einstellungen unter dem alten Namen (`laserwerk.*`) beim ersten Start nach `kizamubeam.*` |
 | `src/dock.ts` | Andockbare Fenster: Reiter, Gruppen, freie Fenster, Größe, Ein-/Ausblenden, gespeicherte Anordnung |
 | `src/apps.ts`, `src/appsPanel.ts` | Werkzeugkasten: Kacheln mit Gruppen, Erklärung und Suchwörtern, Suche; Fenster mit Filter und Gruppen |
+| `src/appArt.ts`, `src/appArt.json` | Beispielbilder der Werkzeugkasten-Kacheln, gezeichnet von `scripts/app-art/` (`npm run build:app-art`) |
 | `src/toolbars.ts` | Anpassbare Funktionsleisten: Aktionen, Belegung, Symbolgröße, Anpassen-Dialog, Leisten ein-/ausblenden |
 | `src/layerdialog.ts` | Layer-Einstellungen (Kerf, Haltestege, Füllen, Air Assist, Perforation, Anschnitt, Leistungsrampe, Z, Sub-Layer) |
 | `src/fonts.ts` | Schriftdateien laden (Systemschriften über Rust, Ersatzschrift) und Text in Bézierpfade umwandeln (opentype.js) |

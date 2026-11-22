@@ -20,7 +20,11 @@ Beide Box-Generatoren stehen unter **Werkzeugkasten → Boxen und Möbel**. Für
 | **Steckspiel** | Jede Zinke wird um so viel schmaler; negativ = Presspassung. |
 | **Schnittfuge (Kerf)** | Breite des Laserschnitts; Konturen werden um die Hälfte nach außen versetzt. |
 
+![Dialog Box erstellen: Innenmaß 120 × 90 × 60 mm, Materialdicke 3 mm, oben offen, Zinkenbreite, Steckspiel und Schnittfuge; die Vorschau zeigt die fünf Teile, darunter das sich ergebende Außenmaß und die Felder je Kante](/img/box-dialog-de.webp)
+
 Vorder- und Rückwand besitzen die Ecken. Die Teile sind eigene Objekte in einer kompakten Anordnung: Gleiche Teile bleiben beieinander. Ein Doppelklick auf irgendein Teil bearbeitet die ganze Box, auf allen Seiten. Teile, die noch in ihrer erzeugten Anordnung liegen, rücken beim Wachsen auseinander; Teile, die du selbst angeordnet hast, bleiben, wo sie sind.
+
+![Die fünf Teile einer offenen Box mit Fingerzinken in ihrer kompakten Anordnung auf der Seite, daneben das Fenster 3D-Ansicht mit der zusammengesteckten Box](/img/box-3d-de.webp)
 
 ### Gravur auf einer Wand
 
@@ -37,6 +41,8 @@ Die [Passungs-Kalibrierung](../features/materials-tests.md#calibrate-fit) findet
 ## Box mit Fingerzinken und Trennwänden
 
 Eine offene oder geschlossene Box mit sich kreuzenden Trennwänden. Dieser Generator ist **experimentell**: Prüfe die Teile in der 3D-Ansicht und an einem Reststück, bevor du das richtige Material schneidest.
+
+![Box mit Fingerzinken und Trennwänden: die acht Teile mit den Schlitzen für die Trennwände auf der Seite und die 3D-Ansicht mit der zusammengesteckten Box, drei Fächer in der Breite (das mittlere doppelt so breit) und zwei in der Tiefe](/img/box-dividers-3d-de.webp)
 
 | Feld | Bedeutung |
 |---|---|

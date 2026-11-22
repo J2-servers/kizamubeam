@@ -10,6 +10,8 @@ Diese Seite beschreibt alles, was nach dem Entwurf passiert. Wie du einen Laser 
 
 Die Maschinenfenster liegen standardmäßig rechts: **Laser** (Job, Status, Geräte), **Verschieben** (Verfahren und Ursprung) und **Konsole**.
 
+![Hauptfenster mit dem Fenster Laser (Gerät, Verbindung, Start, Pause, Stopp, Rahmen, Vorschau, Starten ab, Job-Ursprung und Optionen zur Schnittreihenfolge) und darunter dem Fenster Verschieben mit den Verfahrtasten](/img/machine-windows-de.webp)
+
 ## Vorschau
 
 **Laser → Vorschau …** (Alt+P) simuliert den Job, bevor sich etwas bewegt:
@@ -92,6 +94,8 @@ Jeder Laser ist ein **Gerät** mit eigener Verbindung, eigenem Arbeitsbereich un
 - **G-Code-Skripte**: Befehle, die vor und nach jedem Job laufen,
 - **Rotpunkt-Zeiger**: der Versatz zwischen Laserstrahl und Zeiger, damit Rahmen und Klickfahrten mit dem roten Punkt zielen können,
 - **FluidNC**-Extras (siehe unten).
+
+![Dialog Geräteeinstellungen eines Diodenlasers, Reiter Allgemein: Name, Steuerung, Arbeitsbereich, S-Wert, Lasermodul, Eilgang und Beschleunigung, Achsen und Air Assist; weitere Reiter für Verbindung, Rahmen & Zeiger, Energie, G-Code und Erweitert](/img/device-settings-dialog-de.webp)
 
 ## FluidNC-Extras
 

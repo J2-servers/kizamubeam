@@ -445,6 +445,8 @@ export interface CutSettings {
   zOffset: number;
   /** Je weiterem Durchgang um so viele mm tiefer fokussieren */
   zStep: number;
+  /** Galvo lasers (JCZ/EZCad devices only): pulse frequency in kHz and pulse width in ns (MOPA); missing = defaults */
+  galvo?: { freq: number; pulse: number };
   /** Sub-Layer: weitere Bearbeitungen derselben Formen nach diesem Layer (z. B. erst füllen, dann ausschneiden) */
   sub?: SubLayer[];
   /** Aussehen des Materials in der 3D-Ansicht (Farbe, Textur, Gravurdarstellung); fehlt = automatisch */
@@ -489,7 +491,7 @@ export type SubLayer = Omit<CutSettings, 'air' | 'look' | 'sub'> & { output: boo
 
 export const CUT_KEYS: (keyof CutSettings)[] = [
   'mode', 'speed', 'power', 'minPower', 'passes', 'air', 'kerf', 'tabs', 'fillStyle', 'interval', 'angle', 'crossHatch', 'bidirectional', 'overscan',
-  'perf', 'lead', 'ramp', 'dedup', 'dedupTol', 'zOffset', 'zStep', 'sub', 'look',
+  'perf', 'lead', 'ramp', 'dedup', 'dedupTol', 'zOffset', 'zStep', 'sub', 'look', 'galvo',
 ];
 
 /** Felder eines Sub-Layers (alles außer Air Assist, Aussehen und weiteren Sub-Layern) */
@@ -508,7 +510,7 @@ export function defaultSubLayer(mode: LayerMode = 'line'): SubLayer {
 /** Fehlende Felder eines Sub-Layers auffüllen (ältere Dateien, Import) */
 function normalizeSub(s: SubLayer): SubLayer {
   const d = defaultSubLayer(s.mode === 'fill' ? 'fill' : 'line');
-  for (const k of SUB_KEYS) if (s[k] === undefined) (s as unknown as Record<string, unknown>)[k] = d[k];
+  for (const k of SUB_KEYS) if (s[k] === undefined && k !== 'galvo') (s as unknown as Record<string, unknown>)[k] = d[k];
   fillNested(s);
   if (s.output === undefined) s.output = true;
   if (s.name === undefined) s.name = '';
@@ -586,7 +588,7 @@ export function normalizeLayer(L: Layer): Layer {
 /** Fehlende Bearbeitungseinstellungen mit Standardwerten auffüllen (ältere Dateien, Material-Bibliotheken, Import) */
 export function normalizeCut<T extends CutSettings>(L: T): T {
   const d = defaultCutSettings(L.mode);
-  for (const k of CUT_KEYS) if (L[k] === undefined && k !== 'sub' && k !== 'look') (L as unknown as Record<string, unknown>)[k] = d[k];
+  for (const k of CUT_KEYS) if (L[k] === undefined && k !== 'sub' && k !== 'look' && k !== 'galvo') (L as unknown as Record<string, unknown>)[k] = d[k];
   fillNested(L);
   if (L.sub !== undefined) L.sub = Array.isArray(L.sub) && L.sub.length ? L.sub.map(normalizeSub) : undefined;
   return L;
@@ -646,6 +648,11 @@ export interface MultiLayerPlate {
 export interface MultiLayerAssembly {
   id: string;
   plates: MultiLayerPlate[];
+  /**
+   * Object id of a box plate (joined with the joint tool) the stack is mounted on: the 3D view then stacks the plates on
+   * that plate, inside the box, at their place on the workspace, instead of beside it. Missing = a free-standing stack.
+   */
+  mount?: number;
 }
 
 /** Hilfslinie über das ganze Bett: 'y' = waagrecht auf Höhe v, 'x' = senkrecht bei v (Weltkoordinaten in mm) */
@@ -740,7 +747,7 @@ export function loadDoc(raw: unknown): Doc {
       const anchor = Array.isArray(p.anchor) && p.anchor.length === 6 && p.anchor.every((v) => typeof v === 'number' && isFinite(v)) ? p.anchor as Mat : IDENT;
       plates.push({ object: p.object, name: p.name, thickness: p.thickness, look, anchor });
     }
-    if (plates.length) cleanAssemblies.push({ id: a.id, plates });
+    if (plates.length) cleanAssemblies.push(Number.isInteger(a.mount) ? { id: a.id, plates, mount: a.mount } : { id: a.id, plates });
   }
   if (cleanAssemblies.length) d.multiLayerAssemblies = cleanAssemblies;
   else delete d.multiLayerAssemblies;

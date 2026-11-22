@@ -10,6 +10,8 @@ description: Cut out printed sheets precisely with registration marks, and laser
 
 Print and Cut cuts out a printed sheet exactly along the print, for example stickers or cardboard figures. Start it from the **Toolbox → Laser and Calibration → Print and Cut**.
 
+![Print and Cut dialog next to a sticker sheet with four round motifs and a label: three registration marks sit around the design, and the dialog lists them with their positions and offers the jog buttons, the laser dot and Align](/img/print-and-cut-marks-en.webp)
+
 1. **Place marks**: put three registration marks around the design (or turn your own objects into marks). The marks are printed and exported, but never lasered.
 2. **Print** the design at actual size (100 %, no "fit to page").
 3. **Measure**: put the sheet in the laser. For each mark, move the head to its centre with a low-power laser dot and the jog buttons, or click it in the camera image.
@@ -21,6 +23,8 @@ Two marks are enough to move and rotate; three also correct distortion from the 
 ## Jigs
 
 A jig is a holding plate with cut-outs for a batch of identical workpieces, such as keychain blanks or coasters. Create it in the **Toolbox → Copy and Arrange → Jig**.
+
+![Create Jig dialog: a key fob blank taken from the selection with 8 slots, slot spacing, clearance per side and finger notches; the preview shows the plate with the eight slots and three registration marks](/img/jig-dialog-en.webp)
 
 The slot shapes can come from:
 

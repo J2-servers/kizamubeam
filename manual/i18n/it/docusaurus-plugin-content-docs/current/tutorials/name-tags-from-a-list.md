@@ -15,6 +15,8 @@ In questo tutorial crei targhette con nome per un gruppo, per esempio una classe
 1. Scegli **File → Nuovo dal modello …** e poi **Targhetta con nome**.
 2. La finestra di compilazione mostra i campi del modello: il nome, una **Seconda riga**, la dimensione e se la targhetta ha due fori. Inserisci una dimensione adatta al tuo materiale, per esempio 80 × 30 mm, e conferma.
 
+![Finestra di compilazione del modello della targhetta con nome, con l’anteprima dal vivo: il nome Anna, la seconda riga Class 4b, larghezza 80 mm, altezza 30 mm e i due fori attivati](/img/name-tag-template-en.webp)
+
 Il modello è un normale progetto con [parametri](../features/templates-library.md#parameters). Apri **Finestra → Parametri** per vederli: il testo sulla targhetta contiene `{Name}`, che viene sostituito dal valore del parametro.
 
 Puoi anche disegnare la tua targhetta: disegnala, crea un parametro di testo nella finestra Parametri e scrivi `{Name}` in un testo.
@@ -25,12 +27,16 @@ Puoi anche disegnare la tua targhetta: disegnala, crea un parametro di testo nel
 2. Inserisci i nomi, una riga per targhetta. Puoi incollare celle copiate da un foglio di calcolo, oppure caricare un file con **Importa CSV …**.
 3. In **Assegna colonne** scegli quale colonna riempie quale parametro. Le colonne il cui titolo corrisponde al nome di un parametro vengono assegnate automaticamente. Lascia la seconda riga su **— mantieni valore —** se ogni targhetta deve mostrare lo stesso testo.
 
+![Finestra Serie da tabella: una tabella con la sola colonna Name e 32 righe, la colonna assegnata al parametro Name mentre gli altri parametri mantengono il loro valore, la disposizione a griglia e una distanza di 3 mm](/img/series-from-table-en.webp)
+
 ## 3. Disporre la serie
 
 1. In **Layout** scegli **Griglia: tutti quelli che entrano nel piano di lavoro, poi altre pagine**. Imposta la spaziatura tra le targhette, per esempio 3 mm.
 2. Fai clic su **Crea serie**.
 
 KizamuBeam aggiunge le targhette su nuove pagine dopo quella corrente, con i nomi inseriti. La pagina del modello resta com’era, e la tabella viene salvata con il progetto: puoi aggiungere nomi in seguito e creare di nuovo la serie.
+
+![La nuova pagina Series 1 con 32 targhette in una griglia di quattro colonne, ognuna con il proprio nome e la stessa seconda riga; la finestra Oggetti elenca la pagina del modello Name tag e la pagina della serie](/img/name-tags-series-en.webp)
 
 I nomi lunghi non cambiano la dimensione della targhetta. Controlla le pagine per i nomi troppo larghi, e accorciali o rimpicciolisci il carattere nella pagina del modello prima di creare di nuovo la serie.
 

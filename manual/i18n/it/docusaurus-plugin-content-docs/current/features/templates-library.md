@@ -16,6 +16,8 @@ description: Rendi i progetti regolabili con i parametri, salvali come modelli, 
 
 Quando cambia un valore, tutto viene ricalcolato insieme, su tutte le pagine. I numeri possono avere un intervallo e ricevono allora un cursore. Se rinomini un parametro, il nome cambia in tutti i testi e le formule.
 
+![Finestra Parametri con i parametri Name, Line2, Width, Height e Holes di una targhetta con nome; la targhetta è selezionata e la barra delle modifiche numeriche mostra in corsivo le formule Width e Height al posto dei numeri](/img/parameters-window-en.webp)
+
 **Modifica → Visibile se …** mostra e lavora un oggetto solo finché vale una condizione, come `Coperchio` o `Larghezza > 100`. Questi oggetti hanno una ƒ nella finestra Oggetti.
 
 ## Modelli
@@ -27,6 +29,8 @@ Un modello è un progetto con parametri che chiede i suoi valori quando lo usi.
 - **File → Compila modello …** chiede di nuovo i valori del progetto corrente.
 
 KizamuBeam include un **portachiavi** (il nome si rimpicciolisce per starci), una **targhetta con nome** (seconda riga e fori facoltativi) e una **scatola con etichetta** (una scatola a giunzioni a dita con un’etichetta sul davanti). I modelli delle estensioni installate compaiono in “Dalle estensioni”.
+
+![Finestra Nuovo dal modello: ancora nessun modello personale e, sotto, i tre modelli inclusi (portachiavi, targhetta con nome e scatola con etichetta), ognuno con la sua anteprima](/img/new-from-template-en.webp)
 
 I file `.kzt` si aggiungono con **Da file …** nella finestra dei modelli o trascinandoli sull’area di lavoro. Per modificare un modello, aprilo con **File → Apri …**, modificalo e salvalo di nuovo come modello. Nell’app desktop i modelli si trovano nella cartella `templates` della cartella delle impostazioni (**Mostra cartella** la apre).
 
@@ -54,6 +58,8 @@ Per contatori e date a ogni lavoro invece di un elenco fisso, vedi [testo variab
 ## Libreria
 
 **Finestra → Libreria** conserva motivi, immagini ed elementi grafici da riutilizzare, con anteprime, ricerca e tag.
+
+![Finestra Libreria con il campo di ricerca, i filtri per tipo e gruppo, i pulsanti + Selezione e File e una griglia di voci integrate; sull’area di lavoro un sottobicchiere composto con tre di esse: una cornice smerlata, un’ape e un divisorio di alloro](/img/library-window-en.webp)
 
 - **+ Selezione** (o **Modifica → Aggiungi alla libreria …**) salva gli oggetti selezionati con nome, tipo e tag.
 - **File …**, o il trascinamento di file SVG, DXF, PDF, AI, immagini o `.kza` sulla finestra, aggiunge direttamente i file.

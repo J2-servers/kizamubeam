@@ -12,6 +12,8 @@ These generators build on the finger-jointed box and are in **Toolbox → Boxes 
 
 A drawer with a carcass open at the front, a matching drawer box and a front panel. Without the carcass you get just the drawer box, for an opening that already exists.
 
+![The eleven parts of a drawer on the page, and the 3D View with the Explode slider pulled a little: the carcass, the drawer box drawn out of it and the front panel with a hand slot](/img/drawer-3d-en.webp)
+
 | Field | Meaning |
 |---|---|
 | **Width**, **Height**, **Depth** | Outer size of the carcass. Without carcass: size of the opening. |
@@ -29,6 +31,8 @@ A drawer with a carcass open at the front, a matching drawer box and a front pan
 
 A grid of halved dividers that slot into each other, for a box or drawer: for screws, beads, tea bags or game pieces.
 
+![Divider insert with 4 × 3 compartments: the five halved dividers on the page and, in the 3D View, slotted into each other to form a grid](/img/divider-insert-3d-en.webp)
+
 | Field | Meaning |
 |---|---|
 | **Inner width** / **Inner depth** | Inner size of the box or drawer the insert goes into. |
@@ -42,6 +46,8 @@ A grid of halved dividers that slot into each other, for a box or drawer: for sc
 ## Slot-together shelf
 
 Two sides and any number of shelves joined by cross slots: no glue, no screws.
+
+![Slot-together shelf: three shelves and two sides with their cross slots on the page, and the assembled shelf in the 3D View](/img/shelf-3d-en.webp)
 
 | Field | Meaning |
 |---|---|

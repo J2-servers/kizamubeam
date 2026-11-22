@@ -10,6 +10,8 @@ description: The Objects window, hiding and locking, multi-page projects, projec
 
 The **Objects** window (on the right below the layers; **Window → Objects**) shows all objects of the current page as a tree: pages, layers, objects and expandable groups, with the frontmost object on top.
 
+![Objects window with two pages, the layers and their objects as a tree, an opened group selected, one object set to “Don’t laser” (struck through) and one hidden; above the workspace two project tabs](/img/objects-window-en.webp)
+
 - A click selects an object, Shift or Ctrl adds more. The selection on the workspace follows along.
 - Double-click a name to rename an object or a layer.
 - **Eye**: hide an object or layer.

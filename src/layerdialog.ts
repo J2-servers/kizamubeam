@@ -9,6 +9,9 @@ import { lookEditor } from './view3d/lookui';
 import { guessLook, lookName, resolveLook } from './view3d/looks';
 import { library } from './materials';
 import { imageLayerFields } from './imageLayerFields';
+import { optionPicture } from './optionArt';
+import { device } from './laser';
+import { galvoLayer, normalizeJcz } from './jcz/settings';
 
 /** Opens "Adjust Image" for a layer; set by the UI module (it lives there) */
 let openAdjust: ((ed: Editor, layer: number) => void) | null = null;
@@ -93,25 +96,39 @@ export function openLayerDialog(ed: Editor, i: number) {
       h('option', { value: 'fill', selected: e.mode === 'fill' }, t('Füllen')),
     );
     const sub = tab >= 0 ? subs[tab] : null;
+    // Galvo device (JCZ): speed in mm/s, pulse frequency and (MOPA) pulse width; no Z axis, no air assist command
+    const galvo = device.fw === 'jcz';
+    const J = galvo ? normalizeJcz(device.jcz) : null;
+    const g = () => galvoLayer(e.galvo);
+    const galvoRows = J
+      ? [
+          ...row(t('Frequenz (kHz)'), num(() => g().freq, (v) => (e.galvo = { ...g(), freq: v }), Math.min(J.minFreq, J.maxFreq), Math.max(J.minFreq, J.maxFreq), false, t('Pulsfrequenz der Laserquelle (LightBurn: Frequency), begrenzt auf den Bereich in den Geräteeinstellungen'))),
+          ...(J.pulseWidthEnabled ? row(t('Pulsbreite (ns)'), num(() => g().pulse, (v) => (e.galvo = { ...g(), pulse: v }), 1, 10000, true, t('Nur MOPA-Quellen (LightBurn: Q-Pulse Width)'))) : []),
+        ]
+      : [];
+    const speedRow = galvo
+      ? row(t('Geschwindigkeit (mm/s)'), num(() => Math.round((e.speed / 60) * 100) / 100, (v) => (e.speed = v * 60), 1, 20000, false, t('Markiergeschwindigkeit des Galvos')))
+      : row(t('Geschwindigkeit (mm/min)'), num(() => e.speed, (v) => (e.speed = v), 1, 100000));
     general.replaceChildren(
       ...(sub
         ? row(t('Name'), h('input', { type: 'text', value: sub.name ?? '', oninput: (ev: Event) => (sub.name = (ev.target as HTMLInputElement).value) }))
         : row(t('Name'), h('input', { type: 'text', value: name, oninput: (ev: Event) => (name = (ev.target as HTMLInputElement).value) }))),
       ...(vecs ? row(t('Modus'), modeSel) : []),
-      ...row(t('Geschwindigkeit (mm/min)'), num(() => e.speed, (v) => (e.speed = v), 1, 100000)),
+      ...speedRow,
       ...row(t('Max. Leistung (%)'), num(() => e.power, (v) => (e.power = v), 0, 100)),
       ...row(t('Min. Leistung (%)'), num(() => e.minPower, (v) => (e.minPower = v), 0, 100, false, t('Leistung in Ecken (Leistungsrampe) und bei Bildern in Graustufen'))),
+      ...galvoRows,
       ...row(t('Durchgänge'), num(() => e.passes, (v) => (e.passes = v), 1, 100, true)),
       ...(!vecs ? [] : row(t('Kerf-Versatz (mm)'), num(() => e.kerf, (v) => (e.kerf = v), -5, 5, false, t('Positiv: Außenkonturen wandern nach außen, Löcher nach innen. Etwa die halbe Schnittbreite eintragen, damit Teile maßhaltig werden. Nur geschlossene Konturen (Kerf → Tabs → Perforation; Fill kerft die Hülle, Bilder ohne Kerf).')))),
-      ...(row(t('Z-Versatz (mm)'), num(() => e.zOffset, (v) => (e.zOffset = v), -50, 50, false, t('Fokus beim ersten Durchgang verschieben, positiv = tiefer ins Material. Braucht eine Z-Achse (Geräteeinstellungen); bezogen auf die Höhe beim Start.')))),
-      ...(row(t('Je Durchgang tiefer (mm)'), num(() => e.zStep, (v) => (e.zStep = v), -20, 20, false, t('Fokus nach jedem Durchgang um diesen Wert tiefer setzen, z. B. bei dickem Material. Am Ende fährt Z zurück.')))),
+      ...(galvo ? [] : row(t('Z-Versatz (mm)'), num(() => e.zOffset, (v) => (e.zOffset = v), -50, 50, false, t('Fokus beim ersten Durchgang verschieben, positiv = tiefer ins Material. Braucht eine Z-Achse (Geräteeinstellungen); bezogen auf die Höhe beim Start.')))),
+      ...(galvo ? [] : row(t('Je Durchgang tiefer (mm)'), num(() => e.zStep, (v) => (e.zStep = v), -20, 20, false, t('Fokus nach jedem Durchgang um diesen Wert tiefer setzen, z. B. bei dickem Material. Am Ende fährt Z zurück.')))),
       sub
         ? h('span', { class: 'checks' },
             check(t('Ausgabe'), () => sub.output, (v) => (sub.output = v), t('Sub-Layer beim Lasern ausgeben'), render),
             h('button', { type: 'button', class: 'btn small', onclick: () => removeSub(tab) }, t('Sub-Layer entfernen')),
           )
         : h('span', { class: 'checks' },
-            check(t('Air Assist'), () => c.air, (v) => (c.air = v), t('Luftunterstützung während dieses Layers einschalten (M8/M7, aus mit M9). Gilt auch für Bilder und Sub-Layer auf diesem Layer.')),
+            galvo ? null : check(t('Air Assist'), () => c.air, (v) => (c.air = v), t('Luftunterstützung während dieses Layers einschalten (M8/M7, aus mit M9). Gilt auch für Bilder und Sub-Layer auf diesem Layer.')),
             check(t('Ausgabe'), () => output, (v) => (output = v), t('Layer beim Lasern ausgeben')),
           ),
     );
@@ -173,7 +190,11 @@ export function openLayerDialog(ed: Editor, i: number) {
   const leadSection = (c: Entry) => {
     const Ld = c.lead;
     const box = h('div', { class: 'form' });
-    const fill = () =>
+    const fill = () => {
+      const form = h('span', { class: 'radios' },
+        h('label', {}, h('input', { type: 'radio', name: `lead-${i}`, value: 'line', checked: !Ld.arc, onchange: () => ((Ld.arc = false), fill()) }), t('Gerade')),
+        h('label', {}, h('input', { type: 'radio', name: `lead-${i}`, value: 'arc', checked: Ld.arc, onchange: () => ((Ld.arc = true), fill()) }), t('Bogen')),
+      );
       box.replaceChildren(
         h('span', { class: 'checks' },
           check(t('Anschnitt (Lead-In)'), () => Ld.leadIn, (v) => (Ld.leadIn = v), t('Der Schnitt beginnt neben der Kontur, so bleibt am Startpunkt keine Brandstelle')),
@@ -181,13 +202,12 @@ export function openLayerDialog(ed: Editor, i: number) {
         ),
         ...row(t('Länge (mm)'), num(() => Ld.length, (v) => (Ld.length = v), 0, 100)),
         h('label', {}, t('Form')),
-        h('span', { class: 'radios' },
-          h('label', {}, h('input', { type: 'radio', name: `lead-${i}`, checked: !Ld.arc, onchange: () => ((Ld.arc = false), fill()) }), t('Gerade')),
-          h('label', {}, h('input', { type: 'radio', name: `lead-${i}`, checked: Ld.arc, onchange: () => ((Ld.arc = true), fill()) }), t('Bogen')),
-        ),
+        form,
+        optionPicture(form, 'lead'),
         ...row(Ld.arc ? t('Bogenwinkel (°)') : t('Winkel zur Kontur (°)'), num(() => Ld.angle, (v) => (Ld.angle = v), Ld.arc ? 1 : 0, Ld.arc ? 180 : 90, false, Ld.arc ? t('Wie weit der Bogen um die Ecke führt') : t('90° = senkrecht zur Kontur, 0° = in Verlängerung'))),
         ...row(t('Überschnitt (mm)'), num(() => Ld.overcut, (v) => (Ld.overcut = v), 0, 100, false, t('Nach dem Schließen der Form so weit weiter schneiden, damit sich Anfang und Ende sicher treffen'))),
       );
+    };
     fill();
     return fold(t('Anschnitt und Überschnitt'), Ld.leadIn || Ld.leadOut || Ld.overcut > 0, t('Nur für geschlossene Formen. Anschnitt und Auslauf liegen immer auf der Abfallseite: außen bei Außenkonturen, innen bei Löchern.'), box);
   };
@@ -220,6 +240,7 @@ export function openLayerDialog(ed: Editor, i: number) {
       h('div', { class: 'form-title' }, t('Füllen')),
       h('div', { class: 'form' },
         ...row(t('Füllart'), style, t('Zeilenweise: Fläche Zeile für Zeile abtasten. Kontur folgend: Ringe, die dem Umriss nach innen folgen (gut für schmale Rahmen, Schrift und Ornamente).')),
+        optionPicture(style, 'fill'),
         ...row(t('Zeilenabstand (mm)'), interval),
         ...row(t('Zeilen pro Zoll'), lpi),
         ...(c.fillStyle === 'offset'

@@ -14,6 +14,8 @@ Der Layer enthält **alle Lasereinstellungen**. Objekte, auch Bilder, haben nie 
 
 Das Fenster **Schnitte / Layer** listet die verwendeten Layer mit Modus, Geschwindigkeit, Leistung, Air Assist und Ausgabe. Die Werte lassen sich direkt in der Tabelle ändern; durch Ziehen der Zeilen änderst du die Reihenfolge, in der die Layer gelasert werden.
 
+![Fenster Schnitte / Layer rechts mit fünf Layern (Gravur, Schnitt, Schrift, Ritzen und dem Werkzeug-Layer T1), ihrem Modus, Geschwindigkeit, Leistung und Kontrollkästchen; der Layer Schnitt ist ausgewählt, seine Werte lassen sich unter der Tabelle ändern](/img/layers-window-de.webp)
+
 ## Modi
 
 | Modus | Was passiert |
@@ -35,6 +37,8 @@ T1 und T2 werden nie gelasert. Nutze sie für Konstruktionslinien, den Umriss ei
 ## Schnitteinstellungen
 
 Ein Doppelklick auf einen Layer öffnet seine **Layer-Einstellungen**. Welche Felder erscheinen, hängt vom Modus ab.
+
+![Dialog Layer-Einstellungen eines Layers im Modus Linie: Geschwindigkeit, Leistung, Durchgänge und Kerf-Versatz, eingeschaltete Haltestege mit Länge und Anzahl sowie der geöffnete Abschnitt Anschnitt und Überschnitt](/img/cut-settings-line-de.webp)
 
 ### Für alle Modi
 
@@ -69,6 +73,8 @@ Ein Doppelklick auf einen Layer öffnet seine **Layer-Einstellungen**. Welche Fe
 | **Bidirektional** | Lasert in beide Richtungen (schneller). |
 | **Überfahrweg (%)** | Fährt mit ausgeschaltetem Laser über die Ränder hinaus, damit der Kopf beim Einschalten volle Geschwindigkeit hat. Vermeidet dunklere Ränder. |
 | **Füllart** | **Zeilenweise** oder **Kontur folgend**: Ringe, die der Kontur nach innen folgen. |
+
+![Dialog Layer-Einstellungen eines Layers im Modus Füllen: Füllart, Zeilenabstand, Zeilen pro Zoll, Scanwinkel, Überfahrweg, bidirektional und Kreuzschraffur](/img/cut-settings-fill-de.webp)
 
 **Standardwerte** setzt die Felder auf die Vorgaben des gewählten Modus zurück.
 

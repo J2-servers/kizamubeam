@@ -24,6 +24,8 @@ Eine Drehachse (Rotary) dreht einen runden Gegenstand unter dem Laser, sodass du
 
 **Testdrehung** dreht den Gegenstand mit den eingegebenen Werten genau einmal herum. Dreht er zu weit oder zu kurz, passe den Achsweg pro Umdrehung im gleichen Verhältnis an.
 
+![Dialog Drehachse mit eingeschalteter Drehachse: Art Walzen, Achse Y, Achsweg pro Umdrehung 360, Walzendurchmesser 25 mm, Objektdurchmesser 80 mm mit Umfang, die Optionen Konisches Objekt und Drehrichtung umkehren und die Schaltfläche Testdrehung; dahinter auf der Arbeitsfläche ein Logo für eine Tasse](/img/rotary-setup-de.webp)
+
 ## So funktioniert es
 
 Bei eingeschalteter Drehachse:

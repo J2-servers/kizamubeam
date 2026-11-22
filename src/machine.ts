@@ -1,6 +1,8 @@
 // Verbindung zur Maschine (FluidNC/GRBL). Die eigentliche Kommunikation läuft im Rust-Kern (src-tauri/src/machine.rs);
 // hier liegen Zustand, Statusauswertung und die Befehle für die Oberfläche.
-import { Device, Firmware, FIRMWARES, PreparedGCode } from './gcode';
+import { Device, Firmware, FIRMWARES, JCZ_SIM, PreparedGCode } from './gcode';
+import { JCZ_EVENTS, type JczBoard, type JczJob, type JczStatus } from './jcz/contract';
+import { normalizeJcz } from './jcz/settings';
 import type { RemoteJobInfo } from './remoteBundle';
 import { t, tBackend } from './i18n';
 import { configText, FluidFs, OVERRIDE, overrideSteps, parseConfigFile, runCmd } from './fluidnc';
@@ -240,6 +242,19 @@ class Machine {
   private capture: { fn: (line: string) => void; quiet: boolean } | null = null;
   private queryChain: Promise<unknown> = Promise.resolve();
   private unlisten: Unlisten[] = [];
+  /** Galvo board (fw 'jcz'): last status it reported; null = no galvo connection */
+  jcz: JczStatus | null = null;
+  /** What the galvo board is doing on our request: marking a job, red-light frame, or nothing */
+  jczTask: 'mark' | 'frame' | null = null;
+  /** Red guide light switched on with the light button */
+  jczLight = false;
+  private jczRun = { seenBusy: false, returned: false, started: 0, timer: 0, error: '' };
+  private jczUnlisten: Unlisten[] = [];
+
+  /** Connected to a galvo board (JCZ/EZCad) instead of a G-code controller */
+  get isJcz() {
+    return this.fwId === 'jcz' && this.connected;
+  }
 
   on(fn: (e: MachineEvent) => void) {
     this.listeners.add(fn);
@@ -397,6 +412,7 @@ class Machine {
     try {
       await this.listen();
       const { invoke } = await import('@tauri-apps/api/core');
+      if (d.fw === 'jcz') return await this.connectJcz(d);
       if (d.conn === 'remote') return await this.connectRemote(d);
       const netPort = d.fw === 'ruida' ? (d.ruidaPort || 50200) : d.conn === 'ws' ? d.wsPort : d.tcpPort;
       const where = d.conn === 'serial' ? d.port : `${d.fw === 'ruida' ? 'udp://' : d.conn === 'ws' ? 'ws://' : ''}${d.host}:${netPort}`;
@@ -452,7 +468,182 @@ class Machine {
   async disconnect() {
     if (!isTauri()) return;
     const { invoke } = await import('@tauri-apps/api/core');
+    if (this.isJcz) {
+      try {
+        await invoke('jcz_disconnect');
+      } catch (e) {
+        this.log(String(e), 'error');
+      }
+      return this.jczClosed('');
+    }
     await invoke(this.remote ? 'remote_disconnect' : 'machine_disconnect');
+  }
+
+  // ---------- Galvo (JCZ/EZCad), commands and events in src/jcz/contract.ts ----------
+
+  /** Galvo boards on USB (WinUSB driver installed by LightBurn/EZCad) */
+  async jczBoards(): Promise<JczBoard[]> {
+    if (!isTauri()) return [];
+    const { invoke } = await import('@tauri-apps/api/core');
+    return invoke<JczBoard[]>('jcz_list');
+  }
+
+  private async connectJcz(d: Device) {
+    const { invoke } = await import('@tauri-apps/api/core');
+    if (!this.jczUnlisten.length) {
+      const { listen } = await import('@tauri-apps/api/event');
+      this.jczUnlisten.push(
+        await listen<JczStatus>(JCZ_EVENTS.status, (e) => this.onJczStatus(e.payload)),
+        // The board's or the USB layer's own words, unchanged
+        await listen<string>(JCZ_EVENTS.log, (e) => this.log(String(e.payload), /error|fehl|fail/i.test(String(e.payload)) ? 'error' : 'in')),
+      );
+    }
+    const simulate = d.jczBoard === JCZ_SIM;
+    const serial = !simulate && d.jczBoard ? d.jczBoard : undefined;
+    const where = simulate ? t('Simulator (ohne Laser)') : serial ? `JCZ ${serial}` : t('erste JCZ-Platine');
+    this.log(t('Verbinde mit {where} …', { where }));
+    this.fw = FIRMWARES.jcz;
+    this.fwId = 'jcz';
+    this.jczLight = false;
+    this.jczRun.error = '';
+    const st = await invoke<JczStatus>('jcz_connect', { serial, settings: normalizeJcz(d.jcz), simulate });
+    this.connected = true;
+    this.where = st.simulated ? t('Simulator (ohne Laser)') : where;
+    this.onJczStatus(st);
+    this.log(t('Verbunden mit {where}.', { where: this.where }));
+    if (st.simulated && !simulate) this.log(t('Keine JCZ-Platine gefunden: Es antwortet der Simulator, der Laser feuert nicht.'), 'error');
+  }
+
+  /** Status from the board (event or answer to jcz_status) */
+  private onJczStatus(st: JczStatus) {
+    if (!st || typeof st !== 'object') return;
+    this.jcz = st;
+    if (st.error && st.error !== this.jczRun.error) this.log(st.error, 'error');
+    this.jczRun.error = st.error ?? '';
+    if (this.connected && !st.connected) return this.jczClosed(st.error ?? '');
+    this.status = { ...this.status, state: st.busy ? 'Run' : 'Idle' };
+    if (this.jczTask) {
+      if (st.busy) this.jczRun.seenBusy = true;
+      const p = Math.round(Math.min(1, Math.max(0, st.progress || 0)) * 1000);
+      this.progress = { sent: p, acked: p, total: 1000, errors: st.error ? 1 : 0 };
+      this.emit({ type: 'progress' });
+      this.jczCheckDone();
+    }
+    this.emit({ type: 'status' });
+  }
+
+  /** The board stopped being busy after our job or frame: report the end */
+  private jczCheckDone() {
+    const r = this.jczRun;
+    if (!this.jczTask || !this.jcz || this.jcz.busy || !r.returned) return;
+    // A command may return before the board reports busy: give it a moment before calling the job finished
+    if (!r.seenBusy && performance.now() - r.started < 1500) return;
+    const task = this.jczTask;
+    const err = this.jcz.error;
+    this.jczEnd();
+    if (task === 'mark') {
+      const secs = Math.round((performance.now() - r.started) / 1000);
+      const time = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+      this.emit({ type: 'done', ok: !err, message: err ? err : t('Fertig nach {time} min', { time }) });
+    } else if (err) this.emit({ type: 'done', ok: false, message: err });
+  }
+
+  private jczEnd() {
+    clearInterval(this.jczRun.timer);
+    this.jczTask = null;
+    this.progress = null;
+    this.jobTimes = null;
+    this.jobIsFrame = false;
+    this.emit({ type: 'progress' });
+  }
+
+  private jczClosed(error: string) {
+    if (this.jczTask) this.jczEnd();
+    this.connected = false;
+    this.jcz = null;
+    this.jczLight = false;
+    this.status = emptyStatus();
+    if (error) this.log(error, 'error');
+    this.log(t('Verbindung getrennt.'));
+    this.emit({ type: 'connection' });
+  }
+
+  /** Start a galvo task; the status is read every 300 ms while it runs (events may come less often) */
+  private async jczStart(task: 'mark' | 'frame', cmd: string, args: Record<string, unknown>): Promise<boolean> {
+    if (!this.isJcz) return this.log(t('Nicht verbunden.'), 'error'), false;
+    const { invoke } = await import('@tauri-apps/api/core');
+    clearInterval(this.jczRun.timer);
+    this.jczTask = task;
+    this.jobIsFrame = task === 'frame';
+    this.jobTimes = null;
+    this.jobStarted = performance.now();
+    this.jczRun = { ...this.jczRun, seenBusy: false, returned: false, started: performance.now() };
+    this.progress = { sent: 0, acked: 0, total: 1000, errors: 0 };
+    this.emit({ type: 'progress' });
+    this.jczRun.timer = window.setInterval(() => {
+      invoke<JczStatus>('jcz_status').then((st) => this.onJczStatus(st), (e) => this.log(String(e), 'error'));
+    }, 300);
+    try {
+      await invoke(cmd, args);
+    } catch (e) {
+      this.jczEnd();
+      // The literal cause from the rust side; the panel shows a finished job's message and writes it to the console
+      if (task === 'mark') this.emit({ type: 'done', ok: false, message: String(e) });
+      else this.log(String(e), 'error');
+      return false;
+    }
+    this.jczRun.returned = true;
+    this.jczCheckDone();
+    return true;
+  }
+
+  /** Mark a galvo job: fires the laser. The caller has asked the user for confirmation. */
+  async jczMark(job: JczJob): Promise<boolean> {
+    if (this.jczTask === 'mark') return this.log(t('Es läuft bereits ein Auftrag.'), 'error'), false;
+    // A running red-light frame ends first
+    if (this.jczTask === 'frame' && !(await this.jczStopCmd())) return false;
+    return this.jczStart('mark', 'jcz_mark', { job });
+  }
+
+  /** Red-light frame along a closed polyline, repeated until Stop; the laser stays off */
+  async jczFrame(polyline: [number, number][], speed: number): Promise<boolean> {
+    if (this.jczTask === 'mark') return this.log(t('Es läuft bereits ein Auftrag.'), 'error'), false;
+    if (this.jczTask === 'frame' && !(await this.jczStopCmd())) return false;
+    return this.jczStart('frame', 'jcz_frame', { polyline, speed, loop: true });
+  }
+
+  /** Red guide light on or off */
+  async jczSetLight(on: boolean) {
+    if (!this.isJcz) return this.log(t('Nicht verbunden.'), 'error');
+    const { invoke } = await import('@tauri-apps/api/core');
+    try {
+      await invoke('jcz_light', { on });
+      this.jczLight = on;
+    } catch (e) {
+      this.log(String(e), 'error');
+    }
+    this.emit({ type: 'status' });
+  }
+
+  private async jczStopCmd(): Promise<boolean> {
+    const { invoke } = await import('@tauri-apps/api/core');
+    try {
+      await invoke('jcz_stop');
+    } catch (e) {
+      this.log(String(e), 'error');
+      return false;
+    }
+    const task = this.jczTask;
+    if (task) this.jczEnd();
+    if (task === 'mark') this.emit({ type: 'done', ok: false, message: t('Abgebrochen') });
+    // The board takes a moment to stop; the next frame or job is only accepted once it is idle again
+    for (let i = 0; i < 30; i++) {
+      const st = await invoke<JczStatus>('jcz_status').catch(() => null);
+      if (st) this.onJczStatus(st);
+      if (!st || !st.busy) break;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    return true;
   }
 
   /** Werkstück-Nullpunkt (X, Y) in Maschinenkoordinaten, wie ihn die Steuerung zuletzt gemeldet hat; null = unbekannt */
@@ -463,6 +654,7 @@ class Machine {
   /** Eine Zeile senden (Konsole, Bewegen, Home …). Wird abgelehnt, solange ein Job läuft. */
   async send(line: string, quiet = false) {
     if (!this.connected) return this.log(t('Nicht verbunden.'), 'error');
+    if (this.fwId === 'jcz') return this.log(t('Ein Galvo-Laser (JCZ) nimmt keine G-Code-Befehle an.'), 'error');
     if (!quiet) this.log(line, 'out');
     // Nullpunkt oder Koordinatensystem ändert sich: bis zur nächsten Meldung der Steuerung gilt er als unbekannt
     if (/G\s*(10|92|5[4-9])\b/i.test(line)) this.wco.known = false;
@@ -584,7 +776,7 @@ class Machine {
 
   /** Echtzeitbefehl: ? Status, ! Halt, ~ Weiter, 0x18 Reset, 0x85 Jog abbrechen, 0x90 … Overrides */
   async realtime(byte: number) {
-    if (!this.connected) return;
+    if (!this.connected || this.fwId === 'jcz') return;
     try {
       await this.call('machine_realtime', { byte });
     } catch (e) {
@@ -604,6 +796,8 @@ class Machine {
   /** true, wenn der Auftrag angenommen wurde */
   private async startJob(total: number, times: Float64Array | null, frame: boolean, call: { cmd: string; args: Record<string, unknown> }): Promise<boolean> {
     if (!this.connected) return this.log(t('Nicht verbunden.'), 'error'), false;
+    // G-code jobs never reach a galvo board (it marks only through jczMark, after confirmation)
+    if (this.fwId === 'jcz') return this.log(t('Ein Galvo-Laser (JCZ) nimmt keine G-Code-Befehle an.'), 'error'), false;
     if (this.busy) return this.log(t('Es läuft bereits ein Auftrag.'), 'error'), false;
     if (this.remote) return this.log(t('Über einen anderen KizamuBeam laufen nur Aufträge, die der Host selbst berechnet (Start, Rahmen, Material- und Fokustest).'), 'error'), false;
     const { invoke } = await import('@tauri-apps/api/core');
@@ -626,15 +820,20 @@ class Machine {
 
   /** Anhalten: GRBL-Familie per Echtzeitbefehl !, Marlin durch Zurückhalten weiterer Zeilen (im Rust-Kern) */
   async pause() {
-    if (!this.connected) return;
+    if (!this.connected || this.fwId === 'jcz') return;
     await this.call('machine_pause').catch((e) => this.log(tBackend(String(e)), 'error'));
   }
   async resume() {
-    if (!this.connected) return;
+    if (!this.connected || this.fwId === 'jcz') return;
     await this.call('machine_resume').catch((e) => this.log(tBackend(String(e)), 'error'));
   }
   async stop() {
     if (!this.connected) return;
+    // Galvo: stops framing or marking at once, laser off
+    if (this.fwId === 'jcz') {
+      if (await this.jczStopCmd()) this.log(t('Gestoppt.'), 'info');
+      return;
+    }
     // Ein Job von SD/Flash endet mit dem Reset; Meldung kommt über den Status
     if (this.storedJob) ((this.storedJob.seen = true), (this.storedJob.aborted = true));
     try {

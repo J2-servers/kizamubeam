@@ -31,6 +31,8 @@ Details are in [Calibrate fit](../features/materials-tests.md#calibrate-fit). If
 5. With a calibrated material, the dialog already uses its kerf and clearance. Otherwise enter them yourself.
 6. Click **Create**.
 
+![Create Box dialog with the values of this tutorial: Outside dimensions, width 100, depth 80, height 50, material thickness 2.9 mm and Closed (lid with fingers); the preview shows the six panels](/img/finger-box-dialog-en.webp)
+
 The six panels appear on the page in a compact layout. They are one parametric part: double-click any panel to change the size later.
 
 ## 3. Engrave the name on the lid
@@ -40,6 +42,8 @@ The six panels appear on the page in a compact layout. They are one parametric p
 3. Put the text on its own layer: click another colour in the palette, then set that layer to **Fill** in the layers window.
 4. Select the text and the lid and centre them on each other with **C** and **E**.
 5. Group the text with the lid (Ctrl+G), so it moves along when the box is rearranged.
+
+![The six panels of the box on the page; the name Emma sits in the middle of the lid, on its own layer Engrave set to Fill, which comes before the layer Cut in the layers window](/img/finger-box-name-on-lid-en.webp)
 
 ## 4. Check the box in 3D
 

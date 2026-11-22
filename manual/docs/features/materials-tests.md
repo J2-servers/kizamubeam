@@ -12,6 +12,8 @@ Good results depend on the right speed, power and focus for each material. Kizam
 
 The **Material** window stores cut settings per material and thickness, optionally with the image settings too. To use an entry, select a layer and apply the entry to it; the layer takes over all its settings.
 
+![Material window with entries grouped by material and thickness (birch plywood 3 mm and 5 mm, cardboard, leather), each with its settings; the entry for cutting 3 mm birch plywood is applied to the Cut layer](/img/material-library-en.webp)
+
 - **Save**: set up a layer the way you like it and save it as a new entry (material, thickness, title).
 - **Exchange**: export and import entries as `.kzm` files. Older `.lwm` files still import, and LightBurn libraries (`.clb`) are imported as far as their fields have an equivalent.
 - **Extensions** can add material entries too (see [Templates, library and extensions](templates-library.md#extensions)).
@@ -21,6 +23,8 @@ Material entries also carry the [3D look](construction-3d.md#material-look) and 
 ## Material test
 
 **Laser → Tests and Calibration → Material Test …** (or the **Toolbox → Laser and Calibration**) creates a grid of test cells with two stepped values, for example speed in the rows and power in the columns, with labels. Each cell gets its own test layer.
+
+![Material Test dialog: speed from 1000 to 6000 mm/min in the rows, power from 10 to 100 % in the columns, fixed values, cell size, and the preview of the 60 test cells](/img/material-test-dialog-en.webp)
 
 The test does not change your document: send it straight to the laser with Preview, Frame, Start or Save G-code in the dialog. The cells run in order of increasing energy, so a test you stop early has done the gentle cells.
 
@@ -44,6 +48,8 @@ KizamuBeam measures how dark each cell is against the bare material in the gaps,
 
 **Laser → Tests and Calibration → Focus Test …** helps you find the right distance between laser head and material.
 
+![Focus test dialog with the method Ramp: laser settings, line length, shim height and marks, the four steps and the diagram of the tilted material in which you click the sharpest spot](/img/focus-test-dialog-en.webp)
+
 - **Ramp** works with every laser. Tilt the material on a shim, laser one long line with height marks underneath, then click the sharpest spot in the dialog. KizamuBeam tells you how far the focus is off.
 - **Z series** needs a motorized Z axis. It lasers a row of short lines, each at a different Z offset. Click the sharpest one to enter its offset on the layer or move Z there directly.
 
@@ -58,6 +64,8 @@ Slot-together parts only fit when kerf and clearance are right. **Laser → Test
 - a hole plate with a tab comb with stepped clearance.
 
 The numbers are engraved on a separate layer. After lasering, measure the square and enter it, together with the number of the best-fitting tab and slot. KizamuBeam computes the kerf, the clearance per side and the slot allowance and stores them with the material in the library. A kerf offset on the layer is taken into account.
+
+![Calibrate fit: the test parts on the page (20 mm square, slot comb, hole plate and tab comb with engraved numbers) and the dialog with the measured square, the best tab and the best slot, from which kerf and clearance are computed](/img/calibrate-fit-en.webp)
 
 From then on, new boxes, drawers, inserts and shelves take thickness, kerf and clearance from the calibration of the layer's material, and the Joint tool proposes matching values. Existing parts get a button to apply the calibrated values, and the [design check](construction-3d.md#check-the-design-before-cutting) compares joints against the calibration.
 

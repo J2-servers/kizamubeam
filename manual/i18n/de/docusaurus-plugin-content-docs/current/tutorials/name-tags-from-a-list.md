@@ -15,6 +15,8 @@ In diesem Tutorial machst du Namensschilder für eine Gruppe, etwa eine Klasse o
 1. Wähle **Datei → Neu aus Vorlage …** und dann **Namensschild**.
 2. Der Ausfülldialog zeigt die Felder der Vorlage: den Namen, eine **Zweite Zeile**, die Größe und ob das Schild zwei Löcher bekommt. Gib eine Größe ein, die zu deinem Material passt, etwa 80 × 30 mm, und bestätige.
 
+![Ausfülldialog der Vorlage Namensschild mit seiner Live-Vorschau: der Name Anna, die zweite Zeile Klasse 4b, 80 mm Breite, 30 mm Höhe und die zwei Löcher eingeschaltet](/img/name-tag-template-de.webp)
+
 Die Vorlage ist ein normales Projekt mit [Parametern](../features/templates-library.md#parameters). Öffne **Fenster → Parameter**, um sie zu sehen: Der Text auf dem Schild enthält `{Name}`, das durch den Wert des Parameters ersetzt wird.
 
 Du kannst auch dein eigenes Schild gestalten: zeichne es, lege im Fenster Parameter einen Text-Parameter an und schreibe `{Name}` in einen Text.
@@ -25,12 +27,16 @@ Du kannst auch dein eigenes Schild gestalten: zeichne es, lege im Fenster Parame
 2. Trage die Namen ein, eine Zeile pro Schild. Du kannst aus einer Tabellenkalkulation kopierte Zellen einfügen oder eine Datei mit **CSV importieren …** laden.
 3. Unter **Spalten zuordnen** wählst du, welche Spalte welchen Parameter füllt. Spalten, deren Überschrift einem Parameternamen entspricht, werden automatisch zugeordnet. Lass die zweite Zeile auf **— Wert bleibt —**, wenn auf jedem Schild derselbe Text stehen soll.
 
+![Dialog Serie aus Tabelle: eine Tabelle mit der einzigen Spalte Name und 32 Zeilen, die Spalte ist dem Parameter Name zugeordnet, die übrigen Parameter behalten ihren Wert, dazu die Anordnung Raster und 3 mm Abstand](/img/series-from-table-de.webp)
+
 ## 3. Die Serie anordnen
 
 1. Wähle unter **Anordnung** die Option **Raster: so viele wie aufs Bett passen, dann weitere Seiten**. Stelle den Abstand zwischen den Schildern ein, etwa 3 mm.
 2. Klicke auf **Serie anlegen**.
 
 KizamuBeam legt die Schilder auf neuen Seiten hinter der aktuellen an, mit eingesetzten Namen. Deine Vorlagenseite bleibt, wie sie war, und die Tabelle wird mit dem Projekt gespeichert: Du kannst später Namen ergänzen und die Serie neu anlegen.
+
+![Die neue Seite Serie 1 mit 32 Namensschildern in einem Raster aus vier Spalten, jedes mit eigenem Namen und derselben zweiten Zeile; das Fenster Objekte listet die Vorlagenseite Namensschild und die Seite der Serie](/img/name-tags-series-de.webp)
 
 Lange Namen ändern die Größe des Schilds nicht. Prüfe die Seiten auf Namen, die zu breit für das Schild sind, und kürze sie oder verkleinere die Schrift auf der Vorlagenseite, bevor du die Serie neu anlegst.
 

@@ -19,6 +19,8 @@ Die Zahnrad-Generatoren erzeugen echte Evolventenzähne, so berechnet, wie ein W
 | **Schnittfuge (Kerf)** | Breite des Laserschnitts; die Kontur wird um die Hälfte nach außen versetzt, die Bohrung nach innen. |
 | **Bohrung** | Keine, **Rund**, **D-Profil (abgeflacht)** mit dem Maß über Abflachung oder **Mit Passfedernut** mit Nutbreite und Nuttiefe. |
 
+![Dialog Zahnrad erstellen: 24 Zähne, Modul 2, Eingriffswinkel 20°, Flankenspiel, Schnittfuge und eine Bohrung mit Passfedernut; die Vorschau zeigt das Zahnrad, darunter Teilkreis, Kopfkreis, Fußkreis und Grundkreis](/img/gear-dialog-de.webp)
+
 Unter **Erweitert**:
 
 - **Profilverschiebung x**: Positive Werte machen die Zähne am Fuß kräftiger und vermeiden Unterschnitt bei kleinen Rädern; der Achsabstand ändert sich um x × Modul.
@@ -29,6 +31,8 @@ Flankenspiel und Schnittfuge sind bewusst getrennt: Das Flankenspiel schafft Pla
 ## Zahnradpaar
 
 **Zahnradpaar** erzeugt zwei passende Räder im richtigen Achsabstand, als eine Baugruppe. In der [3D-Ansicht](../features/construction-3d.md#3d-view) greifen sie ineinander und lassen sich drehen.
+
+![Zahnradpaar mit 16 und 40 Zähnen und einer Grundplatte mit zwei Achslöchern auf der Seite; in der 3D-Ansicht greifen die beiden Räder auf der Platte ineinander](/img/gear-pair-3d-de.webp)
 
 | Feld | Bedeutung |
 |---|---|
@@ -42,6 +46,8 @@ Flankenspiel und Schnittfuge sind bewusst getrennt: Das Flankenspiel schafft Pla
 ## Zahnstange
 
 Eine **Zahnstange** ist ein gerades Zahnrad, das mit einem Stirnrad kämmt: Aus Drehung wird eine geradlinige Bewegung.
+
+![Dialog Zahnstange erstellen: 16 Zähne, Modul 2, Eingriffswinkel 20°, Flankenspiel, Schnittfuge und 8 mm Rückenhöhe; unter der Vorschau die Länge von 100,68 mm, die Teilung und die Lage der Teilungslinie](/img/rack-dialog-de.webp)
 
 | Feld | Bedeutung |
 |---|---|

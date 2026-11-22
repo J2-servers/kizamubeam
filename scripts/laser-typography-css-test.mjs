@@ -34,9 +34,13 @@ test('Arc selects retain a 24px minimum target height at the smallest preset', (
 });
 test('Laser buttons grow with wrapped text, not their separate SVG icons', () => {
   const button = rule('.laser-grid .btn');
-  assert.match(button, /min-height:\s*42px/);
-  assert.doesNotMatch(button, /(?:^|[;\n])\s*height:\s*42px/);
-  assert.match(button, /overflow-wrap:\s*anywhere/);
+  assert.match(button, /min-height:\s*48px/);
+  assert.doesNotMatch(button, /(?:^|[;\n])\s*height:\s*(?:42|48)px/);
+  // `anywhere` split a word in the middle ("Enquadramen|to" in pt-BR, measured 22/11/2026): break between
+  // words and leave the rest to the language's own hyphenation.
+  assert.match(button, /overflow-wrap:\s*break-word/);
+  assert.doesNotMatch(button, /overflow-wrap:\s*anywhere/);
+  assert.match(button, /hyphens:\s*auto/);
   assert.match(rule('.laser-grid .btn > span'), /flex:\s*none/);
   assert.match(rule('.laser-grid .btn svg'), /width:\s*16px;\s*height:\s*16px/);
   assert.match(rule('.ib svg'), /width:\s*20px;\s*height:\s*20px/);

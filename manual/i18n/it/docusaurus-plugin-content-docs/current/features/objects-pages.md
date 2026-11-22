@@ -10,6 +10,8 @@ description: La finestra Oggetti, nascondere e bloccare, progetti con più pagin
 
 La finestra **Oggetti** (a destra sotto i livelli; **Finestra → Oggetti**) mostra tutti gli oggetti della pagina corrente come albero: pagine, livelli, oggetti e gruppi espandibili, con l’oggetto più in primo piano in alto.
 
+![Finestra Oggetti con due pagine, i livelli e i loro oggetti come albero, un gruppo aperto e selezionato, un oggetto impostato su «Non lavorare» (barrato) e uno nascosto; sopra l’area di lavoro due schede di progetto](/img/objects-window-en.webp)
+
 - Un clic seleziona un oggetto, Maiusc o Ctrl ne aggiunge altri. La selezione nell’area di lavoro segue.
 - Un doppio clic su un nome rinomina un oggetto o un livello.
 - **Occhio**: nasconde un oggetto o un livello.

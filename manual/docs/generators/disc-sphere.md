@@ -8,6 +8,8 @@ description: A sphere or lamp shade made of round discs that hold each other thr
 
 The **Disc sphere** (**Toolbox → 3D slot-together models**) builds a sphere or lamp shade from round discs. The discs hold each other through angled slots, without glue.
 
+![The 20 discs of a disc sphere with their angled slots on the page, and the 3D View with the assembled sphere](/img/disc-sphere-3d-en.webp)
+
 The discs sit on the face directions of a polyhedron, chosen under **Layout**. More discs make a rounder sphere with more slots; the icosahedron is the default.
 
 | Polyhedron | Discs |
@@ -29,6 +31,8 @@ The discs sit on the face directions of a polyhedron, chosen under **Layout**. M
 | **Bottom opening** | Hole in the bottom disc, for example to change the bulb (Advanced). |
 | **Fit clearance** | Extra slot width; negative = press fit. |
 | **Kerf** | Width of the laser cut. |
+
+![Create Disc sphere dialog: diameter 200 mm, layout Icosahedron (20 discs), overlap 60 %, material thickness 1 mm and a top opening of 40 mm; the preview shows the discs, and below it the disc diameter, the number of slot joints, the angle between discs and the slot width](/img/disc-sphere-dialog-en.webp)
 
 Each pair of crossing discs shares a chord that is split in half: one disc is slotted from one end, the other from the other end. Slots for discs that cross at an angle are made wider accordingly, and sharp corners at the slot entrances get a small chamfer.
 

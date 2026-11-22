@@ -2,6 +2,7 @@ import type { Editor } from './editor';
 import { h, numInput } from './dom';
 import { CutSettings, DITHER_MODES, DitherMode, ImageLayer, isCellMode } from './model';
 import { t } from './i18n';
+import { optionPicture } from './optionArt';
 
 /** Layer settings that images share with fills: line interval, bidirectional, overscan */
 export type RasterSettings = Pick<CutSettings, 'interval' | 'bidirectional' | 'overscan'>;
@@ -18,6 +19,7 @@ export interface RasterAccess {
  * (mode, negative, threshold, cells) are written to the layer's image settings; live = without an undo
  * step (the dialogs commit or revert the whole change themselves). raster: line interval/DPI,
  * bidirectional and overscan, which belong to the layer; null leaves them out (shown elsewhere).
+ * The dialogs (live) also show an example picture of the chosen mode; the narrow layer panel does not.
  */
 export function imageLayerFields(ed: Editor, i: number, live: boolean, onChange?: () => void, raster: RasterAccess | null = null): HTMLElement[] {
   const IL = ed.imgLayer(i);
@@ -50,7 +52,7 @@ export function imageLayerFields(ed: Editor, i: number, live: boolean, onChange?
   });
   renderExtra();
   const negative = h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: IL.negative, onchange: (e: Event) => set({ negative: (e.target as HTMLInputElement).checked }) }), t('Negativ'));
-  const head = [h('label', {}, t('Bildmodus')), modeSel, extra];
+  const head = [h('label', {}, t('Bildmodus')), modeSel, ...(live ? [optionPicture(modeSel, 'dither')] : []), extra];
   if (!raster) return [...head, h('span', { class: 'checks' }, negative)];
 
   const R = raster.get();

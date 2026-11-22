@@ -10,6 +10,8 @@ description: Gedruckte Bögen mit Passermarken genau ausschneiden und Serien von
 
 Print and Cut schneidet einen gedruckten Bogen genau entlang des Drucks aus, etwa Sticker oder Pappfiguren. Starte es über **Werkzeugkasten → Laser und Kalibrieren → Print and Cut**.
 
+![Dialog Print and Cut neben einem Stickerbogen mit vier runden Motiven und einem Schild: Um den Entwurf sitzen drei Passermarken, der Dialog listet sie mit ihren Positionen auf und bietet Verfahrtasten, Laserpunkt und Ausrichten](/img/print-and-cut-marks-de.webp)
+
 1. **Marken setzen**: Setze drei Passermarken um den Entwurf (oder mache eigene Objekte zu Marken). Die Marken werden gedruckt und exportiert, aber nie gelasert.
 2. **Drucken**: den Entwurf in Originalgröße drucken (100 %, nicht „an Seite anpassen“).
 3. **Messen**: Leg den Bogen in den Laser. Fahre für jede Marke den Kopf mit schwachem Laserpunkt und den Verfahrtasten auf ihre Mitte, oder klicke sie im Kamerabild an.
@@ -21,6 +23,8 @@ Zwei Marken reichen zum Verschieben und Drehen; drei gleichen auch Verzerrungen 
 ## Jigs {#jigs}
 
 Ein Jig ist eine Halteplatte mit Aussparungen für eine Serie gleicher Werkstücke, etwa Schlüsselanhänger-Rohlinge oder Untersetzer. Erstelle ihn über **Werkzeugkasten → Vervielfältigen und Anordnen → Jig**.
+
+![Dialog Jig erstellen: ein Schlüsselanhänger-Rohling aus der Auswahl mit 8 Fächern, Abstand der Fächer, Spiel je Seite und Griffmulden; die Vorschau zeigt die Platte mit den acht Fächern und drei Passermarken](/img/jig-dialog-de.webp)
 
 Die Form der Fächer kann kommen aus:
 

@@ -12,6 +12,8 @@ Gute Ergebnisse hängen von der richtigen Geschwindigkeit, Leistung und dem Foku
 
 Das Fenster **Material** speichert Schnitteinstellungen je Material und Dicke, auf Wunsch auch mit den Bildeinstellungen. Um einen Eintrag zu nutzen, wähle einen Layer aus und wende den Eintrag darauf an; der Layer übernimmt alle seine Einstellungen.
 
+![Fenster Material mit Einträgen, gruppiert nach Material und Dicke (Birkensperrholz 3 mm und 5 mm, Karton, Leder), jeweils mit ihren Einstellungen; der Eintrag zum Schneiden von 3 mm Birkensperrholz ist auf den Layer Schnitt angewendet](/img/material-library-de.webp)
+
 - **Speichern**: Richte einen Layer so ein, wie du ihn haben willst, und speichere ihn als neuen Eintrag (Material, Dicke, Titel).
 - **Austauschen**: Einträge als `.kzm`-Dateien exportieren und importieren. Ältere `.lwm`-Dateien lassen sich weiter importieren, und LightBurn-Bibliotheken (`.clb`) werden übernommen, soweit ihre Felder eine Entsprechung haben.
 - **Erweiterungen** können ebenfalls Materialeinträge mitbringen (siehe [Vorlagen, Bibliothek und Erweiterungen](templates-library.md#extensions)).
@@ -21,6 +23,8 @@ Materialeinträge tragen auch das [Aussehen in 3D](construction-3d.md#material-l
 ## Materialtest {#material-test}
 
 **Laser → Test und Kalibrieren → Materialtest …** (oder **Werkzeugkasten → Laser und Kalibrieren**) erzeugt ein Raster aus Testfeldern mit zwei abgestuften Werten, etwa Geschwindigkeit in den Zeilen und Leistung in den Spalten, mit Beschriftung. Jedes Feld bekommt einen eigenen Test-Layer.
+
+![Dialog Materialtest: Geschwindigkeit von 1000 bis 6000 mm/min in den Zeilen, Leistung von 10 bis 100 % in den Spalten, feste Werte, Zellengröße und die Vorschau der 60 Testfelder](/img/material-test-dialog-de.webp)
 
 Der Test verändert dein Dokument nicht: Schicke ihn direkt aus dem Dialog mit Vorschau, Rahmen, Start oder G-Code speichern an den Laser. Die Felder laufen in der Reihenfolge steigender Energie, sodass ein vorzeitig abgebrochener Test die schonenden Felder schon erledigt hat.
 
@@ -44,6 +48,8 @@ KizamuBeam misst, wie dunkel jedes Feld gegenüber dem blanken Material in den Z
 
 **Laser → Test und Kalibrieren → Fokustest …** hilft, den richtigen Abstand zwischen Laserkopf und Material zu finden.
 
+![Dialog Fokustest mit dem Verfahren Rampe: Lasereinstellungen, Linienlänge, Unterlage und Markierungen, die vier Schritte und das Schaubild des schräg liegenden Materials, in dem du die schärfste Stelle anklickst](/img/focus-test-dialog-de.webp)
+
 - **Rampe** funktioniert mit jedem Laser. Lege das Material schräg auf ein Unterlegstück, lasere eine lange Linie mit Höhenmarken darunter und klicke im Dialog die schärfste Stelle an. KizamuBeam sagt dir, wie weit der Fokus daneben liegt.
 - **Z-Reihe** braucht eine motorisierte Z-Achse. Sie lasert eine Reihe kurzer Linien, jede mit anderem Z-Versatz. Klicke die schärfste an, um ihren Versatz in den Layer einzutragen oder Z direkt dorthin zu fahren.
 
@@ -58,6 +64,8 @@ Steckteile passen nur, wenn Kerf und Spiel stimmen. **Laser → Test und Kalibri
 - eine Lochplatte mit Zapfenkamm mit abgestuftem Spiel.
 
 Die Nummern werden auf einem eigenen Layer graviert. Miss nach dem Lasern das Quadrat und gib es ein, zusammen mit der Nummer des am besten passenden Zapfens und Schlitzes. KizamuBeam berechnet Schnittbreite, Spiel je Seite und Schlitzzugabe und speichert sie beim Material in der Bibliothek. Ein Kerf-Versatz des Layers wird berücksichtigt.
+
+![Passung kalibrieren: die Testteile auf der Seite (20-mm-Quadrat, Schlitzkamm, Lochplatte und Zapfenkamm mit gravierten Nummern) und der Dialog mit gemessenem Quadrat, bestem Zapfen und bestem Schlitz, aus denen Schnittfuge und Spiel berechnet werden](/img/calibrate-fit-de.webp)
 
 Ab dann übernehmen neue Boxen, Schubladen, Einsätze und Regale Dicke, Kerf und Spiel aus der Kalibrierung des Layer-Materials, und das Werkzeug Verbindung schlägt passende Werte vor. Vorhandene Teile bekommen eine Schaltfläche, um die kalibrierten Werte zu übernehmen, und die [Konstruktionsprüfung](construction-3d.md#check-the-design-before-cutting) vergleicht Verbindungen mit der Kalibrierung.
 

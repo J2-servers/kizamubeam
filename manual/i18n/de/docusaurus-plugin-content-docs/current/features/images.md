@@ -16,6 +16,8 @@ Ein Bild liegt wie jedes andere Objekt auf einem Layer. Geschwindigkeit, Leistun
 
 Jedes Bild hat seinen eigenen **Bildmodus**, der bestimmt, wie aus Grautönen Laserpunkte werden. Die Arbeitsfläche zeigt das Ergebnis in Laserauflösung.
 
+![Dasselbe Bild auf vier Layern mit den Bildmodi Schwellwert, Jarvis, Zeitungsdruck und Skizze, auf der Arbeitsfläche so dargestellt, wie es gelasert wird](/img/image-modes-de.webp)
+
 | Modus | Gut für |
 |---|---|
 | **Schwellwert** | Logos und Strichzeichnungen: Alles, was dunkler als der Schwellwert ist, wird gelasert. |
@@ -32,11 +34,15 @@ Jedes Bild hat seinen eigenen **Bildmodus**, der bestimmt, wie aus Grautönen La
 
 **Werkzeuge → Bild → Bild anpassen …** stellt Helligkeit, Kontrast, Gamma, Schärfen (mit Radius) und Entrauschen ein, mit Vorschau, Vergleich mit dem Original und 1:1-Ansicht. Anpassungen und Bildmodus lassen sich als benannte Voreinstellungen speichern.
 
+![Dialog Bild anpassen mit der Vorschau links und Reglern für Helligkeit, Kontrast, Gamma, Schärfen, Radius und Entrauschen, dazu Bildmodus, Zeilenabstand und DPI des Layers](/img/adjust-image-dialog-de.webp)
+
 **Bearbeitetes Bild speichern …** speichert das Bild als PNG genau so, wie es gelasert würde.
 
 ## Hintergrund entfernen
 
 **Werkzeuge → Bild → Hintergrund entfernen …** (oder **Freistellen …** in der Leiste) arbeitet lokal, ohne Cloud-Dienst. Die Hintergrundfarben werden vom Bildrand genommen, oder du klickst sie in der Vorschau an (Shift+Klick fügt weitere hinzu). Farben innerhalb der Toleranz werden transparent und nicht gelasert. Die Bereinigung entfernt kleine Flecken und füllt kleine Löcher; **Auf das Motiv zuschneiden** beschneidet das Bild.
+
+![Dialog Hintergrund entfernen: die Vorschau zeigt ein Logo, dessen farbiger Hintergrund transparent geworden ist, darunter die vom Bildrand genommene Hintergrundfarbe, Toleranz, Bereinigen und weiche Kante](/img/remove-background-dialog-de.webp)
 
 ## Zuschneiden und maskieren
 
@@ -50,6 +56,8 @@ Das Bild behält Position und Auflösung; Ctrl+Z macht beides rückgängig.
 ## Bilder nachzeichnen
 
 **Werkzeuge → Bild → Bild nachzeichnen …** (Alt+T) macht aus einem Bild Vektorpfade, mit Live-Vorschau. Stelle den Schwellwert ein, ignoriere kleine Flecken und wähle die Glättung. Das Ergebnis sind Bézierpfade mit erhaltenen Ecken.
+
+![Dialog Bild nachzeichnen mit Art, Schwellwert, ignorierten Flecken und Glättung; auf der Arbeitsfläche erscheinen die nachgezeichneten Umrisse eines Logos als orange gestrichelte Vorschau](/img/trace-image-dialog-de.webp)
 
 Die Art **Mittellinien** zeichnet Striche entlang ihrer Mitte als offene Pfade nach. Das ist die richtige Wahl für Handschrift, Unterschriften und Strichzeichnungen, die als einzelne Linie geritzt statt umfahren werden sollen.
 

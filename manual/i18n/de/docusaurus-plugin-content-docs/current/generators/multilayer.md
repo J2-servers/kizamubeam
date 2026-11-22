@@ -15,7 +15,11 @@ description: Eigene Formen zu einem geschichteten Stück stapeln, etwa einer Sha
 3. Der Dialog listet die ausgewählten Formen von unten nach oben. Gib jeder Platte einen **Name der Platte** und eine **Dicke** und verschiebe sie mit **Eine Ebene höher** / **Eine Ebene tiefer**.
 4. **Erstellen**.
 
+![Dialog Mehrlagenarbeit erstellen mit den drei ausgewählten Formen von unten nach oben (Boden, Rand, Stern), jede mit 3 mm Dicke, einem Materialaussehen und den Schaltflächen für eine Ebene tiefer oder höher; die Formen sind auf der Arbeitsfläche ausgewählt](/img/multilayer-dialog-de.webp)
+
 Die Formen bleiben bearbeitbar. Die [3D-Ansicht](../features/construction-3d.md#3d-view) zeigt sie bündig gestapelt, mit Gravuren und dem [Materialaussehen](../features/construction-3d.md#material-look) ihres Layers, so lässt sich die Tiefenwirkung vor dem Schneiden gut beurteilen.
+
+![Die drei Formen nebeneinander auf der Seite und die 3D-Ansicht, die sie bündig gestapelt zeigt: ein Boden aus Nussbaum, ein Rand aus Birke und ein Stern aus Kirsche](/img/multilayer-3d-de.webp)
 
 Um Reihenfolge oder Dicken später zu ändern, wähle die Platten aus und starte **Mehrlagenarbeit** erneut.
 

@@ -16,6 +16,8 @@ description: Entwürfe mit Parametern anpassbar machen, als Vorlagen speichern, 
 
 Ändert sich ein Wert, wird alles auf einmal neu berechnet, auf allen Seiten. Zahlen können einen Bereich haben und bekommen dann einen Schieberegler. Benennst du einen Parameter um, ändert sich der Name in allen Texten und Formeln mit.
 
+![Fenster Parameter mit den Parametern Name, Zeile2, Breite, Höhe und Löcher eines Namensschilds; das Schild ist ausgewählt, und die Eigenschaftenleiste zeigt statt Zahlen die Formeln Breite und Höhe in Kursivschrift](/img/parameters-window-de.webp)
+
 **Bearbeiten → Sichtbar, wenn …** zeigt und lasert ein Objekt nur, solange eine Bedingung gilt, etwa `Deckel` oder `Breite > 100`. Solche Objekte tragen im Fenster Objekte ein ƒ.
 
 ## Vorlagen
@@ -27,6 +29,8 @@ Eine Vorlage ist ein Projekt mit Parametern, das beim Verwenden nach seinen Wert
 - **Datei → Vorlage ausfüllen …** fragt die Werte des aktuellen Projekts noch einmal ab.
 
 KizamuBeam bringt einen **Schlüsselanhänger** (der Name wird passend verkleinert), ein **Namensschild** (optionale zweite Zeile und Löcher) und eine **beschriftete Box** (eine Box mit Fingerzinken und Beschriftung auf der Vorderseite) mit. Vorlagen aus installierten Erweiterungen erscheinen unter „Aus Erweiterungen“.
+
+![Dialog Neu aus Vorlage: noch keine eigenen Vorlagen, darunter die drei mitgelieferten Vorlagen Schlüsselanhänger, Namensschild und Beschriftete Box, jede mit Vorschau](/img/new-from-template-de.webp)
 
 `.kzt`-Dateien fügst du mit **Aus Datei …** im Vorlagen-Dialog hinzu oder ziehst sie auf die Arbeitsfläche. Um eine Vorlage zu ändern, öffne sie mit **Datei → Öffnen …**, bearbeite sie und speichere sie erneut als Vorlage. In der Desktop-App liegen die Vorlagen im Ordner `templates` des Einstellungsordners (**Ordner zeigen** öffnet ihn).
 
@@ -54,6 +58,8 @@ Für Zähler und Datum bei jedem Job statt einer festen Liste siehe [variabler T
 ## Bibliothek
 
 **Fenster → Bibliothek** bewahrt Motive, Bilder und Gestaltungselemente zum Wiederverwenden auf, mit Vorschau, Suche und Schlagwörtern.
+
+![Fenster Bibliothek mit Suchfeld, den Filtern für Art und Gruppe, den Schaltflächen + Auswahl und Dateien und einem Raster eingebauter Einträge; auf der Arbeitsfläche ein Untersetzer aus drei davon: ein gewellter Rahmen, eine Biene und ein Lorbeertrenner](/img/library-window-de.webp)
 
 - **+ Auswahl** (oder **Bearbeiten → Zur Bibliothek hinzufügen …**) speichert die ausgewählten Objekte mit Name, Art und Schlagwörtern.
 - **Dateien …** oder das Ziehen von SVG-, DXF-, PDF-, AI-, Bild- oder `.kza`-Dateien auf das Fenster fügt Dateien direkt hinzu.

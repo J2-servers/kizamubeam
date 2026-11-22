@@ -10,6 +10,8 @@ This page covers everything that happens after the design is done. How to connec
 
 The machine windows sit on the right by default: **Laser** (job, status, devices), **Move** (jogging and origin) and **Console**.
 
+![Main window with the Laser window (device, connection, Start, Pause, Stop, Frame, Preview, Start From, job origin and cut order options) and the Move window with the jog buttons below it](/img/machine-windows-en.webp)
+
 ## Preview
 
 **Laser → Preview …** (Alt+P) simulates the job before anything moves:
@@ -92,6 +94,8 @@ Each laser is a **device** with its own connection, work area and settings. Pick
 - **G-code scripts**: commands to run before and after every job,
 - **red-dot pointer**: the offset between beam and pointer, so framing and click moves can aim with the red dot,
 - **FluidNC** extras (see below).
+
+![Device Settings dialog of a diode laser, General tab: name, controller, work area, S value, laser module, rapid speed and acceleration, axes and air assist; further tabs for Connection, Framing & pointer, Energy, G-Code and Advanced](/img/device-settings-dialog-en.webp)
 
 ## FluidNC extras
 

@@ -20,7 +20,11 @@ Entrambi i generatori di scatole si trovano in **Casella degli strumenti → Sca
 | **Gioco di accoppiamento** | Ogni dito diventa più stretto di questo valore; negativo = accoppiamento a pressione. |
 | **Kerf** | Larghezza del taglio laser; i contorni vengono spostati verso l’esterno della metà. |
 
+![Finestra di creazione della scatola: dimensioni interne di 120 × 90 × 60 mm, spessore del materiale 3 mm, aperta in alto, larghezza delle dita, gioco di accoppiamento e kerf; l’anteprima mostra le cinque parti e, sotto, le dimensioni esterne risultanti e i campi per bordo](/img/box-dialog-en.webp)
+
 Le pareti anteriore e posteriore possiedono gli angoli. Le parti sono oggetti separati in una disposizione compatta: le parti uguali restano vicine. Un doppio clic su una parte qualsiasi modifica l’intera scatola, su tutti i lati. Le parti ancora nella disposizione generata si allontanano quando la scatola cresce; quelle che hai disposto tu restano dove sono.
+
+![Le cinque parti di una scatola aperta con giunzioni a dita nella loro disposizione compatta sulla pagina e, accanto, la finestra della vista 3D con la scatola montata](/img/box-3d-en.webp)
 
 ### Incisione su una parete
 
@@ -37,6 +41,8 @@ La [calibrazione dell’accoppiamento](../features/materials-tests.md#calibrate-
 ## Scatola con giunti a pettine e divisori
 
 Una scatola aperta o chiusa con divisori che si incrociano. Questo generatore è **sperimentale**: controlla le parti nella vista 3D e su un ritaglio prima di tagliare il materiale buono.
+
+![Scatola con divisori: le otto parti con le asole per i divisori sulla pagina e la vista 3D con la scatola montata, tre scomparti in larghezza (quello centrale largo il doppio) e due in profondità](/img/box-dividers-3d-en.webp)
 
 | Campo | Significato |
 |---|---|

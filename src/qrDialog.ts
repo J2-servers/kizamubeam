@@ -7,6 +7,7 @@ import { barcodeData, cellOutlines, qrMatrix, vcardData, wifiData } from './barc
 import { fillTemplate, scopeOf } from './params';
 import { subsToPath2D } from './geom';
 import { CODES, shownText } from './vartext';
+import { openBatchProof } from './batchProofDialog';
 import { openText } from './files';
 import { dec, t, tn } from './i18n';
 
@@ -225,6 +226,8 @@ export function openVarTextDialog(ed: Editor) {
     h('div', { class: 'note' }, t('Die Nummer ist die Seriennummer und zugleich die Zeile der CSV-Datei (erste Datenzeile = 1). Jedes Objekt kann einen eigenen Versatz haben, z. B. für mehrere Schilder in einem Job.')),
     h('h4', {}, t('Diese Seite mit der aktuellen Nummer')),
     preview,
+    h('div', { class: 'vt-inline' },
+      h('button', { class: 'btn', title: t('Jedes Stück der Serie einzeln ansehen und prüfen, bevor der Job läuft'), onclick: () => (dlg.close(), openBatchProof(ed)) }, t('Chargenprüfung …'))),
     h('details', {}, h('summary', {}, t('Platzhalter')), codes),
     h('div', { class: 'dialog-buttons' }, h('button', { class: 'btn primary', onclick: () => dlg.close() }, t('Schließen'))),
   );

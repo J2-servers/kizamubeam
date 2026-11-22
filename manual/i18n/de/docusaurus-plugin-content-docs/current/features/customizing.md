@@ -10,6 +10,8 @@ description: Fenster und Leisten anordnen, Sprache und Design wechseln und deine
 
 **Bearbeiten → Einstellungen …** enthält alle programmweiten Einstellungen in einem Fenster, mit einer Seitenleiste (Allgemein, Darstellung, Arbeitsfläche und Fangen, Maus und Tastatur, Maschinen und Dienste, Erweiterungen und Schriften) und einer Suche über alle Bereiche. Änderungen gelten mit **OK**; **Abbrechen** verwirft sie, und **Standardwerte** setzt den aktuellen Bereich zurück.
 
+![Fenster Einstellungen mit Suchfeld, der Seitenleiste der Bereiche und dem Bereich Darstellung: Design und vier Regler für die Schriftgrößen](/img/settings-window-de.webp)
+
 Einstellungen, die es auch als Menüeintrag gibt (Sprache, Design, Fangen, Raster und so weiter), sind dieselben Werte: Änderst du sie an einer Stelle, ändern sie sich auch an der anderen.
 
 ## Sprache und Design
@@ -28,11 +30,15 @@ Die Werkzeugfenster (Schnitte / Layer, Objekte, Laser, Verschieben, Konsole, Mat
 - Ziehe ihn an den linken Rand neben die Werkzeugleiste, um ihn links anzudocken.
 - Ziehe ihn auf die Arbeitsfläche, um ein freies Fenster daraus zu machen. ⇥ oder ein Doppelklick auf seinen Kopf dockt es wieder an.
 
+![Umsortierte Werkzeugfenster: Objekte und Verlauf links angedockt, Schnitte / Layer und Material als Reiter rechts über dem Fenster Laser, das Fenster Verschieben schwebt über der Arbeitsfläche](/img/window-layout-de.webp)
+
 Die Trennlinien zwischen Fenstern lassen sich ziehen. ▾ oder ein Doppelklick auf einen Kopf klappt eine Gruppe ein, × auf einem Tab blendet das Fenster aus. Das Menü **Fenster** blendet alle Fenster und Leisten ein und aus.
 
 ## Funktionsleisten
 
 Öffne **Fenster → Funktionsleisten** oder klicke mit rechts auf den Rahmen einer Leiste, um vorhandene Leisten anzupassen: verfügbare Einträge hinzufügen oder entfernen, umsortieren, Trennlinien einfügen und die Symbolgröße wählen. Auch Eigenschaften- und Textleiste nutzen dieses Layoutsystem; ihre Felder bearbeiten weiterhin dieselben Funktionswerte.
+
+![Dialog Funktionsleisten anpassen: Auswahl der Leiste, Symbolgröße, Zeilen und Spalten, links die Liste der verfügbaren Aktionen, rechts die Einträge der Hauptleiste](/img/customize-toolbars-de.webp)
 
 Ziehe eine Leiste am Griff, um sie zu verschieben, an einem der vier Ränder anzudocken oder innerhalb der App frei zu platzieren. Die Kante bestimmt ihre Ausrichtung: oben/unten waagerecht, seitlich senkrecht. Schwebende Leisten behalten ihre letzte Ausrichtung. Lege sie nahe einer Zeilengrenze ab, um eine neue Zeile zwischen vorhandenen Zeilen einzufügen. Die Zeilen- oder Spaltenzahl innerhalb einer Leiste stellst du im Anpassen-Dialog ein; nicht passender Inhalt scrollt intern. Andere Leisten und der Arbeitsbereich gleiten innerhalb von 150 ms an ihre Position, sofern reduzierte Bewegung nicht aktiviert ist.
 

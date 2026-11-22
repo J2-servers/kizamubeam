@@ -27,6 +27,8 @@ Ziehe eine Hilfslinie aus dem oberen Lineal (waagerecht) oder dem linken Lineal 
 
 **Werkzeuge → Messen** (oder die Lineal-Schaltfläche): Anfangs- und Endpunkt anklicken, mit Fang. KizamuBeam zeigt Länge, Δx, Δy und Winkel, über einem Kreis Durchmesser und Radius. Esc löscht die Messung.
 
+![Eine Platte, eingerahmt von vier gestrichelten Hilfslinien aus den Linealen, und das Werkzeug Messen, das 120,00 mm, Δx, Δy und den Winkel zwischen den Mittelpunkten zweier Löcher anzeigt](/img/guides-measure-de.webp)
+
 ## Beziehungen
 
 **Anordnen → Beziehungen** (oder die Beziehungs-Gruppe in der Werkzeugleiste) verschiebt oder dreht ein Objekt so, dass es in einer Beziehung zu einem anderen steht. Klicke zuerst das Bezugselement an (es bleibt stehen), dann das Element des Objekts, das sich anpassen soll.
@@ -45,6 +47,8 @@ Beziehungen werden einmalig angewendet, wie ein Befehl; jede ist ein Rückgängi
 ## Skizzen mit Bemaßung {#sketches-with-dimensions}
 
 Für Teile, die beim Ändern ihre genauen Maße behalten sollen, gibt es **Werkzeugkasten → Skizzen mit Beziehungen → Neue Skizze** (oder **In Skizze umwandeln**). In einer Skizze behalten Linien, Rechtecke, Kreise und Bögen ihre Beziehungen und Maße dauerhaft, wie in einem CAD-Programm.
+
+![Eine geöffnete Skizze: eine Platte mit schräger Ecke und Loch, bemaßt mit Längen, Abständen und einem Durchmesser, dazu die Skizzenleiste mit Zeichenwerkzeugen, Beziehungen und den verbleibenden Freiheitsgraden](/img/sketch-dimensions-de.webp)
 
 - Beziehungen über die Leiste oben oder per Taste: deckungsgleich (O), waagerecht (H), senkrecht (V), parallel (P), rechtwinklig (N), gleich (E), tangential (T), konzentrisch (X), Mittelpunkt (M), symmetrisch (Y), fest (F).
 - **Bemaßen** (D): Eine Linie bekommt eine Länge, zwei Linien einen Winkel, ein Kreis einen Durchmesser, ein Bogen einen Radius, zwei Punkte einen Abstand. Ein Doppelklick auf ein Maß ändert es. Maße können Formeln mit Projektparametern sein, etwa `Breite / 2`.

@@ -43,6 +43,8 @@ Controllers with Wi-Fi or Ethernet, such as FluidNC or Ruida DSP, are reached ov
 
 Enter the address of the controller, for example `192.168.1.50` or `fluidnc.local`. **Search …** next to the address field finds FluidNC controllers on your local network.
 
+![Device settings, Connection tab: Wi-Fi (Telnet) connection, USB port, baud rate, the address fluidnc.local with the Search button, and the network ports](/img/device-connection-settings-en.webp)
+
 :::tip Unstable Wi-Fi
 With FluidNC, a job can be uploaded to the controller’s SD card or flash and run from there (**Laser → FluidNC**). With Ruida, **Save to controller …** stores a named `.rd` job in the controller’s internal memory. A network dropout then no longer stops the job.
 :::
@@ -50,6 +52,8 @@ With FluidNC, a job can be uploaded to the controller’s SD card or flash and r
 ## Several devices
 
 Each laser is stored as a device with its own work area, connection and settings. Switch between them at the top of the Laser window or under **Laser → Device → Devices …**. Device templates exist for many common lasers (for example Swiitol, Ortur, Atomstack, Sculpfun, xTool, Creality Falcon, Two Trees, Longer, Comgrow, OMTech and Ruida); the workspace always shows the bed of the selected device.
+
+![Devices dialog with three lasers, each with controller and work area, and the list of device templates for adding a new one](/img/devices-dialog-en.webp)
 
 ## Without a laser
 

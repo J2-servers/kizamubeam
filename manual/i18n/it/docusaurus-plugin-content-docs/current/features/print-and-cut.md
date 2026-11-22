@@ -10,6 +10,8 @@ description: Ritaglia con precisione fogli stampati usando marcatori di registro
 
 Stampa e taglia ritaglia un foglio stampato esattamente lungo la stampa, per esempio adesivi o figure di cartone. Avvialo da **Casella degli strumenti → Laser e calibrazione → Stampa e taglia**.
 
+![Finestra Stampa e taglia accanto a un foglio di adesivi con quattro motivi rotondi e un’etichetta: intorno al progetto ci sono tre marcatori di registro, e la finestra li elenca con le loro posizioni e offre i pulsanti di movimento, il punto laser e Allinea](/img/print-and-cut-marks-en.webp)
+
 1. **Posiziona marcatori**: metti tre marcatori di registro intorno al progetto (o trasforma oggetti tuoi in marcatori). I marcatori vengono stampati ed esportati, ma mai lavorati.
 2. **Stampa** il progetto a grandezza reale (100 %, senza “adatta alla pagina”).
 3. **Misura**: metti il foglio nel laser. Per ogni marcatore porta la testa al suo centro con un punto laser a bassa potenza e i pulsanti di movimento, oppure fai clic su di esso nell’immagine della fotocamera.
@@ -21,6 +23,8 @@ Due marcatori bastano per spostare e ruotare; tre correggono anche la distorsion
 ## Maschere {#jigs}
 
 Una maschera (jig) è una piastra di supporto con sedi per una serie di pezzi uguali, come grezzi per portachiavi o sottobicchieri. Creala in **Casella degli strumenti → Copia e disponi → Maschera**.
+
+![Finestra di creazione della maschera: un grezzo per portachiavi preso dalla selezione con 8 sedi, distanza tra le sedi, gioco per lato e incavi di presa; l’anteprima mostra la piastra con le otto sedi e tre marcatori di registro](/img/jig-dialog-en.webp)
 
 La forma delle sedi può venire da:
 

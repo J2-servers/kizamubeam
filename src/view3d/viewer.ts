@@ -27,6 +27,9 @@ export interface Scene3D {
 }
 
 export type ViewPreset = 'iso' | 'top' | 'front';
+/** Optional product frame for view(): world directions of the product's right (x), back (y) and up (z). "front" then
+ *  looks at the product's front face, whichever way the assembly ended up in the scene. */
+export interface ViewAxes { x: [number, number, number]; y: [number, number, number]; z: [number, number, number] }
 
 /** Hintergrund im Mockup-Modus: wie die Oberfläche, Weiß, Hellgrau, Dunkel oder Studio-Verlauf */
 export type MockupBg = 'theme' | 'white' | 'grey' | 'dark' | 'studio';
@@ -480,12 +483,18 @@ export class Viewer3D {
     this.needsRender = true;
   }
 
-  view(preset: ViewPreset) {
+  /** rollUp: also turn the camera's up to the product's up (only for a throwaway viewer that takes pictures: the orbit
+   *  controls keep the up they were created with, so an interactive view must leave it alone) */
+  view(preset: ViewPreset, axes?: ViewAxes, rollUp = false) {
     const b = this.bounds();
     if (b.isEmpty()) return;
     const sphere = b.getBoundingSphere(new THREE.Sphere());
     const r = Math.max(sphere.radius, 1);
-    const dir = preset === 'top' ? new THREE.Vector3(0, -0.0001, 1) : preset === 'front' ? new THREE.Vector3(0, -1, 0.0001) : new THREE.Vector3(0.9, -1.5, 1.1);
+    const [cx, cy, cz] = preset === 'top' ? [0, -0.0001, 1] : preset === 'front' ? [0, -1, 0.0001] : [0.9, -1.5, 1.1];
+    const dir = axes
+      ? new THREE.Vector3(...axes.x).multiplyScalar(cx).addScaledVector(new THREE.Vector3(...axes.y), cy).addScaledVector(new THREE.Vector3(...axes.z), cz)
+      : new THREE.Vector3(cx, cy, cz);
+    if (rollUp) this.camera.up.set(...(axes ? axes.z : ([0, 0, 1] as [number, number, number])));
     const dist = r / Math.sin(THREE.MathUtils.degToRad(this.camera.fov / 2)) * (this.camera.aspect < 1 ? 1.15 / this.camera.aspect : 1.15);
     this.camera.position.copy(sphere.center).addScaledVector(dir.normalize(), dist);
     this.camera.near = Math.max(0.01, dist / 1000);

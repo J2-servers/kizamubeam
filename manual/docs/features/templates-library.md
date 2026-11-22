@@ -16,6 +16,8 @@ description: Make designs adjustable with parameters, save them as templates, pr
 
 Changing a value recalculates everything at once, on all pages. Numbers can have a range and then get a slider. Renaming a parameter renames it in all texts and formulas.
 
+![Parameters window with the parameters Name, Line2, Width, Height and Holes of a name tag; the tag is selected, and the numeric toolbar shows the formulas Width and Height in italics instead of numbers](/img/parameters-window-en.webp)
+
 **Edit → Visible If …** shows and lasers an object only while a condition holds, such as `Lid` or `Width > 100`. These objects carry a ƒ in the Objects window.
 
 ## Templates
@@ -27,6 +29,8 @@ A template is a project with parameters that asks for its values when you use it
 - **File → Fill in template …** asks the values of the current project again.
 
 KizamuBeam includes a **key fob** (the name shrinks to fit), a **name tag** (optional second line and holes) and a **labelled box** (a finger-jointed box with a label on the front). Templates from installed extensions appear under "From extensions".
+
+![New from template dialog: no templates of your own yet, and below them the three included templates Key fob, Name tag and Labelled box, each with a preview](/img/new-from-template-en.webp)
 
 `.kzt` files can be added with **From file …** in the template dialog or by dragging them onto the workspace. To change a template, open it with **File → Open …**, edit it and save it as a template again. In the desktop app the templates live in the `templates` folder of the settings folder (**Show folder** opens it).
 
@@ -54,6 +58,8 @@ For counters and dates on each job instead of a fixed list, see [variable text](
 ## Library
 
 **Window → Library** keeps motifs, images and design elements for reuse, with previews, search and tags.
+
+![Library window with the search field, the filters for type and group, the buttons + Selection and Files and a grid of built-in items; on the workspace a coaster put together from three of them: a scalloped frame, a bee and a laurel divider](/img/library-window-en.webp)
 
 - **+ Selection** (or **Edit → Add to library …**) stores the selected objects with name, type and tags.
 - **Files …**, or dragging SVG, DXF, PDF, AI, image or `.kza` files onto the window, adds files directly.

@@ -8,6 +8,8 @@ description: Eine Kugel oder ein Lampenschirm aus runden Scheiben, die sich übe
 
 Die **Scheibenkugel** (**Werkzeugkasten → 3D-Steckmodelle**) baut eine Kugel oder einen Lampenschirm aus runden Scheiben. Die Scheiben halten sich über schräge Schlitze gegenseitig, ohne Leim.
 
+![Die 20 Scheiben einer Scheibenkugel mit ihren schrägen Schlitzen auf der Seite und die 3D-Ansicht mit der zusammengesteckten Kugel](/img/disc-sphere-3d-de.webp)
+
 Die Scheiben sitzen auf den Flächenrichtungen eines Polyeders, gewählt unter **Anordnung**. Mehr Scheiben ergeben eine rundere Kugel mit mehr Schlitzen; Standard ist das Ikosaeder.
 
 | Polyeder | Scheiben |
@@ -29,6 +31,8 @@ Die Scheiben sitzen auf den Flächenrichtungen eines Polyeders, gewählt unter *
 | **Öffnung unten** | Loch in der unteren Scheibe, etwa zum Wechseln der Lampe (Erweitert). |
 | **Steckspiel** | Zusätzliche Schlitzbreite; negativ = Presspassung. |
 | **Schnittfuge (Kerf)** | Breite des Laserschnitts. |
+
+![Dialog Scheibenkugel erstellen: Durchmesser 200 mm, Anordnung Ikosaeder (20 Scheiben), Überlappung 60 %, Materialdicke 1 mm und 40 mm Öffnung oben; die Vorschau zeigt die Scheiben, darunter Scheibendurchmesser, Zahl der Steckverbindungen, Winkel zwischen den Scheiben und Schlitzbreite](/img/disc-sphere-dialog-de.webp)
 
 Jedes Paar sich kreuzender Scheiben teilt sich eine Sehne, die halbiert wird: Eine Scheibe wird vom einen Ende her geschlitzt, die andere vom anderen. Schlitze für Scheiben, die sich schräg kreuzen, werden entsprechend breiter, und spitze Ecken an den Schlitzeingängen bekommen eine kleine Fase.
 

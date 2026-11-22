@@ -10,6 +10,8 @@ description: Importa file SVG, DXF, PDF, Illustrator e LightBurn ed esporta prog
 
 **File → Importa …** (Ctrl+I), il trascinamento dei file sull’area di lavoro o l’incolla con Ctrl+V da altri programmi funzionano allo stesso modo. I colori vengono associati al colore più vicino della tavolozza, cioè al livello più vicino, e più oggetti arrivano come gruppo.
 
+![Un file SVG importato sull’area di lavoro: un portachiavi da parete arriva come un unico gruppo selezionato, e i suoi quattro colori sono diventati quattro livelli nella finestra Tagli / Livello](/img/import-svg-en.webp)
+
 ### SVG
 
 Percorsi (anche archi), rettangoli, cerchi, ellissi, linee, poligoni, riferimenti `use`, trasformazioni, classi CSS e immagini incorporate. Le dimensioni derivano da `width`, `height` e `viewBox`. **Il testo nei file SVG viene saltato**: converti il testo in percorsi nel programma di disegno prima di salvare.
@@ -48,6 +50,8 @@ Vedi [Immagini e ricalco](images.md).
 | **DXF** | La pagina corrente in mm, un layer DXF per ogni livello usato con nome e colore. Le curve vengono esportate come spline esatte. Le immagini non possono andare nel DXF. |
 | **PDF** | Tutte le pagine, ognuna alle dimensioni del piano 1:1, ogni livello come livello PDF proprio, livelli di riempimento riempiti, immagini incorporate. |
 | **Illustrator (`.ai`)** | Lo stesso file compatibile PDF; si apre in Illustrator, Inkscape e Affinity. |
+
+![Menu File con il sottomenu Esporta aperto: esporta come SVG, DXF, PDF e file Illustrator (AI)](/img/export-menu-en.webp)
 
 I testi vengono esportati come contorni.
 

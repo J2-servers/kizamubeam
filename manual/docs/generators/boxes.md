@@ -20,7 +20,11 @@ Find both box generators in **Toolbox → Boxes and Furniture**. For a lid that 
 | **Fit clearance** | Every finger gets this much narrower; negative = press fit. |
 | **Kerf** | Width of the laser cut; outlines are offset outward by half of it. |
 
+![Create Box dialog: inside dimensions of 120 × 90 × 60 mm, material thickness 3 mm, open at the top, finger width, fit clearance and kerf; the preview shows the five parts, and below it the resulting outside dimensions and the fields per edge](/img/box-dialog-en.webp)
+
 The front and back walls own the corners. The parts are separate objects in a compact arrangement: identical parts stay together. A double-click on any part edits the whole box, on every page. Parts still in their generated layout move apart when they grow; parts you arranged yourself stay where they are.
+
+![The five parts of an open finger-jointed box in their compact arrangement on the page, and next to them the 3D View window with the box put together](/img/box-3d-en.webp)
 
 ### Engraving on a panel
 
@@ -37,6 +41,8 @@ The [fit calibration](../features/materials-tests.md#calibrate-fit) finds these 
 ## Finger Joint Box with Dividers
 
 An open or closed box with dividers that cross each other. This generator is **experimental**: check the parts in the 3D view and on an offcut before cutting the real material.
+
+![Finger Joint Box with Dividers: the eight parts with the slots for the dividers on the page, and the 3D View with the assembled box, three compartments across the width (the middle one twice as wide) and two across the depth](/img/box-dividers-3d-en.webp)
 
 | Field | Meaning |
 |---|---|

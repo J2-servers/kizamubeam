@@ -7,6 +7,8 @@ description: Generatoren erzeugen fertige Teile aus wenigen Maßen, etwa Boxen, 
 
 Generatoren erzeugen fertige Teile aus wenigen Maßen, statt sie von Hand zu zeichnen. Sie stehen alle im **Werkzeugkasten** (**Werkzeuge → Werkzeugkasten …**, **Fenster → Werkzeugkasten** oder die Kachel-Schaltfläche in der Werkzeugleiste), nach Gruppen sortiert und durchsuchbar.
 
+![Fenster Werkzeugkasten links mit Suchfeld, Gruppenfiltern, Zuletzt benutzt und den Gruppen Mechanik sowie Boxen und Möbel als Kacheln; auf der Seite eine Box, ein Zahnrad, ein Nocken und eine Riemenscheibe, die damit erzeugt wurden, jeweils am nächsten freien Platz](/img/toolbox-de.webp)
+
 | Seite | Generatoren |
 |---|---|
 | [Zahnräder und Zahnstangen](gears.md) | Zahnrad, Zahnradpaar, Zahnstange |
@@ -39,6 +41,8 @@ Manche Änderungen würden die Parameter zerstören: Skalieren, Knotenbearbeitun
 ### Formeln und Parameter
 
 Jedes Zahlenfeld nimmt einen [Projektparameter](../features/templates-library.md#parameters) oder eine Formel an, etwa `{Dicke}` oder `{Breite} - 2 * {Dicke}`. Auswahl- und Ja/Nein-Felder bekommen einen Parameter über die ƒ-Schaltfläche. So folgt eine Box in einer Vorlage den ausgefüllten Werten, und eine an einer Stelle geänderte Materialdicke aktualisiert jedes Teil.
+
+![Generator-Dialog des Steckregals mit seiner Live-Vorschau: In den Feldern Breite und Materialdicke stehen die Projektparameter Breite und Dicke, blau und kursiv, darunter die berechneten Werte 240 und 4](/img/generator-dialog-formula-de.webp)
 
 ### Schnittfuge und Spiel
 

@@ -14,6 +14,8 @@ Il modello viene salvato una sola volta nel file del progetto, così le parti si
 
 Il modello viene tagliato in pannelli sovrapposti che poi incolli insieme: teste, figure, rilievi, terreni.
 
+![Finestra di creazione del modello a strati per un cagnolino giocattolo: l’asse verso l’alto, strati da davanti a dietro, dimensione di 150 mm, spessore del materiale 3 mm, sezione a metà dello strato e numeri incisi; l’anteprima mostra i 13 pannelli numerati e un avviso segnala che 10 strati sono formati da più pezzi](/img/layered-model-dialog-en.webp)
+
 | Impostazione | Significato |
 |---|---|
 | **Su nel modello** | Quale asse del file punta verso l’alto. |
@@ -27,11 +29,15 @@ Il modello viene tagliato in pannelli sovrapposti che poi incolli insieme: teste
 
 Più corpi sovrapposti nel file vengono uniti per ogni strato. I buchi nella mesh fino a 0,5 mm vengono chiusi e segnalati. Il controllo avvisa di strati vuoti, strati in più pezzi e un numero molto alto di strati. La vista 3D mostra la pila.
 
+![I 13 pannelli numerati del cane sulla pagina e la vista 3D con i pannelli impilati a formare il modello](/img/layered-model-3d-en.webp)
+
 **Consiglio:** con un modello largo, scegli la direzione di impilamento (**Livello**) in modo che gli strati siano il più grandi possibile: meno strati, meno incollaggi.
 
 ## Modello a nervature
 
 Le nervature stanno trasversali a un asse e si infilano su un dorso con mezzi incastri, come nei kit di animali in legno.
+
+![Modello a nervature dello stesso cane: 36 nervature e piastre del dorso numerate e annidate sulla pagina, e la vista 3D con le nervature infilate sui dorsi del corpo, delle zampe e delle due estremità](/img/rib-model-3d-en.webp)
 
 | Impostazione | Significato |
 |---|---|
@@ -56,6 +62,8 @@ Animali e figure hanno bisogno di più di un dorso: corpo, zampe, testa, coda. N
 Ogni sezione ha una posizione del piano (**Centro** la mette a metà del materiale), una propria distanza tra le nervature, un raggio per la zona che le appartiene e un’estensione del suo dorso oltre l’asse, così il pannello di una zampa entra nel corpo e si incastra nelle nervature del corpo. Il pulsante di copia specchia una sezione, per esempio per la seconda zampa. Trascina punti e linee per modificarli; in un’altra vista il trascinamento sposta il piano.
 
 **Suggerisci** trova automaticamente le sezioni come punto di partenza: il piano di simmetria del modello diventa il dorso del corpo, le zampe vengono seguite dal pavimento verso l’alto e le estremità sottili come una coda ricevono sezioni proprie e curve. Controlla e correggi il suggerimento prima di creare.
+
+![Area di disegno della finestra del modello a nervature nella vista frontale dopo Suggerisci: la sagoma del cane con le nervature lungo l’asse del corpo, sotto l’elenco delle sezioni (Body, End 1, End 2 e le zampe) con posizione del piano, distanza, prolungamento e raggio e, in fondo, gli avvisi sulle nervature che vengono tralasciate](/img/rib-model-sections-en.webp)
 
 Altre opzioni:
 

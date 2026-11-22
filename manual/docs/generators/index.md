@@ -7,6 +7,8 @@ description: Generators create finished parts from a few dimensions, such as box
 
 Generators create finished parts from a few dimensions instead of drawing them by hand. They are all in the **Toolbox** (**Tools → Toolbox …**, **Window → Toolbox** or the tile button in the tools toolbar), sorted into groups and searchable.
 
+![Toolbox window on the left with the search field, the group filters, Recently Used and the groups Mechanics and Boxes and Furniture as tiles; on the page a box, a gear, a cam and a pulley made with it, each placed in the next free spot](/img/toolbox-en.webp)
+
 | Page | Generators |
 |---|---|
 | [Gears and racks](gears.md) | Gear, gear pair, rack |
@@ -39,6 +41,8 @@ Some changes would break the parameters: scaling, node editing, or a Boolean ope
 ### Formulas and parameters
 
 Every numeric field accepts a [project parameter](../features/templates-library.md#parameters) or a formula, for example `{Thickness}` or `{Width} - 2 * {Thickness}`. Choice and yes/no fields get a parameter with the ƒ button. That way a box in a template follows the values filled in, and changing the material thickness in one place updates every part.
+
+![Generator dialog of the slot-together shelf with its live preview: the fields Width and Material thickness hold the project parameters Width and Thickness, shown in blue italics with the resulting values 240 and 4 below them](/img/generator-dialog-formula-en.webp)
 
 ### Kerf and clearance
 

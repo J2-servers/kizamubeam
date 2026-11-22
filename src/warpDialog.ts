@@ -2,6 +2,7 @@
 import { Editor } from './editor';
 import { check, numField, select } from './arrayDialogs';
 import { h } from './dom';
+import { optionPicture } from './optionArt';
 import { WarpKind, WarpOptions } from './warp';
 import { dec, t } from './i18n';
 
@@ -69,6 +70,7 @@ export function openWarpDialog(ed: Editor) {
   amount.style.width = '4.5em';
   const hasText = ed.sel.some((o) => o.shape.kind === 'text' || o.shape.kind === 'group');
   const hasGen = ed.sel.some((o) => o.shape.kind === 'gen');
+  const kindSel = select('warp-kind', st.kind, WARP_LABELS, (v) => ((st.kind = v), preview()));
 
   const dlg = h(
     'dialog',
@@ -78,7 +80,8 @@ export function openWarpDialog(ed: Editor) {
       'div',
       { class: 'form' },
       h('label', { for: 'warp-kind' }, t('Art')),
-      select('warp-kind', st.kind, WARP_LABELS, (v) => ((st.kind = v), preview())),
+      kindSel,
+      optionPicture(kindSel, 'warp'),
       h('label', { for: 'warp-amount' }, t('Stärke (%)')),
       h('span', { class: 'hinge-inline', style: 'display: flex; gap: 6px; align-items: center' }, slider, amount),
       h('span', { class: 'checks' }, check(st.vertical, (v) => ((st.vertical = v), preview()), t('Senkrecht (um 90° gedreht)'))),

@@ -33,7 +33,7 @@
       "version": 1,
       "runtime": "js",
       "code": "@dist/stencil-bridges.js",
-      "icon": "text",
+      "icon": "stencil",
       "host": [
         "boolean"
       ],

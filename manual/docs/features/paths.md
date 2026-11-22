@@ -18,6 +18,8 @@ Select two or more shapes and choose one of the operations under **Tools → Boo
 | **Boolean Difference** | Alt+- | Cuts one shape out of the others. |
 | **Boolean Intersection** | Alt+* | Keeps only the area where the shapes overlap. |
 
+![Two overlapping shapes, a rounded square and a circle, selected, with the Boolean button group open; below them the results of union, difference and intersection](/img/boolean-operations-en.webp)
+
 **Boolean Options** (in the button group or under **Tools → Boolean Operations**) set which shape is the base (first selected, backmost or frontmost) and whether the originals are kept. The same menu also has **Subtract front from back** and **Subtract back from front**.
 
 Good to know:
@@ -31,9 +33,13 @@ Good to know:
 
 **Offset Shapes** (Alt+O) draws a new outline at a given distance, outward, inward or both, with round, sharp or beveled corners and a live preview. Open lines get a closed outline around them. Typical uses: a border around text, a backing plate, or an inlay pocket.
 
+![Offset Shapes dialog with 3 mm spacing, direction outward and round corners; the dashed orange preview draws an outline around a lettering](/img/offset-dialog-en.webp)
+
 ## Warp
 
 **Tools → Warp …** bends the selection over its frame: arc, arc upper, arc lower, bulge, flag or vanishing-point perspective, from −100 to 100 %, optionally rotated by 90°. Shapes, text and images are warped together. Shapes and text become Bézier paths, images are recalculated at their original resolution.
+
+![Warp dialog with the type Arc at 50 %; the dashed orange preview shows the lettering bent into an arc](/img/warp-dialog-en.webp)
 
 ## Path tools
 

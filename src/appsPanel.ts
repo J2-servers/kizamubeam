@@ -1,7 +1,8 @@
 // Fenster „Werkzeugkasten“: alle Generatoren und Spezialwerkzeuge als Kacheln, nach Gruppen geordnet, mit
 // Suche und Filter. Ein Klick ruft dieselbe Aktion auf wie Menü oder Funktionsleiste. Welche Kacheln es gibt,
-// steht in apps.ts; Symbol, Aufruf und Verfügbarkeit kommen von der Aktion (toolbars.ts). Dazu kommen
-// Vorlagen aus installierten Erweiterungen. Oben stehen Favoriten (Rechtsklick auf eine Kachel) und die
+// steht in apps.ts; Symbol, Aufruf und Verfügbarkeit kommen von der Aktion (toolbars.ts). Jede Kachel zeigt ein
+// Beispielbild dessen, was das Werkzeug macht (appArt.ts); ohne Bild (Werkzeug einer Erweiterung) bleibt das Symbol.
+// Dazu kommen Vorlagen aus installierten Erweiterungen. Oben stehen Favoriten (Rechtsklick auf eine Kachel) und die
 // zuletzt benutzten Werkzeuge; neue Werkzeuge tragen „NEU“, bis sie einmal benutzt wurden.
 // Gemerkt wird alles im localStorage („kizamubeam.apps“).
 import type { Editor } from './editor';
@@ -15,6 +16,7 @@ import { startFromTemplate } from './templateDialogs';
 import { pluginGenerators, pluginTools } from './plugins/registry';
 import { openPluginTool, toolNeeds } from './plugins/toolDialog';
 import { openGenerator } from './generators/run';
+import { artSvg, loadArt } from './appArt';
 import { version as APP_VERSION } from '../package.json';
 
 const KEY = 'kizamubeam.apps';
@@ -193,6 +195,7 @@ export function buildAppsPanel(ed: Editor) {
   const tileEl = (tile: Tile) => {
     const fav = st.favs.includes(tile.key);
     const isNew = tile.isNew && !st.used.includes(tile.key);
+    const pic = tile.img ? '' : artSvg(tile.key);
     return h('button', {
       class: 'app-tile', 'data-g': tile.group, 'data-key': tile.key,
       title: `${tile.name}\n${tile.desc}\n${fav ? t('Rechtsklick: aus den Favoriten entfernen') : t('Rechtsklick: zu den Favoriten')}`,
@@ -203,7 +206,7 @@ export function buildAppsPanel(ed: Editor) {
       },
     },
       h('span', { class: `app-art${tile.img ? ' img' : ''}` },
-        tile.img ? h('img', { src: svgUrl(tile.img), alt: '' }) : h('span', { class: 'app-icon', icon: tile.icon ?? '' }),
+        tile.img ? h('img', { src: svgUrl(tile.img), alt: '' }) : pic ? h('span', { class: 'app-pic', svg: pic }) : h('span', { class: 'app-icon', icon: tile.icon ?? '' }),
         isNew ? h('span', { class: 'app-new' }, t('NEU')) : null,
         fav ? h('span', { class: 'app-fav', icon: 'star' }) : null,
       ),
@@ -338,6 +341,8 @@ export function buildAppsPanel(ed: Editor) {
   };
   onPacksChanged(refreshPacks);
   void ensurePacks().then(refreshPacks);
+  // Die Beispielbilder kommen nach; bis dahin stehen die Symbole
+  void loadArt().then(render);
 
   // Bestehende Nutzer: einmal auf das neue Fenster hinweisen (es startet bei ihnen ausgeblendet)
   setTimeout(() => {

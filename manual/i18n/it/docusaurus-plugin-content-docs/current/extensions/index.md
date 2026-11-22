@@ -14,6 +14,8 @@ I pacchetti di estensione (file `.kzp`) aggiungono a KizamuBeam **modelli di dis
 2. Scegli un pacchetto dal **catalogo ufficiale** e installalo con un clic, oppure fai clic su **Installa …** e scegli un file `.kzp`. Puoi anche trascinare un file `.kzp` sull’area di lavoro.
 3. La finestra mostra il contenuto del pacchetto e se si tratta di un aggiornamento. Conferma l’installazione.
 
+![Finestra di installazione dell’estensione per il pacchetto di esempio 1.1.0: elenca un modello di dispositivo, un modello di progetto e due materiali, e avvisa che il file non è firmato](/img/extension-install-en.webp)
+
 Dopo l’installazione:
 
 - i modelli compaiono in **File → Nuovo dal modello … → Dalle estensioni**,
@@ -22,6 +24,8 @@ Dopo l’installazione:
 - motivi ed elementi grafici compaiono nella libreria.
 
 Rimuovendo un pacchetto nella stessa finestra, le sue voci spariscono di nuovo.
+
+![Finestra Estensioni: tra le estensioni installate il pacchetto di esempio con i pulsanti per disattivarlo e rimuoverlo, più in basso l’opzione offline e il catalogo con la firma verificata e un pulsante di installazione per ogni pacchetto](/img/extensions-window-en.webp)
 
 ## Sicurezza
 

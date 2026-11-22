@@ -12,6 +12,8 @@ Beide Generatoren stehen unter **Werkzeugkasten → Mechanik**.
 
 Eine **Riemenscheibe** für Zahnriemen, deren Außendurchmesser aus Teilung und Wirklinienabstand des Riemens berechnet wird.
 
+![Dialog Riemenscheibe erstellen: Riemenprofil GT2 2 mm, 36 Zähne, Spiel der Zahnlücke, Schnittfuge und eine Bohrung mit D-Profil; die Vorschau zeigt die Scheibe mit ihren runden Zahnlücken, darunter Außendurchmesser, Wirkdurchmesser und Riemenweg je Umdrehung](/img/pulley-dialog-de.webp)
+
 | Feld | Bedeutung |
 |---|---|
 | **Riemenprofil** | GT2 (2, 3 oder 5 mm Teilung) oder HTD (3M, 5M). |
@@ -25,6 +27,8 @@ Die Zahnlücken sind rund, mit der für das Profil üblichen Tiefe und Breite. E
 ## Nocken
 
 Ein **Nocken** (eine Kurvenscheibe) macht aus einer Drehung eine Hubbewegung eines Stößels: für Automaten, Spielzeug und einfache Mechanismen. Eine Umdrehung teilt sich in Hub, Rast oben, Rückhub und Rast unten.
+
+![Dialog Nocken erstellen: Grundkreisradius 22 mm, Hub 10 mm, Hubwinkel 110°, Rast oben 40°, Rückhubwinkel 110°, das Bewegungsgesetz Zykloide und ein Stößel mit Rolle; die Vorschau zeigt den Nocken, darunter größter Radius, größter Druckwinkel und Rast unten](/img/cam-dialog-de.webp)
 
 | Feld | Bedeutung |
 |---|---|

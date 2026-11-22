@@ -43,6 +43,8 @@ I controller con Wi-Fi o Ethernet, come FluidNC o Ruida DSP, si raggiungono in r
 
 Inserisci l’indirizzo del controller, per esempio `192.168.1.50` o `fluidnc.local`. **Cerca …** accanto al campo dell’indirizzo trova i controller FluidNC nella tua rete locale.
 
+![Impostazioni del dispositivo, scheda Connessione: collegamento Wi-Fi (Telnet), porta USB, baud rate, l’indirizzo fluidnc.local con il pulsante Cerca e le porte di rete](/img/device-connection-settings-en.webp)
+
 :::tip Wi-Fi instabile
 Con FluidNC un lavoro può essere caricato sulla scheda SD o sulla memoria flash del controller ed eseguito da lì (**Laser → FluidNC**). Con Ruida, **Salva nel controller …** salva un lavoro `.rd` con nome nella memoria interna del controller. Un’interruzione della rete non ferma più il lavoro.
 :::
@@ -50,6 +52,8 @@ Con FluidNC un lavoro può essere caricato sulla scheda SD o sulla memoria flash
 ## Più dispositivi
 
 Ogni laser viene salvato come dispositivo con area di lavoro, connessione e impostazioni proprie. Puoi passare dall’uno all’altro in cima alla finestra Laser o in **Laser → Dispositivo → Dispositivi …**. Esistono modelli di dispositivo per molti laser diffusi (per esempio Swiitol, Ortur, Atomstack, Sculpfun, xTool, Creality Falcon, Two Trees, Longer, Comgrow, OMTech e Ruida); l’area di lavoro mostra sempre il piano del dispositivo selezionato.
+
+![Finestra Dispositivi con tre laser, ciascuno con controller e area di lavoro, e l’elenco dei modelli per aggiungerne uno nuovo](/img/devices-dialog-en.webp)
 
 ## Senza laser
 

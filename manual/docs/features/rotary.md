@@ -24,6 +24,8 @@ Open **Laser → Device → Rotary Setup …** (or **Rotary …** in the Laser w
 
 **Test rotation** turns the object exactly once with the values entered. If it turns too far or not far enough, change the travel per rotation in the same ratio.
 
+![Rotary dialog with the rotary enabled: type Rollers, axis Y, travel per rotation 360, roller diameter 25 mm, object diameter 80 mm with its circumference, the options Tapered object and Reverse direction, and the Test rotation button; behind it a logo for a cup on the workspace](/img/rotary-setup-en.webp)
+
 ## How it works
 
 When the rotary is on:

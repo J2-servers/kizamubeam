@@ -60,6 +60,43 @@ export function csvRow(vt: VarText, n: number): string[] | null {
   return vt.csv?.rows[n - 1] ?? null;
 }
 
+/** Spaltennummer zu einer Überschrift (Groß-/Kleinschreibung und Leerzeichen zählen nicht); -1 = gibt es nicht */
+export function csvColumn(vt: VarText, name: string): number {
+  return vt.csv?.header?.findIndex((h) => h.trim().toLowerCase() === name.trim().toLowerCase()) ?? -1;
+}
+
+/** Muster aller Platzhalter: %% , %{Name} , %# und %5# , %0 , %Y … — eine Quelle für expand und refs */
+const PLACEHOLDER = /%(%|\{([^}]*)\}|(\d*)#|(\d+)|([A-Za-z]))/g;
+
+/** Art eines Platzhalters */
+export type VarRefKind = 'percent' | 'serial' | 'csv-name' | 'csv-index' | 'date' | 'unknown';
+
+/** Ein Platzhalter in einer Vorlage */
+export interface VarRef {
+  /** der ganze Platzhalter, z. B. „%{Name}“ */
+  code: string;
+  kind: VarRefKind;
+  /** Spaltenname bei %{Name} */
+  name?: string;
+  /** Spaltennummer bei %0 */
+  col?: number;
+}
+
+/** Platzhalter einer Vorlage auflisten (für die Chargenprüfung: welche Felder füllt welche Spalte?) */
+export function refs(template: string): VarRef[] {
+  const out: VarRef[] = [];
+  PLACEHOLDER.lastIndex = 0;
+  for (const m of template.matchAll(PLACEHOLDER)) {
+    const [code, , name, digits, col, letter] = m;
+    if (code === '%%') out.push({ code, kind: 'percent' });
+    else if (name !== undefined) out.push({ code, kind: 'csv-name', name });
+    else if (digits !== undefined) out.push({ code, kind: 'serial' });
+    else if (col !== undefined) out.push({ code, kind: 'csv-index', col: Number(col) });
+    else out.push({ code, kind: dateCode(letter, new Date()) === null ? 'unknown' : 'date' });
+  }
+  return out;
+}
+
 /**
  * Platzhalter ersetzen. n ist die Nummer (aktuelle Nummer + Versatz des Objekts).
  * %# Seriennummer, %5# mit führenden Nullen auf 5 Stellen, %0 %1 … CSV-Spalten, %{Name} CSV-Spalte nach Kopfzeile,
@@ -67,10 +104,10 @@ export function csvRow(vt: VarText, n: number): string[] | null {
  */
 export function expand(template: string, n: number, vt: VarText = varText(), now: Date = fixedNow ?? new Date()): string {
   const row = csvRow(vt, n);
-  return template.replace(/%(%|\{([^}]*)\}|(\d*)#|(\d+)|([A-Za-z]))/g, (all, _x, name, digits, col, letter) => {
+  return template.replace(PLACEHOLDER, (all, _x, name, digits, col, letter) => {
     if (all === '%%') return '%';
     if (name !== undefined) {
-      const i = vt.csv?.header?.findIndex((h) => h.trim().toLowerCase() === name.trim().toLowerCase()) ?? -1;
+      const i = csvColumn(vt, name);
       return i >= 0 ? row?.[i] ?? '' : all;
     }
     if (digits !== undefined) return String(n).padStart(Number(digits) || 0, '0');

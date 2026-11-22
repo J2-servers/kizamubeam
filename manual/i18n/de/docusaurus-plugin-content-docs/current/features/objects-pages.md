@@ -10,6 +10,8 @@ description: Das Fenster Objekte, Ausblenden und Sperren, mehrseitige Projekte, 
 
 Das Fenster **Objekte** (rechts unter den Layern; **Fenster → Objekte**) zeigt alle Objekte der aktuellen Seite als Baum: Seiten, Layer, Objekte und aufklappbare Gruppen, das vorderste Objekt oben.
 
+![Fenster Objekte mit zwei Seiten, den Layern und ihren Objekten als Baum, einer aufgeklappten, ausgewählten Gruppe, einem Objekt mit „Nicht lasern“ (durchgestrichen) und einem ausgeblendeten; über der Arbeitsfläche zwei Projekt-Tabs](/img/objects-window-de.webp)
+
 - Ein Klick wählt ein Objekt aus, Shift oder Ctrl fügt weitere hinzu. Die Auswahl auf der Arbeitsfläche folgt.
 - Ein Doppelklick auf einen Namen benennt ein Objekt oder einen Layer um.
 - **Auge**: Objekt oder Layer ausblenden.

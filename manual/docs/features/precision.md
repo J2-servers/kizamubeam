@@ -27,6 +27,8 @@ Drag a guide out of the top ruler (horizontal) or the left ruler (vertical). Gui
 
 **Tools → Measure** (or the ruler button): click a start and an end point, with snapping. KizamuBeam shows length, Δx, Δy and angle; over a circle, diameter and radius. Esc clears the measurement.
 
+![A plate framed by four dashed guides dragged out of the rulers, and the Measure tool showing 120.00 mm, Δx, Δy and the angle between the centres of two holes](/img/guides-measure-en.webp)
+
 ## Relations
 
 **Arrange → Relations** (or the relations button group on the tools toolbar) moves or turns one object so that it relates to another. Click the reference first (it stays), then the element of the object that should adapt.
@@ -45,6 +47,8 @@ Relations are applied once, like a command; each is one undo step.
 ## Sketches with dimensions
 
 For parts that must keep exact dimensions while you change them, use **Toolbox → Sketches with relations → New sketch** (or **Convert to sketch**). In a sketch, lines, rectangles, circles and arcs keep their relations and dimensions permanently, like in a CAD program.
+
+![An open sketch: a plate with a slanted corner and a hole, dimensioned with lengths, distances and a diameter, and the sketch bar with drawing tools, relations and the remaining degrees of freedom](/img/sketch-dimensions-en.webp)
 
 - Relations from the bar at the top or by key: coincident (O), horizontal (H), vertical (V), parallel (P), perpendicular (N), equal (E), tangent (T), concentric (X), midpoint (M), symmetric (Y), fixed (F).
 - **Dimension** (D): a line gets a length, two lines an angle, a circle a diameter, an arc a radius, two points a distance. Double-click a dimension to change it. Dimensions can be formulas with project parameters, such as `Width / 2`.

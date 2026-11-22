@@ -14,6 +14,8 @@ Das Modell wird einmal in der Projektdatei gespeichert, sodass sich die Teile sp
 
 Das Modell wird in gestapelte Platten geschnitten, die du wieder zusammenleimst: Köpfe, Figuren, Reliefs, Gelände.
 
+![Dialog Schichtmodell erstellen für einen Spielzeughund: die Achse nach oben, Schichten von vorne nach hinten, 150 mm Größe, Materialdicke 3 mm, Querschnitt in der Mitte der Schicht und gravierte Nummern; die Vorschau zeigt die 13 nummerierten Platten, und eine Warnung meldet, dass 10 Schichten aus mehreren Stücken bestehen](/img/layered-model-dialog-de.webp)
+
 | Einstellung | Bedeutung |
 |---|---|
 | **Oben im Modell** | Welche Achse der Datei nach oben zeigt. |
@@ -27,11 +29,15 @@ Das Modell wird in gestapelte Platten geschnitten, die du wieder zusammenleimst:
 
 Mehrere überlappende Körper in der Datei werden je Schicht vereinigt. Löcher im Netz bis 0,5 mm werden überbrückt und gemeldet. Die Prüfung warnt vor leeren Schichten, Schichten aus mehreren Stücken und sehr vielen Schichten. Die 3D-Ansicht zeigt den Stapel.
 
+![Die 13 nummerierten Platten des Hundes auf der Seite und die 3D-Ansicht mit den zum Modell gestapelten Platten](/img/layered-model-3d-de.webp)
+
 **Tipp:** Wähle bei einem breiten Modell die Stapelrichtung (**Schichten**) so, dass die Schichten möglichst groß werden: weniger Schichten, weniger Leimen.
 
 ## Rippenmodell
 
 Rippen stehen quer zu einer Achse und werden mit Halbschlitzen auf ein Rückgrat gesteckt, wie bei Holztier-Bausätzen.
+
+![Rippenmodell desselben Hundes: 36 nummerierte Rippen und Rückgrat-Platten verschachtelt auf der Seite und die 3D-Ansicht mit den Rippen, die auf den Rückgraten von Rumpf, Beinen und den beiden Enden stecken](/img/rib-model-3d-de.webp)
 
 | Einstellung | Bedeutung |
 |---|---|
@@ -56,6 +62,8 @@ Tiere und Figuren brauchen mehr als ein Rückgrat: Körper, Beine, Kopf, Schwanz
 Jeder Abschnitt hat eine Ebenenlage (**Mitte** legt sie in die Mitte des Materials), einen eigenen Rippenabstand, einen Radius für den Bereich, der ihm gehört, und eine Verlängerung seines Rückgrats über die Achse hinaus, sodass eine Beinplatte in den Körper reicht und in die Körperrippen greift. Die Kopier-Schaltfläche spiegelt einen Abschnitt, etwa für das zweite Bein. Ziehe Punkte und Linien, um sie zu ändern; in einer anderen Ansicht verschiebt Ziehen die Ebene.
 
 **Vorschlagen** findet Abschnitte automatisch als Ausgangspunkt: Die Spiegelebene des Modells wird zum Rückgrat des Körpers, Beine werden vom Boden aufwärts verfolgt, und dünne Enden wie ein Schwanz bekommen eigene, gebogene Abschnitte. Prüfe und korrigiere den Vorschlag vor dem Erstellen.
+
+![Zeichenfläche des Dialogs Rippenmodell in der Ansicht von vorne nach Vorschlagen: die Silhouette des Hundes mit den Rippen entlang der Achse des Rumpfs, darunter die Liste der Abschnitte (Rumpf, Ende 1, Ende 2 und die Beine) mit Ebene, Abstand, Verlängerung und Radius, ganz unten Warnungen zu Rippen, die wegfallen](/img/rib-model-sections-de.webp)
 
 Weitere Optionen:
 

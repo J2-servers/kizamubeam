@@ -12,6 +12,8 @@ Un buon risultato dipende dalla velocità, dalla potenza e dal fuoco giusti per 
 
 La finestra **Materiale** conserva le impostazioni di taglio per materiale e spessore, a scelta anche con le impostazioni immagine. Per usare una voce, seleziona un livello e applicala: il livello riprende tutte le sue impostazioni.
 
+![Finestra Materiale con le voci raggruppate per materiale e spessore (compensato di betulla da 3 e 5 mm, cartone, pelle), ciascuna con le sue impostazioni; la voce per tagliare il compensato da 3 mm è applicata al livello di taglio](/img/material-library-en.webp)
+
 - **Salvare**: imposta un livello come ti piace e salvalo come nuova voce (materiale, spessore, titolo).
 - **Scambiare**: esporta e importa le voci come file `.kzm`. I vecchi file `.lwm` si importano ancora, e le librerie LightBurn (`.clb`) vengono importate per quanto i loro campi hanno un equivalente.
 - Anche le **estensioni** possono aggiungere voci di materiale (vedi [Modelli, libreria ed estensioni](templates-library.md#extensions)).
@@ -21,6 +23,8 @@ Le voci di materiale contengono anche l’[aspetto 3D](construction-3d.md#materi
 ## Test del materiale {#material-test}
 
 **Laser → Test e calibrazione → Test del materiale …** (o **Casella degli strumenti → Laser e calibrazione**) crea una griglia di celle di prova con due valori a gradini, per esempio la velocità nelle righe e la potenza nelle colonne, con etichette. Ogni cella riceve un proprio livello di prova.
+
+![Finestra Test del materiale: velocità da 1000 a 6000 mm/min nelle righe, potenza dal 10 al 100 % nelle colonne, valori fissi, dimensione delle celle e l’anteprima delle 60 celle di prova](/img/material-test-dialog-en.webp)
 
 Il test non modifica il tuo documento: invialo direttamente al laser dalla finestra con Anteprima, Frame, Avvia o Salva GCode. Le celle vengono eseguite in ordine di energia crescente, così un test interrotto in anticipo ha già fatto le celle più leggere.
 
@@ -44,6 +48,8 @@ KizamuBeam misura quanto è scura ogni cella rispetto al materiale nudo negli sp
 
 **Laser → Test e calibrazione → Test laser …** aiuta a trovare la distanza giusta tra testa laser e materiale.
 
+![Finestra del test di messa a fuoco con il metodo Rampa: impostazioni laser, lunghezza della linea, spessore e tacche, i quattro passaggi e lo schema del materiale inclinato in cui fai clic sul punto più nitido](/img/focus-test-dialog-en.webp)
+
 - **Rampa** funziona con ogni laser. Inclina il materiale su uno spessore, incidi una lunga linea con segni di altezza sotto, poi fai clic nella finestra sul punto più nitido. KizamuBeam ti dice di quanto è spostato il fuoco.
 - **Serie Z** richiede un asse Z motorizzato. Incide una fila di brevi linee, ognuna con un offset Z diverso. Fai clic sulla più nitida per inserire il suo offset nel livello o portare Z direttamente lì.
 
@@ -58,6 +64,8 @@ I pezzi a incastro si accoppiano solo se kerf e gioco sono giusti. **Laser → T
 - una piastra con fori e un pettine di linguette con gioco a gradini.
 
 I numeri vengono incisi su un livello separato. Dopo la lavorazione, misura il quadrato e inserisci la misura, insieme al numero della linguetta e dell’asola che si accoppiano meglio. KizamuBeam calcola kerf, gioco per lato e maggiorazione delle asole e li salva con il materiale nella libreria. Un offset kerf del livello viene considerato.
+
+![Calibra accoppiamento: i pezzi di prova sulla pagina (quadrato da 20 mm, pettine di asole, piastra forata e pettine di linguette con i numeri incisi) e la finestra con il quadrato misurato, la linguetta e l’asola migliori, da cui si calcolano kerf e gioco](/img/calibrate-fit-en.webp)
 
 Da quel momento nuove scatole, cassetti, inserti e scaffali prendono spessore, kerf e gioco dalla calibrazione del materiale del livello, e lo strumento Giunzione propone valori adatti. I pezzi esistenti ricevono un pulsante per applicare i valori calibrati, e il [controllo del progetto](construction-3d.md#check-the-design-before-cutting) confronta le giunzioni con la calibrazione.
 

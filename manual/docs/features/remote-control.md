@@ -26,6 +26,8 @@ On the other computer:
 2. Click **Find host …** to find hosts in the network, or enter the host's address (over a VPN such as Tailscale or WireGuard, enter it by hand).
 3. Click **Pair …**. The host shows a 6-digit code; type it in on this computer.
 
+![Device Settings, Connection tab, on the computer that uses the laser from a distance: the connection Other KizamuBeam (network), the address of the host, host port 47900 and the Pairing row with the state Not paired and the buttons Find host and Pair](/img/remote-pairing-device-en.webp)
+
 The host lists all paired computers and can remove them or change their role:
 
 | Role | May |

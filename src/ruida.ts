@@ -193,6 +193,8 @@ export interface RuidaLayerParam {
   power: number;
   minPower: number;
   color: number;
+  /** Work mode of the part: 0 = cut, 1 = scan one-way, 2 = scan both ways (`CA 41 <part> <mode>`) */
+  scan?: 0 | 1 | 2;
 }
 
 export interface RuidaParams {
@@ -209,6 +211,10 @@ export interface RuidaParams {
   layers: RuidaLayerParam[];
   filename?: string;
   upload?: boolean;
+  /** Bild-Rasterbewegungen im Scan-Modus der Steuerung: [von, bis, Part] (Bewegungsindizes von..bis, sortiert) */
+  scan?: [number, number, number][];
+  /** Z-Versatz-Wechsel [Bewegungsindex, z mm] in Steuerungsrichtung, relativ zur Höhe beim Start */
+  z?: [number, number][];
 }
 
 /** Bereinigt einen Dateinamen auf max. 8 Großbuchstaben/Ziffern (`[A-Z0-9_-]`) für den Ruida-Speicher */
@@ -273,6 +279,9 @@ export function ruidaParamsForJob(
   layerOf?: (i: number) => Layer,
   opts?: { filename?: string; upload?: boolean },
 ): RuidaParams {
+  const layers = ruidaLayersFromMoves(job.moves, layerOf);
+  const scan = ruidaScanParts(job.moves, layers);
+  const z = d.zAxis ? ruidaZChanges(job.moves, d.zFlip) : [];
   return {
     x0: job.moves.x0,
     y0: job.moves.y0,
@@ -284,10 +293,75 @@ export function ruidaParamsForJob(
     laser: d.ruidaLaser ?? '1',
     returnHome: d.returnHome,
     air: job.air,
-    layers: ruidaLayersFromMoves(job.moves, layerOf),
+    layers,
     ...(opts?.filename ? { filename: opts.filename } : {}),
     ...(opts?.upload ? { upload: true } : {}),
+    ...(scan.length ? { scan } : {}),
+    ...(z.length ? { z } : {}),
   };
+}
+
+/**
+ * Bildzeilen (Moves.scan) als Scan-Parts der Steuerung. Ein Layer nur mit Bildern wird selbst zum Scan-Part;
+ * schneidet derselbe Layer auch Vektoren, bekommen die Bildzeilen einen freien Part (0…31) mit denselben Werten.
+ * Ohne freien Part bleiben sie Schnittbewegungen wie bisher. Ändert `layers` (Modus, zusätzliche Parts).
+ */
+export function ruidaScanParts(mv: Moves, layers: RuidaLayerParam[]): [number, number, number][] {
+  const ranges: [number, number, boolean][] = [];
+  const sc = mv.scan ?? [];
+  for (let k = 0; k + 2 < sc.length; k += 3) {
+    const from = Math.max(0, sc[k]),
+      to = Math.min(mv.n, sc[k + 1]);
+    let cuts = false;
+    for (let i = from; i < to && !cuts; i++) cuts = mv.f[i] > 0 && mv.s[i] > 0 && mv.layer[i] >= 0;
+    if (cuts) ranges.push([from, to, sc[k + 2] === 1]);
+  }
+  if (!ranges.length) return [];
+  ranges.sort((a, b) => a[0] - b[0]);
+  const inScan = new Uint8Array(mv.n);
+  for (const [a, b] of ranges) inScan.fill(1, a, b);
+  const vectorLayers = new Set<number>();
+  for (let i = 0; i < mv.n; i++) if (!inScan[i] && mv.f[i] > 0 && mv.s[i] > 0) vectorLayers.add(mv.layer[i]);
+  const used = new Set(layers.map((l) => Math.max(0, l.index) & 0x1f));
+  const partOf = new Map<number, number | null>();
+  const out: [number, number, number][] = [];
+  for (const [a, b, bidir] of ranges) {
+    const li = mv.layer[a];
+    let part = partOf.get(li);
+    if (part === undefined) {
+      const L = layers.find((l) => l.index === li);
+      part = null;
+      if (L && !vectorLayers.has(li)) {
+        part = Math.max(0, li) & 0x1f;
+        L.scan = bidir ? 2 : 1;
+      } else if (L) {
+        for (let p = 0; p < 32; p++)
+          if (!used.has(p)) {
+            part = p;
+            used.add(p);
+            layers.push({ ...L, index: p, scan: bidir ? 2 : 1 });
+            break;
+          }
+      }
+      partOf.set(li, part);
+    }
+    if (part !== null) out.push([a, b, part]);
+  }
+  return out;
+}
+
+/** Wechsel des Z-Versatzes je Bewegung (Moves.z) in Steuerungsrichtung: positiv = Fokus tiefer = Z− ohne zFlip */
+export function ruidaZChanges(mv: Moves, zFlip: boolean): [number, number][] {
+  const k = zFlip ? 1 : -1;
+  const out: [number, number][] = [];
+  let z = 0;
+  for (let i = 0; i < mv.n; i++) {
+    const zi = Math.round(mv.z[i] * k * 1000) / 1000 || 0;
+    if (zi === z) continue;
+    out.push([i, zi]);
+    z = zi;
+  }
+  return out;
 }
 
 function um(mmVal: number): number {
@@ -382,7 +456,12 @@ export function writeRuidaPlain(mv: Moves, p: RuidaParams): Uint8Array {
     out.push(0xe7, 0x07, ...encodeI35(maxX), ...encodeI35(maxY));
   }
 
-  // 3. Layer-Tabelle
+  // 3. Layer-Tabelle. Mit Scan-Parts bekommt jeder Part auch seinen Arbeitsmodus (`CA 41 <Part> <Modus>`,
+  // LibLaserCut `Ruida.java`: 00 Schneiden, 01 Scan in eine Richtung, 02 in beide); Jobs ohne Bilder bleiben gleich.
+  const scan = p.scan ?? [];
+  const zs = p.z ?? [];
+  const hasScan = scan.length > 0;
+  const partMode = new Map<number, number>();
   const layerMin = new Map<number, number>();
   for (const l of p.layers) {
     const idx = Math.max(0, l.index) & 0x1f;
@@ -393,16 +472,34 @@ export function writeRuidaPlain(mv: Moves, p: RuidaParams): Uint8Array {
     out.push(0xc9, 0x04, idx, ...encodeI35(spd));
     pushLayerPower(out, idx, minP, maxP, p.laser);
     out.push(0xca, 0x06, idx, ...encodeU35(l.color & 0x00ff_ffff));
+    const mode = l.scan === 1 || l.scan === 2 ? l.scan : 0;
+    partMode.set(idx, mode);
+    if (hasScan) out.push(0xca, 0x41, idx, mode);
   }
 
   // 4. Bewegungen & Schnitte
   let curPos: [number, number] | null = null;
   let curLayer = -32768;
+  let curPart = -Infinity;
   let curSpeed = -1;
   let curPower = -1;
   let airOn = false;
+  let scanK = 0;
+  let zK = 0;
+  let curZ = 0;
 
   for (let i = 0; i < n; i++) {
+    // Z-Versatz des Layers/Durchgangs vor seiner ersten Bewegung (`80 08`, relativ zur Starthöhe)
+    while (zK < zs.length && zs[zK][0] <= i) {
+      const zt = um(zs[zK][1]);
+      if (zt !== curZ) {
+        out.push(0x80, 0x08, ...encodeI35(zt - curZ));
+        curZ = zt;
+      }
+      zK++;
+    }
+    while (scanK < scan.length && i >= scan[scanK][1]) scanK++;
+    const scanPart = scanK < scan.length && i >= scan[scanK][0] ? scan[scanK][2] : null;
     const [rx, ry] = pts[i];
     if (curPos !== null && curPos[0] === rx && curPos[1] === ry) continue;
     const cut = mv.f[i] > 0 && mv.s[i] > 0;
@@ -411,9 +508,16 @@ export function writeRuidaPlain(mv: Moves, p: RuidaParams): Uint8Array {
         out.push(0x88, ...encodeI35(startUm[0]), ...encodeI35(startUm[1]));
         curPos = [startUm[0], startUm[1]];
       }
-      if (mv.layer[i] !== curLayer) {
+      const part = scanPart ?? mv.layer[i];
+      if (part !== curPart) {
+        curPart = part;
         curLayer = mv.layer[i];
-        const idx = Math.max(0, curLayer) & 0x1f;
+        const idx = Math.max(0, part) & 0x1f;
+        // Aktueller Arbeitsmodus vor der Layernummer (LibLaserCut: `ca01` 00 Schneiden, 01 beide Richtungen, 02 eine)
+        if (hasScan) {
+          const m = partMode.get(idx) ?? 0;
+          out.push(0xca, 0x01, m === 2 ? 0x01 : m === 1 ? 0x02 : 0x00);
+        }
         out.push(0xca, 0x02, idx);
         const wantAir = p.air?.includes(curLayer) ?? false;
         if (wantAir !== airOn) {
@@ -432,7 +536,8 @@ export function writeRuidaPlain(mv: Moves, p: RuidaParams): Uint8Array {
       const pw14 = Math.round((pwPct * 16383) / 100);
       if (pw14 !== curPower) {
         const lm = layerMin.get(curLayer);
-        const minPct = curPower === -1 && lm !== undefined && lm > 0 ? Math.min(lm, pwPct) : pwPct;
+        // Scan-Läufe behalten eine Leistung über den ganzen Lauf (min = max, wie MeerK40t und LibLaserCut Raster schreiben)
+        const minPct = curPower === -1 && scanPart === null && lm !== undefined && lm > 0 ? Math.min(lm, pwPct) : pwPct;
         const min14 = Math.round((Math.max(0, Math.min(100, minPct)) * 16383) / 100);
         pushCutPower(out, min14, pw14, p.laser);
         curPower = pw14;
@@ -461,6 +566,8 @@ export function writeRuidaPlain(mv: Moves, p: RuidaParams): Uint8Array {
   }
 
   if (airOn) out.push(0xca, 0x01, 0x12);
+  // Z vor dem Ende zurück auf die Starthöhe (wie das Ende von `zInserts` beim G-Code)
+  if (curZ !== 0) out.push(0x80, 0x08, ...encodeI35(-curZ));
   if (p.returnHome && curPos !== null && (curPos[0] !== startUm[0] || curPos[1] !== startUm[1])) {
     out.push(0x88, ...encodeI35(startUm[0]), ...encodeI35(startUm[1]));
   }

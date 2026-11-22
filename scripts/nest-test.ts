@@ -3,9 +3,9 @@ import './core-fixtures-env';
 import { strict as assert } from 'node:assert';
 import ClipperLib from 'clipper-lib';
 import type { Mat, Obj, Pt } from '../src/model';
-const { DEFAULT_NEST, nest, grow, regionArea } = await import('../src/nest');
+const { DEFAULT_NEST, autoCell, nest, grow, leftover, regionArea } = await import('../src/nest');
 import type { NestOptions, NestPart, NestResult, Poly } from '../src/nest';
-const { EditorNest, DEFAULT_NEST_SETTINGS } = await import('../src/editor/nest');
+const { EditorNest, DEFAULT_NEST_SETTINGS, QUALITY } = await import('../src/editor/nest');
 const { t } = await import('../src/i18n');
 const { loadDoc, defaultLayer, IDENT, translate, leaves } = await import('../src/model');
 
@@ -326,6 +326,125 @@ await test('Editor: ein nicht gewähltes Rohteil wird umgangen, mit Hinweis', as
   assert.equal(r2?.placed.length, 1);
   const b2 = worldBox(part);
   assert.ok(b2.x1 <= 700 + 1e-6 && b2.y1 <= 300 + 1e-6, JSON.stringify(b2));
+});
+
+// ---------- Rasterweite: Was zwischen zwei Teilen wirklich verloren geht ----------
+
+/** Kleinster Abstand zwischen zwei platzierten Teilen (Umgebungskästen, reicht für Rechtecke) */
+function engsterAbstand(parts: NestPart[], r: NestResult): number {
+  const gelegt = placedRegions(parts, r).filter((p) => p.sheet === 0).map((p) => p.region[0]);
+  const kasten = (p: Pt[]) => ({ x0: Math.min(...p.map((q) => q.x)), x1: Math.max(...p.map((q) => q.x)), y0: Math.min(...p.map((q) => q.y)), y1: Math.max(...p.map((q) => q.y)) });
+  let min = Infinity;
+  for (let i = 0; i < gelegt.length; i++)
+    for (let j = i + 1; j < gelegt.length; j++) {
+      const A = kasten(gelegt[i]), B = kasten(gelegt[j]);
+      const d = Math.hypot(Math.max(0, Math.max(A.x0 - B.x1, B.x0 - A.x1)), Math.max(0, Math.max(A.y0 - B.y1, B.y0 - A.y1)));
+      if (d > 1e-9 && d < min) min = d;
+    }
+  return min;
+}
+
+await test('Rasterweite: der wirkliche Abstand bleibt zwischen dem gewünschten und dem gewünschten plus Zelldiagonale', () => {
+  // Das Raster zwingt jedes Teil, um cell/√2 zu wachsen (sonst wäre der Abstand nicht garantiert).
+  // Der Abstand darf also nie KLEINER als gewünscht sein — und nie größer als gewünscht + cell·√2.
+  const gap = 2;
+  for (const cell of [2, 1, 0.5]) {
+    const parts: NestPart[] = Array.from({ length: 30 }, (_, i) => ({ key: i, region: [rect(0, 0, 60, 40)] }));
+    const r = nest(parts, { area: [rect(0, 0, 600, 400)], obstacles: [] }, opts({ cell, gap, margin: 3, newSheets: false }));
+    const d = engsterAbstand(parts, r);
+    assert.ok(d >= gap - 1e-6, `Zelle ${cell}: ${d.toFixed(2)} mm ist enger als die gewünschten ${gap} mm`);
+    assert.ok(d <= gap + cell * Math.SQRT2 + 1e-6, `Zelle ${cell}: ${d.toFixed(2)} mm überschreitet ${gap} + ${cell}·√2`);
+  }
+});
+
+await test('Rasterweite: eine feinere Zelle verschenkt weniger Platz', () => {
+  const gap = 2;
+  const messen = (cell: number) => {
+    const parts: NestPart[] = Array.from({ length: 30 }, (_, i) => ({ key: i, region: [rect(0, 0, 60, 40)] }));
+    return engsterAbstand(parts, nest(parts, { area: [rect(0, 0, 600, 400)], obstacles: [] }, opts({ cell, gap, margin: 3, newSheets: false })));
+  };
+  assert.ok(messen(0.5) < messen(2), 'die feine Zelle muss näher an den gewünschten Abstand kommen als die grobe');
+});
+
+await test('Genauigkeit: die drei Stufen geben auf einer großen Platte DREI verschiedene Rasterweiten', () => {
+  // Vor dem 22.11.2026 zwang die feste Obergrenze von 1,5 Mio. Zellen alle drei Stufen auf dieselbe
+  // Weite (1,84 mm auf 2750 × 1850): Die Wahl der Genauigkeit tat dort gar nichts.
+  const platte: [number, number] = [2750, 1850];
+  const weiten = (['fast', 'normal', 'fine'] as const).map((q) => autoCell(platte[0], platte[1], QUALITY[q].cell, QUALITY[q].maxCells));
+  assert.equal(new Set(weiten.map((w) => w.toFixed(3))).size, 3, `drei verschiedene Weiten erwartet, bekommen: ${weiten.map((w) => w.toFixed(2)).join(', ')}`);
+  assert.ok(weiten[0] > weiten[1] && weiten[1] > weiten[2], `gröber → feiner erwartet: ${weiten.join(', ')}`);
+  assert.ok(weiten[2] < 1, `„Gründlich“ sollte unter 1 mm bleiben, ist ${weiten[2].toFixed(2)}`);
+  // Und der Speicher bleibt im Rahmen: 3 Byte je Zelle
+  for (const q of ['fast', 'normal', 'fine'] as const) assert.ok((QUALITY[q].maxCells * 3) / 1048576 <= 24, `${q}: zu viel Speicher`);
+});
+
+// ---------- Reststück: was von der Platte übrig bleibt ----------
+
+const box = (polys: Poly[]) =>
+  polys.reduce(
+    (b, p) => p.reduce((c, q) => ({ x0: Math.min(c.x0, q.x), y0: Math.min(c.y0, q.y), x1: Math.max(c.x1, q.x), y1: Math.max(c.y1, q.y) }), b),
+    { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity },
+  );
+
+await test('Reststück: zwei Teile in der Ecke lassen ein L übrig', () => {
+  const rest = leftover([rect(0, 0, 300, 200)], [[rect(0, 0, 100, 100)], [rect(100, 0, 60, 60)]], { grow: 1, minWidth: 15 });
+  assert.equal(rest.length, 1);
+  // 60000 − (102 × 102) − (62 × 62 ohne die Überschneidung) ≈ 46100, auf jeden Fall kleiner als ohne Abstand
+  const a = regionArea(rest);
+  assert.ok(a > 45000 && a < 60000 - 100 * 100 - 60 * 60 + 1, `${a} mm²`);
+  assert.deepEqual(box(rest), { x0: 0, y0: 0, x1: 300, y1: 200 });
+});
+
+await test('Reststück: ein Teil in der Mitte lässt einen Ring (Loch bleibt)', () => {
+  const rest = leftover([rect(0, 0, 300, 200)], [[rect(120, 80, 60, 40)]], { grow: 1, minWidth: 15 });
+  assert.equal(rest.length, 2, 'Außenkontur und Loch');
+  assert.ok(Math.abs(regionArea(rest) - (60000 - 62 * 42)) < 5, `${regionArea(rest)} mm²`);
+});
+
+await test('Reststück: scharfe Ecken bleiben scharf (kein Rundlaufen durch das Öffnen)', () => {
+  const rest = leftover([rect(0, 0, 300, 200)], [[rect(150, 0, 150, 200)]], { grow: 0, minWidth: 15 });
+  assert.equal(rest.length, 1);
+  assert.deepEqual(box(rest), { x0: 0, y0: 0, x1: 150, y1: 200 });
+  assert.ok(Math.abs(regionArea(rest) - 150 * 200) < 1, `${regionArea(rest)} mm²`);
+});
+
+await test('Reststück: zu schmale Streifen fallen weg, mit kleinerem Mindestmaß bleiben sie', () => {
+  const schmal = [[rect(0, 0, 300, 192)]];
+  assert.deepEqual(leftover([rect(0, 0, 300, 200)], schmal, { grow: 0, minWidth: 15 }), []);
+  const mit = leftover([rect(0, 0, 300, 200)], schmal, { grow: 0, minWidth: 5 });
+  assert.equal(mit.length, 1);
+  assert.ok(Math.abs(regionArea(mit) - 300 * 8) < 1, `${regionArea(mit)} mm²`);
+});
+
+await test('Reststück: zu kleine Stücke fallen weg, große bleiben', () => {
+  // Ein 12 × 200 links (zu schmal) und ein 100 × 200 rechts
+  const rest = leftover([rect(0, 0, 300, 200)], [[rect(12, 0, 188, 200)]], { grow: 0, minWidth: 15 });
+  assert.equal(rest.length, 1);
+  assert.deepEqual(box(rest), { x0: 200, y0: 0, x1: 300, y1: 200 });
+});
+
+await test('Reststück: volle Platte und leere Eingabe geben nichts zurück', () => {
+  assert.deepEqual(leftover([rect(0, 0, 100, 100)], [[rect(0, 0, 100, 100)]], { grow: 0, minWidth: 15 }), []);
+  assert.deepEqual(leftover([], [[rect(0, 0, 10, 10)]], { grow: 0, minWidth: 15 }), []);
+  assert.equal(regionArea(leftover([rect(0, 0, 100, 100)], [], { grow: 0, minWidth: 15 })), 10000);
+});
+
+await test('Editor: „Reststück zeichnen“ legt den Umriss auf den Werkzeug-Layer', async () => {
+  const parts = Array.from({ length: 3 }, (_, i) => rectObj(i * 3, 0, 40, 30));
+  const ed = fakeEditor(parts);
+  const vorher = ed.doc.pages[0].objs.length;
+  const r = await ed.nestSel({ ...DEFAULT_NEST_SETTINGS, sheet: 'material', w: 200, h: 150, x: 0, y: 0, quality: 'fast', rest: true, restMin: 10 });
+  assert.ok(r && r.placed.length === 3, `${r?.placed.length}`);
+  const neu = ed.doc.pages[0].objs.filter((o) => o.shape.kind === 'path');
+  assert.equal(ed.doc.pages[0].objs.length, vorher + 1, 'genau ein neues Objekt');
+  assert.equal(neu.length, 1);
+  assert.equal(neu[0].layer, 30, 'Werkzeug-Layer T1');
+  assert.ok((neu[0].shape as { subs: unknown[] }).subs.length >= 1);
+  // Ohne die Einstellung kommt nichts dazu
+  const ed2 = fakeEditor(Array.from({ length: 3 }, (_, i) => rectObj(i * 3, 0, 40, 30)));
+  const n0 = ed2.doc.pages[0].objs.length;
+  await ed2.nestSel({ ...DEFAULT_NEST_SETTINGS, sheet: 'material', w: 200, h: 150, x: 0, y: 0, quality: 'fast' });
+  assert.equal(ed2.doc.pages[0].objs.length, n0);
 });
 
 if (failed) {

@@ -30,7 +30,7 @@
       "kind": "assembly",
       "runtime": "js",
       "code": "@dist/layered-art.js",
-      "icon": "stack",
+      "icon": "layeredArt",
       "host": [
         "trace",
         "nest"

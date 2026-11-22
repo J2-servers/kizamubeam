@@ -10,6 +10,8 @@ description: Disponi finestre e barre degli strumenti, cambia lingua e tema e tr
 
 **Modifica → Impostazioni …** raccoglie tutte le preferenze dell’applicazione in una finestra, con una barra laterale (Generale, Aspetto, Area di lavoro e aggancio, Mouse e tastiera, Macchine e servizi, Estensioni e font) e una ricerca su tutte le sezioni. Le modifiche diventano effettive con **OK**; **Annulla** le scarta, e **Valori predefiniti** ripristina la sezione corrente.
 
+![Finestra Impostazioni con il campo di ricerca, la barra laterale delle sezioni e la sezione Aspetto: tema e quattro cursori per le dimensioni del testo](/img/settings-window-en.webp)
+
 Le impostazioni che hanno anche una voce di menu (lingua, tema, aggancio, griglia e così via) sono gli stessi valori: cambiandole in un punto, cambiano anche nell’altro.
 
 ## Lingua e tema
@@ -28,11 +30,15 @@ Le finestre degli strumenti (Tagli / Livello, Oggetti, Laser, Sposta, Console, M
 - Trascinala sul bordo sinistro, accanto alla barra Strumenti, per agganciarla a sinistra.
 - Trascinala sull’area di lavoro per farne una finestra mobile. ⇥ o un doppio clic sulla sua intestazione la riaggancia.
 
+![Finestre degli strumenti riordinate: Oggetti e Cronologia agganciate a sinistra, Tagli / Livello e Materiale come schede a destra sopra la finestra Laser, e la finestra Sposta fluttuante sull’area di lavoro](/img/window-layout-en.webp)
+
 I divisori tra le finestre si possono trascinare. ▾ o un doppio clic su un’intestazione comprime un gruppo, × su una scheda nasconde la finestra. Il menu **Finestra** mostra e nasconde tutte le finestre e le barre.
 
 ## Barre degli strumenti
 
 Apri **Finestra → Barre degli strumenti**, oppure fai clic destro sulla cornice di una barra, per personalizzare le barre esistenti: aggiungi o rimuovi gli elementi disponibili, riordinali, inserisci separatori e scegli la dimensione delle icone. Anche le barre delle modifiche numeriche e del testo usano questo sistema di disposizione; i campi modificano sempre gli stessi valori delle funzioni.
+
+![Finestra Personalizza barre degli strumenti: scelta della barra, dimensione delle icone, righe e colonne, a sinistra l’elenco delle azioni disponibili e a destra le voci della barra principale](/img/customize-toolbars-en.webp)
 
 Trascina la maniglia di una barra per spostarla, agganciarla a uno dei quattro bordi o lasciarla libera dentro l'app. Il bordo determina l'orientamento: orizzontale in alto/in basso, verticale ai lati. Le barre libere mantengono l'ultimo orientamento. Rilascia vicino al confine tra due righe per inserire una nuova riga. Nella finestra di personalizzazione regola il numero di righe o colonne interne; il contenuto che non entra scorre internamente. Le altre barre e l'area di lavoro raggiungono la nuova posizione in 150 ms, salvo quando è attiva la riduzione del movimento.
 

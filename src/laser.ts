@@ -6,9 +6,12 @@ import { saveBinary, saveText } from './files';
 import { native } from './native';
 import {
   anchorOf, BedCheck, Box, buildJob, burns, checkBed, DEFAULT_ROTARY, Device, estimate, Firmware, FIRMWARES, liveStatus, formatDuration, frameGCode, Job, jogLines, jogToLines, LASER_TYPES, moveLines, LaserModule, LaserType, loadDevices, Moves, newDevice,
-  posShift, prepareGCode, Rotary, RotaryAxis, rotaryCirc, rotaryOn, rotaryTestLines, RuidaLaser, RuidaMagic, RuidaOrigin, sameMoves, sanitizeRuidaFilename, saveDevices, StartFrom, startHere, zJogLines,
+  isJcz, JCZ_SIM, jczBed, posShift, prepareGCode, Rotary, RotaryAxis, rotaryCirc, rotaryOn, rotaryTestLines, RuidaLaser, RuidaMagic, RuidaOrigin, sameMoves, sanitizeRuidaFilename, saveDevices, StartFrom, startHere, zJogLines,
 } from './gcode';
 import { isTauri, machine, PortInfo } from './machine';
+import type { JczBoard } from './jcz/contract';
+import { buildJczJob, jczFramePath, jczSummary } from './jcz/job';
+import { JCZ_FIBER_TYPES, normalizeJcz } from './jcz/settings';
 import type { PreparedGCode } from './gcode';
 import { airProblem, digitalOutputs, FluidFs, listCmd, outputCmd, OVERRIDE, parseFileList, pinNames, RAPID_OVERRIDE, TOGGLE_FLOOD, TOGGLE_MIST } from './fluidnc';
 import type { Doc, ImageLayer, Layer, Obj } from './model';
@@ -18,7 +21,10 @@ import { cameraTab } from './cameraui';
 import { dockWindow, windowBody } from './dock';
 import { loadCheckSettings } from './check';
 import { openCheck } from './checkPanel';
+import { jobProof, openBatchProof } from './batchProofDialog';
 import { presetList } from './packs';
+import { openLightburnImport } from './lbdevicesDialog';
+import { ruidaFilesButton } from './ruidaFiles';
 import { laserTypeLabel, presetPicker } from './packsDialog';
 import { dec, locale, t, tBackend, tn } from './i18n';
 import { getTypography, groupFactor, onTypographyChange, resolveTypography } from './uiTypography';
@@ -211,19 +217,31 @@ function boundsOk(ed: Editor, job: Job): boolean {
   return confirm(t('⚠ Achtung') + '\n\n' + why + (hint ? '\n\n' + hint : '') + '\n\n' + t('Trotzdem starten?'));
 }
 
-/** Konstruktion prüfen vor dem Start: bei Fehlern oder Warnungen nachfragen, sonst die Stellen zeigen */
+/**
+ * Vor dem Start prüfen: die Konstruktion (Geometrie) und den Inhalt der Stücke, die dieser Job graviert
+ * (Chargenprüfung: leere Felder, Anweisungen im Namen, Emoji, fehlende Zeichen). Bei Fehlern oder Warnungen
+ * nachfragen; Abbrechen zeigt die Stellen im passenden Fenster.
+ */
 function designOk(ed: Editor): boolean {
   if (!loadCheckSettings().beforeLaser) return true;
   let xs = ed.runCheck().filter((x) => x.level !== 'info');
   if (device.cutSelected) xs = xs.filter((x) => x.objs.some((o) => ed.sel.includes(o)));
-  if (!xs.length) return true;
-  const lines = xs.slice(0, 6).map((x) => '• ' + x.msg);
-  if (xs.length > 6) lines.push(tn('… und {n} weitere|one', '… und {n} weitere', xs.length - 6));
-  const ok = confirm(
-    tn('Konstruktion prüfen hat {n} Problem gefunden:', 'Konstruktion prüfen hat {n} Probleme gefunden:', xs.length) +
-      '\n\n' + lines.join('\n') + '\n\n' + t('Trotzdem starten? (Abbrechen zeigt die Stellen im Fenster Prüfung.)'),
-  );
-  if (!ok) openCheck();
+  const proof = jobProof(ed, device.cutSelected ? ed.sel : null).issues;
+  // Fehler zuerst: Die Abfrage zeigt nur sechs Zeilen, und ein leeres Namensfeld darf nicht hinter sechs
+  // Warnungen der Geometrie verschwinden.
+  const alle = [...xs.map((x) => ({ level: x.level, msg: x.msg })), ...proof.map((x) => ({ level: x.level, msg: x.msg }))];
+  const msgs = [...alle.filter((x) => x.level === 'error'), ...alle.filter((x) => x.level !== 'error')].map((x) => x.msg);
+  if (!msgs.length) return true;
+  const lines = msgs.slice(0, 6).map((m) => '• ' + m);
+  if (msgs.length > 6) lines.push(tn('… und {n} weitere|one', '… und {n} weitere', msgs.length - 6));
+  const head = proof.length
+    ? tn('Die Prüfung hat {n} Problem gefunden:', 'Die Prüfung hat {n} Probleme gefunden:', msgs.length)
+    : tn('Konstruktion prüfen hat {n} Problem gefunden:', 'Konstruktion prüfen hat {n} Probleme gefunden:', msgs.length);
+  const ok = confirm(head + '\n\n' + lines.join('\n') + '\n\n' + t('Trotzdem starten? (Abbrechen zeigt die Stellen im Fenster Prüfung.)'));
+  if (!ok) {
+    if (xs.length) openCheck();
+    else openBatchProof(ed);
+  }
   return ok;
 }
 
@@ -319,7 +337,72 @@ function canRun(): boolean {
   return !why;
 }
 
+// ---------- Galvo (JCZ/EZCad) ----------
+
+const JCZ_DESKTOP_ONLY = () => t('Galvo-Laser (JCZ) brauchen die Desktop-App: Im Browser gibt es keinen USB-Zugriff. Entwurf, Vorschau und Einstellungen funktionieren.');
+
+/** Galvo job of the document (or of a test document), polylines in field coordinates */
+function makeJczJob(ed: Editor, src?: JobSource) {
+  return buildJczJob({
+    doc: src?.doc ?? ed.doc,
+    layer: src?.layer ?? ((i) => ed.layer(i)),
+    imgLayer: src?.imgLayer ?? ((i) => ed.imgLayer(i)),
+    device,
+    only: src ? (src.only ?? null) : device.cutSelected ? ed.sel : null,
+  });
+}
+
+/** Why no galvo job or frame can start now (null = it can) */
+function jczBlocker(): string | null {
+  if (!isTauri()) return JCZ_DESKTOP_ONLY();
+  if (!machine.isJcz) return t('Nicht verbunden.');
+  if (machine.jczTask === 'mark') return t('Es läuft bereits ein Auftrag.');
+  return null;
+}
+
+/** Mark on the galvo: only after the user confirmed the summary of power, speed and frequency */
+async function startJczJob(ed: Editor, src?: JobSource) {
+  const why = jczBlocker();
+  if (why) return notify(why, true);
+  const { base, prep } = await makeJczJob(ed, src);
+  if (!prep.groups.length) return void nothingToDo(base);
+  if (!src && !designOk(ed)) return;
+  // The lens cannot reach it: never send coordinates beyond the field
+  if (prep.outside) return notify(prep.warnings[0], true);
+  const S = normalizeJcz(device.jcz);
+  const field = dec(String(S.field));
+  const text = [
+    t('⚠ Achtung'),
+    t('Der Galvo-Laser feuert mit diesen Werten:'),
+    ...jczSummary(prep, device),
+    t('Feld {field} × {field} mm, geschätzt {total}.', { field, total: formatDuration(prep.time) }),
+    ...(prep.warnings.length ? ['', ...prep.warnings] : []),
+    '',
+    t('Schutzbrille tragen und den Bereich sichern. Jetzt markieren?'),
+  ];
+  if (!confirm(text.join('\n'))) return;
+  prep.warnings.forEach((w) => notify(w));
+  notify(t('Markieren gestartet, geschätzt {total}.', { total: formatDuration(prep.time) }));
+  if ((await machine.jczMark(prep.job)) && !src) ed.afterJob();
+}
+
+/** Red-light frame (laser off) around the job or along its outline, repeated until Stop */
+async function frameJcz(ed: Editor, contour: boolean, src?: JobSource) {
+  const why = jczBlocker();
+  if (why) return notify(why, true);
+  const { base, prep } = await makeJczJob(ed, src);
+  const path = jczFramePath(base, (src?.doc ?? ed.doc).bed, contour);
+  if (!path) return void nothingToDo(base);
+  const S = normalizeJcz(device.jcz);
+  // The guide light is held inside the field; the warning says that the design reaches beyond it
+  const half = S.field / 2;
+  if (prep.outside) notify(prep.warnings[0], true);
+  const inField = path.map(([x, y]): [number, number] => [Math.max(-half, Math.min(half, x)), Math.max(-half, Math.min(half, y))]);
+  if (await machine.jczFrame(inField, S.frameSpeed || 3000)) notify(t('Rotlicht-Rahmen läuft (Laser aus), bis Stopp gedrückt wird.'));
+}
+
 export async function startJob(ed: Editor, src?: JobSource) {
+  if (isJcz(device)) return startJczJob(ed, src);
   if (!canRun()) return;
   if (machine.remote) {
     if (!src && !designOk(ed)) return;
@@ -340,6 +423,7 @@ export async function startJob(ed: Editor, src?: JobSource) {
  * die Stelle ist Bewegung i bei Anteil frac. Der Job wird neu berechnet und muss zur Vorschau passen.
  */
 export async function startJobAt(ed: Editor, preview: Moves, i: number, frac: number, src?: JobSource): Promise<boolean> {
+  if (isJcz(device)) return notify(t('„Start hier“ gibt es für Galvo-Laser (JCZ) nicht; Start markiert den ganzen Job.'), true), false;
   if (!canRun()) return false;
   if (machine.remote) return notify(t('„Start hier“ geht über einen anderen KizamuBeam noch nicht.'), true), false;
   const job = await makeJob(ed, false, src);
@@ -363,6 +447,7 @@ export async function startJobAt(ed: Editor, preview: Moves, i: number, frac: nu
 }
 
 export async function frameJob(ed: Editor, contour: boolean, src?: JobSource) {
+  if (isJcz(device)) return frameJcz(ed, contour, src);
   if (!canRun()) return;
   if (machine.remote) return void (await remoteFrame(ed, src, device.cutSelected, contour, notify));
   const job = await makeJob(ed, false, src);
@@ -373,8 +458,12 @@ export async function frameJob(ed: Editor, contour: boolean, src?: JobSource) {
 }
 
 export async function saveGCode(ed: Editor, src?: JobSource) {
+  if (isJcz(device)) return notify(t('Galvo-Laser (JCZ) markieren direkt aus KizamuBeam; eine G-Code-Datei gibt es dafür nicht.'), true);
   const job = await makeJob(ed, false, src);
   if (nothingToDo(job)) return;
+  // Die Datei IST die Produktion: Sie wird am Laser gestartet, und beim Speichern zählt die Seriennummer
+  // weiter (afterJob unten). Also dieselbe Prüfung wie vor einem Start aus dem Programm heraus.
+  if (!src && !designOk(ed)) return;
   if (device.startFrom === 'current') notify(t('Hinweis: Die Datei enthält die aktuelle Laserposition als Startpunkt.'));
   const g = await prepareGCode(
     job,
@@ -464,6 +553,12 @@ export function buildLaser(ed: Editor) {
 function stateText(): [string, string] {
   if (machine.connecting) return [t('Verbinde …'), 'busy'];
   if (!machine.connected) return [t('Nicht verbunden'), ''];
+  if (machine.isJcz) {
+    if (machine.jczTask === 'mark') return [t('Markiert …'), 'busy'];
+    if (machine.jczTask === 'frame') return [t('Rotlicht-Rahmen'), 'busy'];
+    if (machine.jcz?.error) return [t('Fehler'), 'error'];
+    return [machine.jcz?.busy ? t('Läuft') : t('Bereit'), machine.jcz?.busy ? 'busy' : 'ok'];
+  }
   const s = machine.status.state;
   const names: Record<string, string> = {
     Idle: t('Bereit'), Run: t('Läuft'), Hold: t('Angehalten'), Jog: t('Fährt'), Alarm: t('Alarm'), Door: t('Tür offen'), Home: t('Referenzfahrt'), Check: t('Prüfmodus'), Sleep: t('Ruhezustand'),
@@ -529,6 +624,9 @@ function laserTab(ed: Editor): HTMLElement {
     title: t('Job als benannte Datei im internen Speicher der Ruida-Steuerung ablegen (ohne sofortigen Start)'),
     onclick: () => uploadRuidaToController(ed),
   }, t('In Steuerung speichern …')) as HTMLButtonElement;
+  // Galvo (JCZ): red guide light on/off (laser stays off); note when the browser cannot reach the board
+  const lightB = big('target', t('Rotlicht'), t('Rotes Führungslicht ein- oder ausschalten (Laser aus)'), () => machine.jczSetLight(!machine.jczLight)) as HTMLButtonElement;
+  const jczNote = h('div', { class: 'note' }, JCZ_DESKTOP_ONLY());
   const bar = h('div', { class: 'progress' }, h('div', { class: 'fill' }));
   const progTxt = h('div', { class: 'progress-text' });
   const msg = h('div', { class: 'note laser-msg' });
@@ -595,28 +693,32 @@ function laserTab(ed: Editor): HTMLElement {
     for (const d of store.devices) devSel.append(h('option', { value: d.id }, `${d.name} (${FIRMWARES[d.fw].label})`));
     devSel.value = device.id;
   };
+  const startForm = h('div', { class: 'form' },
+    h('label', {}, t('Starten ab')), startFrom,
+    h('label', {}, t('Job-Ursprung')), originGrid,
+  );
+  const rotaryCheck = check(t('Drehachse'), t('Rotary einschalten: Y wird zur Umfangsrichtung des Objekts'), () => device.rotary.enabled, (v) => (device.rotary = { ...device.rotary, enabled: v }));
+  const rotaryBtn = h('button', { class: 'btn small', title: t('Drehachse (Rotary) einrichten'), onclick: () => openRotaryDialog() }, t('Drehachse …'));
   root.append(
     h('div', { class: 'conn-row' }, devSel, h('button', { class: 'btn', title: t('Geräte hinzufügen, bearbeiten, löschen'), onclick: () => openDevicesDialog(ed) }, t('Geräte …'))),
     h('div', { class: 'laser-status' }, h('span', {}, dot, stTxt), posTxt),
     pinTxt,
     h('div', { class: 'conn-row' }, portSel, refreshBtn, connBtn),
-    h('div', { class: 'laser-grid' }, startB, pauseB, stopB, frameB, contourB, homeB, originB, previewB, saveB),
-    ruidaMemB,
+    jczNote,
+    h('div', { class: 'laser-grid' }, startB, pauseB, stopB, frameB, contourB, homeB, originB, lightB, previewB, saveB),
+    ruidaMemB, ruidaFilesButton(ruidaMemB),
     frameViewRow,
     bar,
     progTxt,
     ovBox,
-    h('div', { class: 'form' },
-      h('label', {}, t('Starten ab')), startFrom,
-      h('label', {}, t('Job-Ursprung')), originGrid,
-    ),
+    startForm,
     h('div', { class: 'checks' },
       check(t('Nur Auswahl'), t('Nur die ausgewählten Objekte lasern'), () => device.cutSelected, (v) => (device.cutSelected = v)),
       check(t('Innere Formen zuerst'), t('Löcher und Innenkonturen vor ihrer Außenkontur schneiden'), () => device.optInnerFirst, (v) => (device.optInnerFirst = v)),
       check(t('Leerwege verkürzen'), t('Nächstgelegene Form als nächste schneiden (Alternative zur manuellen Reihenfolge)'), () => device.optTravel, (v) => (device.optTravel = v)),
       check(t('Gruppen zusammenhalten'), t('Formen eines Objekts bzw. einer Gruppe bevorzugt nacheinander schneiden'), () => device.optGroup, (v) => (device.optGroup = v)),
-      check(t('Drehachse'), t('Rotary einschalten: Y wird zur Umfangsrichtung des Objekts'), () => device.rotary.enabled, (v) => (device.rotary = { ...device.rotary, enabled: v })),
-      h('button', { class: 'btn small', title: t('Drehachse (Rotary) einrichten'), onclick: () => openRotaryDialog() }, t('Drehachse …')),
+      rotaryCheck,
+      rotaryBtn,
     ),
     h('div', { class: 'conn-row' },
       h('button', { class: 'btn', onclick: () => openDeviceDialog(ed) }, h('span', { icon: 'settings' }), t('Geräteeinstellungen')),
@@ -631,13 +733,33 @@ function laserTab(ed: Editor): HTMLElement {
     msg.classList.toggle('error', error);
     clearTimeout(msgTimer);
     msgTimer = window.setTimeout(() => (msg.textContent = ''), 12000);
+    // Diese Zeile steht unten im Laser-Fenster. Gemessen am 22.11.2026: Bei 1500 × 950 liegt sie auf
+    // y = 1096, also unter dem Fensterrand und im abgeschnittenen Teil des Panels (524 statt 324 px).
+    // „Vorschau“ und „Start“ auf einer leeren Seite sahen deshalb aus, als täte das Programm nichts.
+    // Die Statuszeile ist immer zu sehen: Dort steht die Meldung ab jetzt auch.
+    ed.hint = m;
+    ed.emit('tool');
   };
 
   let ports: PortInfo[] = [];
   const NET = '__net__';
   const NET_WS = '__ws__';
   const REMOTE = '__remote__';
+  // Galvo: the boards on USB (WinUSB) instead of serial ports, plus the simulator
+  let boards: JczBoard[] = [];
+  const fillBoards = () => {
+    portSel.textContent = '';
+    portSel.title = t('JCZ-Platine am USB (WinUSB-Treiber von LightBurn/EZCad)');
+    portSel.append(h('option', { value: '' }, boards.length ? t('Erste gefundene Platine') : t('Keine JCZ-Platine gefunden')));
+    for (const b of boards) portSel.append(h('option', { value: b.serial }, `${b.model || 'JCZ'} · ${b.serial}`));
+    const cur = device.jczBoard ?? '';
+    if (cur && cur !== JCZ_SIM && !boards.some((b) => b.serial === cur)) portSel.append(h('option', { value: cur }, t('{serial} (nicht gefunden)', { serial: cur })));
+    portSel.append(h('option', { value: JCZ_SIM }, t('Simulator (ohne Laser)')));
+    portSel.value = cur;
+  };
   const fillPorts = () => {
+    if (isJcz(device)) return fillBoards();
+    portSel.title = t('Schnittstelle oder Netzwerk');
     portSel.textContent = '';
     const names = ports.map((p) => p.name);
     if (device.port && !names.includes(device.port)) names.unshift(device.port);
@@ -656,6 +778,7 @@ function laserTab(ed: Editor): HTMLElement {
     portSel.value = device.conn === 'tcp' || (device.fw === 'ruida' && device.conn === 'ws') ? NET : device.conn === 'ws' ? NET_WS : device.conn === 'remote' ? REMOTE : device.port || names[0] || NET;
   };
   const applyPortChoice = () => {
+    if (isJcz(device)) return ((device.jczBoard = portSel.value), deviceChanged());
     if (portSel.value === NET) device.conn = 'tcp';
     else if (portSel.value === NET_WS) device.conn = 'ws';
     else if (portSel.value === REMOTE) device.conn = 'remote';
@@ -665,7 +788,8 @@ function laserTab(ed: Editor): HTMLElement {
   portSel.addEventListener('change', applyPortChoice);
   const loadPorts = async () => {
     try {
-      ports = await machine.ports();
+      if (isJcz(device)) boards = await machine.jczBoards();
+      else ports = await machine.ports();
     } catch (e) {
       notify(t('Schnittstellen konnten nicht gelesen werden: {error}', { error: tBackend(String(e)) }), true);
     }
@@ -736,6 +860,29 @@ function laserTab(ed: Editor): HTMLElement {
     framePointerB.classList.toggle('cur', device.frameView !== 'tool');
     frameToolB.classList.toggle('cur', device.frameView === 'tool');
     frameViewRow.hidden = !device.pointerOffset?.enabled;
+    // Galvo (JCZ): no G-code, no motion axes. Start asks for confirmation; Stop stays usable while connected;
+    // Frame/Contour run the red light (laser off) until Stop and may be restarted with a new outline.
+    const galvo = isJcz(device);
+    for (const el of [pauseB, homeB, originB, saveB, startForm, rotaryCheck, rotaryBtn]) el.hidden = galvo;
+    lightB.hidden = !galvo;
+    jczNote.hidden = !galvo || isTauri();
+    if (galvo) {
+      frameViewRow.hidden = true;
+      const marking = machine.jczTask === 'mark';
+      for (const b of [startB, frameB, contourB]) b.disabled = !on || marking || !!uploading;
+      // The board switches the light only while idle (not during a frame or a job)
+      lightB.disabled = !on || !!machine.jczTask;
+      lightB.classList.toggle('cur', machine.jczLight);
+      frameB.title = t('Rechteck um den Job mit dem Rotlicht zeigen (Laser aus), bis Stopp');
+      contourB.title = t('Umriss des Jobs mit dem Rotlicht zeigen (Laser aus), bis Stopp');
+      startB.title = t('Job markieren (fragt vorher mit Leistung, Geschwindigkeit und Frequenz nach)');
+      stopB.title = t('Markieren oder Rotlicht-Rahmen sofort stoppen, Laser aus');
+    } else {
+      frameB.title = t('Rechteck um den Job abfahren');
+      contourB.title = t('Umriss des Jobs abfahren (Gummiband)');
+      startB.title = t('Job starten');
+      stopB.title = t('Job abbrechen');
+    }
   };
   machine.on((e) => {
     if (e.type === 'done') notify(e.message, !e.ok);
@@ -743,7 +890,14 @@ function laserTab(ed: Editor): HTMLElement {
     if (e.type !== 'line') refresh();
   });
   uploadListeners.add(refresh);
-  deviceListeners.add(() => (fillDevices(), fillPorts(), refresh()));
+  // Switching between a galvo and another device swaps boards and serial ports in the list
+  let listedJcz = isJcz(device);
+  deviceListeners.add(() => {
+    fillDevices();
+    if (isJcz(device) !== listedJcz && isTauri()) ((listedJcz = isJcz(device)), void loadPorts());
+    else fillPorts();
+    refresh();
+  });
   fillDevices();
   // Fortschrittstext auch ohne neue Ereignisse aktualisieren (vergangene Zeit)
   setInterval(() => machine.running && refresh(), 1000);
@@ -970,6 +1124,12 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
   };
   const ruidaEls: HTMLElement[] = [];
   const nonRuidaEls: HTMLElement[] = [];
+  // Galvo (JCZ): edited on a copy, own tab; G-code, motion and connection fields do not apply and are hidden
+  const J = normalizeJcz(d.jcz);
+  const nonJczEls: HTMLElement[] = [];
+  const nonJczTabs: number[] = [];
+  const grab = (from: number, into: HTMLElement[]) => into.push(...rows.slice(from).filter((x): x is HTMLElement => x instanceof HTMLElement));
+  let syncTabs = () => {};
   newTab(t('Allgemein'));
   text(t('Name'), () => d.name, (v) => (d.name = v));
   const sMaxRef: { el?: HTMLInputElement; lab?: HTMLElement } = {};
@@ -981,9 +1141,11 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
       if (d.sMax === old.sMax && sMaxRef.el) ((d.sMax = FIRMWARES[d.fw].sMax), (sMaxRef.el.value = String(d.sMax)));
       readBtn.disabled = !canRead();
       syncFw();
+      syncTabs();
     },
   }, ...(Object.keys(FIRMWARES) as Firmware[]).map((k) => h('option', { value: k, selected: k === d.fw }, FIRMWARES[k].label))) as HTMLSelectElement;
   rows.push(h('label', {}, t('Steuerung (Firmware)')), fwSel);
+  const bedFrom = rows.length;
   const bw = num(t('Breite (mm)'), () => bed.w, (v) => (bed.w = v), t('Arbeitsbereich X'));
   const bh = num(t('Höhe (mm)'), () => bed.h, (v) => (bed.h = v), t('Arbeitsbereich Y'));
   {
@@ -996,6 +1158,8 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     sMaxRef.lab = lab;
     nonRuidaEls.push(lab, el);
   }
+  // Galvo: the work area is the lens field (tab Galvo), power is in % of the source
+  grab(bedFrom, nonJczEls);
   {
     const ruidaHead = head('Ruida DSP');
     const origLab = h('label', { title: t('Ecke des Arbeitsbereichs, in der die Ruida-Steuerung ihren Maschinennullpunkt (0, 0) hat') }, t('Maschinennullpunkt'));
@@ -1044,6 +1208,7 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     opt(t('Optische Leistung (W)'), () => d.laser?.power, (v) => setLaser({ power: v }));
     opt(t('Wellenlänge (nm)'), () => d.laser?.wavelength, (v) => setLaser({ wavelength: v === undefined ? undefined : Math.round(v) }));
   }
+  const motionFrom = rows.length;
   head(t('Bewegung (für die Zeitschätzung)'));
   const rapid = num(t('Eilgang (mm/min)'), () => d.rapid, (v) => (d.rapid = v));
   const accel = num(t('Beschleunigung (mm/s²)'), () => d.accel, (v) => (d.accel = v));
@@ -1073,7 +1238,91 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     nonRuidaEls.push(airHead, airLab, airSel, outsLab, outsIn);
   }
   rows.push(h('div', { class: 'note wide' }, t('Startreferenz und Job-Ursprung stehen im Laser-Fenster.')));
+  grab(motionFrom, nonJczEls);
+  newTab(t('Galvo'));
+  const galvoTab = tabs.length - 1;
+  {
+    // Numbers of the galvo settings: any sign, clamped to a sensible range; names in brackets are LightBurn's
+    const jnum = (label: string, title: string, get: () => number, set: (v: number) => void, min: number, max: number, int = false) => {
+      const el = numInput('', (v) => {
+        if (Number.isFinite(v)) set(Math.max(min, Math.min(max, int ? Math.round(v) : v)));
+        el.value = String(get());
+      }, title);
+      el.value = String(get());
+      rows.push(h('label', { title }, label), el);
+      return el;
+    };
+    const jbool = (label: string, title: string, get: () => boolean, set: (v: boolean) => void) =>
+      rows.push(h('label', { title }, label), h('span', {}, h('input', { type: 'checkbox', checked: get(), onchange: (e: Event) => set((e.target as HTMLInputElement).checked) })));
+    head(t('Linse und Feld'));
+    jnum(t('Feldgröße (mm)'), t('Kantenlänge des quadratischen Markierfelds der Linse (LightBurn: Breite = Höhe des Geräts). Wird zur Arbeitsfläche.'), () => J.field, (v) => (J.field = v), 1, 1000);
+    jnum(t('Feld-Versatz X (mm) (FieldOffsetX)'), t('Verschiebt das ganze Feld'), () => J.offsetX, (v) => (J.offsetX = v), -500, 500);
+    jnum(t('Feld-Versatz Y (mm) (FieldOffsetY)'), t('Verschiebt das ganze Feld'), () => J.offsetY, (v) => (J.offsetY = v), -500, 500);
+    jnum(t('Feld-Drehung (°) (FieldAngle)'), t('Dreht das ganze Feld'), () => J.angle, (v) => (J.angle = v), -360, 360);
+    head(t('Galvo-Korrektur'));
+    jbool(t('Galvo 1 ist X (Galvo_1_is_X)'), t('Aus: Galvo 1 lenkt in Y ab'), () => J.galvo1IsX, (v) => (J.galvo1IsX = v));
+    const pair = (label: string, title: string, key: 'scale' | 'bulge' | 'skew' | 'trapezoid') => {
+      const one = (g: 'galvo1' | 'galvo2') => {
+        const el = numInput('', (v) => {
+          if (Number.isFinite(v)) J[g][key] = Math.max(0.01, Math.min(10, v));
+          el.value = String(J[g][key]);
+        }, title);
+        el.value = String(J[g][key]);
+        return el;
+      };
+      rows.push(h('label', { title }, label), h('span', { class: 'jcz-pair' }, one('galvo1'), one('galvo2')));
+    };
+    rows.push(h('label', {}, ''), h('span', { class: 'jcz-pair note' }, h('span', {}, t('Galvo 1')), h('span', {}, t('Galvo 2'))));
+    pair(t('Skalierung (Scale)'), t('Maßstab je Galvo; 1 = unverändert'), 'scale');
+    pair(t('Wölbung (Bulge)'), t('Kissen- oder Tonnenverzerrung ausgleichen; 1 = keine'), 'bulge');
+    pair(t('Schräglage (Skew)'), t('Schräge Kanten ausgleichen; 1 = keine'), 'skew');
+    pair(t('Trapez (Trapezoid)'), t('Trapezförmige Verzerrung ausgleichen; 1 = keine'), 'trapezoid');
+    {
+      const sign = (g: 'galvo1' | 'galvo2') => h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: J[g].sign < 0, onchange: (e: Event) => (J[g].sign = (e.target as HTMLInputElement).checked ? -1 : 1) }), t('umkehren'));
+      rows.push(h('label', { title: t('Ablenkrichtung des Galvos umkehren') }, t('Richtung (Sign)')), h('span', { class: 'jcz-pair' }, sign('galvo1'), sign('galvo2')));
+    }
+    head(t('Laserquelle'));
+    rows.push(h('label', { title: t('Art der Laserquelle (LightBurn: Laser_Type)') }, t('Laserart (Laser_Type)')), h('select', { onchange: (e: Event) => (J.laserType = (e.target as HTMLSelectElement).value as typeof J.laserType) },
+      h('option', { value: 'fiber', selected: J.laserType === 'fiber' }, t('Faser')),
+      h('option', { value: 'co2', selected: J.laserType === 'co2' }, 'CO2'),
+      h('option', { value: 'uv', selected: J.laserType === 'uv' }, 'UV'),
+    ));
+    {
+      const list = h('datalist', { id: `jcz-fiber-${Math.random().toString(36).slice(2)}` }, ...JCZ_FIBER_TYPES.map((n) => h('option', { value: n })));
+      const el = h('input', { type: 'text', value: J.fiberType, placeholder: t('z. B. JPT M7'), oninput: (e: Event) => (J.fiberType = (e.target as HTMLInputElement).value.trim()) });
+      el.setAttribute('list', list.id);
+      rows.push(h('label', { title: t('Hersteller und Typ der Faserquelle (LightBurn: Laser_FiberType)') }, t('Quelle (Laser_FiberType)')), el, list);
+    }
+    jnum(t('Kleinste Frequenz (kHz) (Laser_MinFreq)'), t('Layer-Frequenzen darunter werden auf diesen Wert angehoben'), () => J.minFreq, (v) => (J.minFreq = v), 0.1, 4000);
+    jnum(t('Größte Frequenz (kHz) (Laser_MaxFreq)'), t('Layer-Frequenzen darüber werden auf diesen Wert begrenzt'), () => J.maxFreq, (v) => (J.maxFreq = v), 0.1, 4000);
+    jbool(t('Pulsbreite einstellbar (MOPA) (Laser_QPulseWidthEnabled)'), t('Nur MOPA-Quellen: Layer bekommen das Feld Pulsbreite (ns)'), () => J.pulseWidthEnabled, (v) => (J.pulseWidthEnabled = v));
+    head(t('Zeiten (Standardwerte)'));
+    jnum(t('Sprunggeschwindigkeit (mm/s) (Default_JumpSpeed)'), t('Geschwindigkeit der Leerwege zwischen den Linien'), () => J.jumpSpeed, (v) => (J.jumpSpeed = v), 1, 100000);
+    jnum(t('Laser-an-Verzögerung (µs) (Default_LaserOn_TC)'), t('Darf negativ sein'), () => J.laserOnDelay, (v) => (J.laserOnDelay = v), -10000, 10000, true);
+    jnum(t('Laser-aus-Verzögerung (µs) (Default_LaserOff_TC)'), '', () => J.laserOffDelay, (v) => (J.laserOffDelay = v), -10000, 10000, true);
+    jnum(t('Eckenverzögerung (µs) (Default_Polygon_TC)'), '', () => J.polygonDelay, (v) => (J.polygonDelay = v), 0, 10000, true);
+    jnum(t('Endverzögerung (µs) (Default_End_TC)'), '', () => J.endDelay, (v) => (J.endDelay = v), 0, 10000, true);
+    jnum(t('Kleinste Sprungverzögerung (µs) (Default_MinJumpDelay)'), '', () => J.minJumpDelay, (v) => (J.minJumpDelay = v), 0, 100000, true);
+    jnum(t('Größte Sprungverzögerung (µs) (Default_MaxJumpDelay)'), '', () => J.maxJumpDelay, (v) => (J.maxJumpDelay = v), 0, 100000, true);
+    jnum(t('Sprungweite für die größte Verzögerung (mm) (Default_MaxJumpDistance)'), '', () => J.maxJumpDistance, (v) => (J.maxJumpDistance = v), 0, 1000);
+    head(t('Rotlicht'));
+    jnum(t('Rahmen-Geschwindigkeit (mm/s) (FrameSpeed)'), t('Geschwindigkeit des roten Führungslichts bei Rahmen und Kontur'), () => J.frameSpeed ?? 3000, (v) => (J.frameSpeed = v), 1, 100000);
+    jnum(t('Rotlicht-Versatz X (mm) (RedDotOffsetX)'), t('Lage des Führungslichts gegenüber dem Strahl'), () => J.redDot.offsetX, (v) => (J.redDot.offsetX = v), -100, 100);
+    jnum(t('Rotlicht-Versatz Y (mm) (RedDotOffsetY)'), t('Lage des Führungslichts gegenüber dem Strahl'), () => J.redDot.offsetY, (v) => (J.redDot.offsetY = v), -100, 100);
+    jnum(t('Rotlicht-Skalierung X (RedDotScaleX)'), t('Maßstab des Führungslichts; 1 = wie der Strahl'), () => J.redDot.scaleX, (v) => (J.redDot.scaleX = v), 0.01, 10);
+    jnum(t('Rotlicht-Skalierung Y (RedDotScaleY)'), t('Maßstab des Führungslichts; 1 = wie der Strahl'), () => J.redDot.scaleY, (v) => (J.redDot.scaleY = v), 0.01, 10);
+    head(t('Anschlüsse der Platine'));
+    const port = (label: string, key: keyof typeof J.ports, title = t('Nummer des Ein- oder Ausgangs der JCZ-Platine, −1 = nicht benutzt')) =>
+      jnum(label, title, () => J.ports[key], (v) => (J.ports[key] = v), -1, 15, true);
+    port(t('Start-Taster / Fußschalter (StartMarkPortBit)'), 'startMark');
+    port(t('Rahmen-Taster (StartFramePortBit)'), 'startFrame');
+    port(t('Stopp-Taster (StopMarkPortBit)'), 'stopMark');
+    port(t('Türschalter (DoorProtectPortBit)'), 'doorProtect');
+    port(t('Rotlicht-Ausgang (RedLightPortBit)'), 'redLight', t('Ausgang des roten Führungslichts; −1 = Standardausgang 8 der Platine'));
+    rows.push(h('div', { class: 'note wide' }, t('Namen in Klammern: die Einstellung im LightBurn-Gerät „JCZFiber“. Die Werte gehen beim Verbinden an die Platine; nach einer Änderung neu verbinden.')));
+  }
   newTab(t('Verbindung|Gerät'));
+  nonJczTabs.push(tabs.length - 1);
   const connTcpOpt = h('option', { value: 'tcp', selected: d.conn === 'tcp' }, t('WLAN (Telnet)')) as HTMLOptionElement;
   const connWsOpt = h('option', { value: 'ws', selected: d.conn === 'ws' }, t('WLAN (WebSocket)')) as HTMLOptionElement;
   const connSel: HTMLSelectElement = h('select', { onchange: (e: Event) => (d.conn = (e.target as HTMLSelectElement).value as Device['conn']) },
@@ -1199,6 +1448,7 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     h('option', { value: 'no', selected: d.limitSwitches === 'no' }, t('Keine')),
   ));
   newTab(t('Rahmen & Zeiger'));
+  nonJczTabs.push(tabs.length - 1);
   head(t('Rahmen'));
   num(t('Geschwindigkeit (mm/min)'), () => d.frameSpeed, (v) => (d.frameSpeed = v));
   bool(t('Mit Laser (schwach)'), () => d.frameLaser, (v) => (d.frameLaser = v), t('Rahmen mit niedriger Leistung sichtbar machen'));
@@ -1262,6 +1512,7 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
   const energyRows = energySettingsRows(d.energy);
   rows.push(...energyRows);
   newTab(t('G-Code'));
+  nonJczTabs.push(tabs.length - 1);
   {
     const fncHead = head('FluidNC');
     const fncLab = h('label', { title: t('Bei WLAN-Aussetzern läuft ein Job von SD-Karte oder Flash weiter; er wird vor dem Start über die Weboberfläche hochgeladen') }, t('Job ausführen'));
@@ -1309,6 +1560,9 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
       d.conn = 'tcp';
       connSel.value = 'tcp';
     }
+    // Galvo: hide what only G-code machines have; back for the others (Ruida keeps its own rule above)
+    const galvo = d.fw === 'jcz';
+    for (const el of nonJczEls) el.hidden = galvo || (isRuida && nonRuidaEls.includes(el)) || (!isRuida && ruidaEls.includes(el));
   };
   syncFw();
   newTab(t('Erweitert'));
@@ -1370,11 +1624,8 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     },
   }, t('Von der Maschine lesen'));
   // „Von der Maschine lesen“ gehört zu Allgemein (erster Tab), nicht ans Ende.
-  tabs[0].rows.push(
-    h('label', {}, ''),
-    h('span', { class: 'conn-row' }, readBtn),
-    readNote,
-  );
+  const readRow = [h('label', {}, ''), h('span', { class: 'conn-row' }, readBtn)];
+  tabs[0].rows.push(...readRow, readNote);
   let activeTab = lastDeviceTab < tabs.length ? lastDeviceTab : 0;
   const selectTab = (i: number) => {
     activeTab = lastDeviceTab = i;
@@ -1385,6 +1636,15 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     h('button', { class: 'btn small' + (i === activeTab ? ' cur' : ''), onclick: () => selectTab(i) }, tb.label),
   );
   const panels = tabs.map((tb, i) => h('div', { class: 'form', hidden: i !== activeTab }, ...tb.rows));
+  // Galvo tab only for JCZ devices; connection, frame/pointer and G-code tabs only for the others
+  syncTabs = () => {
+    const galvo = d.fw === 'jcz';
+    tabBtns.forEach((b, k) => (b.hidden = k === galvoTab ? !galvo : galvo && nonJczTabs.includes(k)));
+    // Galvo boards have no G-code settings to read
+    for (const el of readRow) el.hidden = galvo;
+    if (tabBtns[activeTab]?.hidden) selectTab(galvo ? galvoTab : 0);
+  };
+  syncTabs();
   const dlg = h('dialog', { class: 'device-dialog' },
     h('h3', {}, t('Geräteeinstellungen: {name}', { name: target.name })),
     h('div', { class: 'dtab-bar' }, ...tabBtns),
@@ -1397,7 +1657,8 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
           // Felder, die noch den Fokus haben, zuerst übernehmen
           (document.activeElement as HTMLElement | null)?.blur();
           saveEnergySettings(energyRows, () => selectTab(energyTabIndex), () => {
-            Object.assign(target, d, { bedW: bed.w, bedH: bed.h });
+            // Galvo: the work area is the lens field
+            Object.assign(target, d, d.fw === 'jcz' ? jczBed(J) : { bedW: bed.w, bedH: bed.h });
             if (isCurrent) applyBed(ed);
             deviceChanged();
             dlg.close();
@@ -1584,6 +1845,19 @@ export function openDevicesDialog(ed: Editor) {
     list,
     h('div', { class: 'conn-row' }, h('label', {}, t('Neues Gerät aus Vorlage')), presetSel, h('button', { class: 'btn primary', onclick: add }, t('Hinzufügen'))),
     presetInfo,
+    h('div', { class: 'conn-row' }, h('label', {}, t('Geräte aus LightBurn')), h('button', {
+      class: 'btn', title: t('Geräte aus LightBurn übernehmen (Ruida, GRBL, JCZ-Galvo …), mit Übersicht, was übernommen wird'),
+      onclick: () => openLightburnImport({
+        devices: () => store.devices,
+        canReplace: (d) => !(d === device && (machine.connected || machine.connecting)),
+        add: (d) => store.devices.push(d),
+        replace: (old, d) => {
+          store.devices[store.devices.indexOf(old)] = d;
+          if (old === device) selectDevice(ed, d.id);
+        },
+        done: () => (deviceChanged(), fill()),
+      }),
+    }, t('Aus LightBurn importieren …'))),
     h('div', { class: 'note' }, t('Die Maße der Vorlagen stammen aus den Herstellerangaben. Bitte vor dem ersten Job prüfen, am einfachsten mit „Von der Maschine lesen“ in den Geräteeinstellungen (FluidNC, GRBL, grblHAL).')),
     h('div', { class: 'dialog-buttons' }, h('button', { class: 'btn', onclick: () => dlg.close() }, t('Schließen'))),
   );

@@ -12,6 +12,8 @@ Everything you draw in KizamuBeam is an editable vector shape. This page covers 
 
 The drawing tools are on the tools toolbar on the left and in the **Tools** menu.
 
+![Workspace with a rectangle, an ellipse, a star, a freehand wave and a house outline that is being drawn with the Lines and curves tool, which is active in the tools toolbar](/img/drawing-tools-en.webp)
+
 | Tool | Shortcut | How to use it |
 |---|---|---|
 | **Lines and curves** | Ctrl+L | Click to set corners; click and drag to make a Bézier curve. Clicking the start point closes the shape; double-click, Enter or right-click finishes. |
@@ -56,6 +58,8 @@ The **numeric edits toolbar** at the top shows position, size and rotation of th
 ## Editing nodes
 
 Choose **Edit nodes** (Ctrl+`) to change the shape of paths. With several paths or shapes selected, the nodes of all of them can be edited together.
+
+![Edit nodes on a heart shape: four nodes with their curve handles, one node selected, and the node buttons Line, Curve, Corner, Smooth and Delete in the toolbar at the top](/img/node-editing-en.webp)
 
 | Action | How |
 |---|---|

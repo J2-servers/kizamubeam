@@ -1218,6 +1218,79 @@ await test('Ruida: Nullpunkt-Ecken, relative Referenz (current/user) und Magic 0
   assert.ok(Math.abs(dec.layers.get(0)!.minPower - 50) < 0.2);
 });
 
+await test('Ruida: Bildzeilen im Scan-Modus (eigener Part neben Vektoren), Z-Versatz je Durchgang nur mit Z-Achse', async () => {
+  const { decodeRuida, ruidaParamsForJob, swizzle, writeRuidaPlain } = await import('../src/ruida');
+  // Z-Versatz bleibt auch nach mehr als 1024 Bewegungen erhalten (Moves.z wächst mit)
+  const big = new Moves(0, 0);
+  big.zCur = 1;
+  for (let i = 0; i < 3000; i++) big.push(i % 7, 0, 600, 0.5, 0);
+  assert.equal(big.z[2999], 1);
+
+  const mv = new Moves(0, 0);
+  mv.zCur = 0.5;
+  mv.push(9, 10, 0, 0, 1); // Overscan-Anfang
+  mv.push(10, 10, 6000, 0, 1);
+  mv.push(11, 10, 6000, 0.7, 1);
+  mv.push(12, 10, 6000, 0.4, 1);
+  mv.push(13, 10, 6000, 0, 1); // Overscan-Ende
+  mv.scan.push(0, mv.n, 1);
+  mv.zCur = 0;
+  mv.push(20, 30, 0, 0, 1);
+  mv.push(60, 30, 1200, 0.9, 1); // Vektor auf demselben Layer
+  const layerOf = (i: number): Layer => ({ ...defaultLayer(i), speed: 6000, power: 70, minPower: 10 });
+  const job = { moves: mv, air: [] } as never;
+  const dev = newDevice({ fw: 'ruida', zAxis: true, bedW: 600, bedH: 400, ruidaOrigin: 'bottom-left', startFrom: 'absolute', returnHome: false });
+  const p = ruidaParamsForJob(job, dev, layerOf);
+  // Layer 1 schneidet auch einen Vektor: die Bildzeilen bekommen den freien Part 0 im Modus „beide Richtungen“
+  assert.deepEqual(p.scan, [[0, 5, 0]]);
+  assert.deepEqual(p.layers.map((l) => [l.index, l.scan ?? 0]), [[1, 0], [0, 2]]);
+  // Z-Versatz 0,5 mm (Fokus tiefer) = Z −0,5 in Steuerungsrichtung, danach zurück auf 0
+  assert.deepEqual(p.z, [[0, -0.5], [5, 0]]);
+  const plain = Array.from(writeRuidaPlain(mv, p));
+  const hex = plain.map((b) => b.toString(16).padStart(2, '0')).join(' ');
+  assert.ok(hex.includes('ca 41 00 02'), 'CA 41 Part 0 Modus 2 (LibLaserCut: beide Richtungen)');
+  assert.ok(hex.includes('ca 41 01 00'), 'CA 41 Part 1 Modus 0 (Schneiden)');
+  assert.ok(hex.includes('ca 01 01 ca 02 00'), 'Scan-Part: Arbeitsmodus 01 vor der Layernummer');
+  assert.ok(hex.includes('ca 01 00 ca 02 01'), 'Vektor-Part: Arbeitsmodus 00');
+  assert.ok(hex.includes('80 08 0f 7f 7f 7c 0c'), 'Z −500 µm vor der ersten Bewegung');
+  assert.ok(hex.includes('80 08 00 00 00 03 74'), 'Z +500 µm zurück vor dem Vektor');
+  // Scan-Läufe: min = max je Lauf (70 % = 59 4c, 40 % = 33 19)
+  assert.ok(hex.includes('c6 01 59 4c c6 02 59 4c aa 07 68 c6 01 33 19 c6 02 33 19 aa 07 68'), hex);
+  // Der Decoder liest Scan-Dateien weiter
+  const dec = decodeRuida(swizzle(writeRuidaPlain(mv, p), 0x88));
+  assert.equal(dec.cuts.length, 3);
+  // Ohne Z-Achse kein Z, ohne Bilder keine Scan-Befehle (Vektor-Jobs bleiben byte-gleich)
+  const noZ = ruidaParamsForJob(job, { ...dev, zAxis: false }, layerOf);
+  assert.equal(noZ.z, undefined);
+  const vec = new Moves(0, 0);
+  vec.push(20, 30, 0, 0, 1);
+  vec.push(60, 30, 1200, 0.9, 1);
+  const pv = ruidaParamsForJob({ moves: vec, air: [] } as never, { ...dev, zAxis: false }, layerOf);
+  assert.equal(pv.scan, undefined);
+  const vhex = Array.from(writeRuidaPlain(vec, pv)).map((b) => b.toString(16).padStart(2, '0')).join(' ');
+  assert.ok(!vhex.includes('ca 41') && !vhex.includes('80 08') && !vhex.includes('ca 01 00'), vhex);
+});
+
+await test('Ruida: Dateiliste aus dem Speicher auswerten, Fehler bleiben wörtlich', async () => {
+  const { parseRuidaFiles, ruidaResult } = await import('../src/ruidaFiles');
+  const r = parseRuidaFiles([
+    'RUIDA_LIST_FILES',
+    '[Ruida] Dateien im Speicher: 3',
+    '[Ruida] Datei 1: CAIXA',
+    '[Ruida] Datei 2: LOGO-MDF',
+    '[Ruida] Datei 3: Name nicht gelesen: Keine Antwort der Ruida-Steuerung über USB auf E8 01 00 03.',
+    'ok',
+  ]);
+  assert.equal(r.count, 3);
+  assert.deepEqual(r.files.map((f) => [f.num, f.name]), [[1, 'CAIXA'], [2, 'LOGO-MDF'], [3, '']]);
+  assert.equal(r.files[2].error, 'Name nicht gelesen: Keine Antwort der Ruida-Steuerung über USB auf E8 01 00 03.');
+  const bad = parseRuidaFiles(['[Ruida] Dateiliste nicht gelesen: USB-Lesen fehlgeschlagen: Zugriff verweigert', 'ok']);
+  assert.equal(bad.count, null);
+  assert.deepEqual(bad.errors, ['Dateiliste nicht gelesen: USB-Lesen fehlgeschlagen: Zugriff verweigert']);
+  assert.equal(ruidaResult(['[Ruida] Datei 2 gelöscht.', 'ok'], /^\[Ruida\] Datei \d+ gelöscht\.$/), null);
+  assert.equal(ruidaResult(['[Ruida] Löschen fehlgeschlagen: Keine Bestätigung (ACK) über USB von der Ruida-Steuerung.', 'ok'], /gelöscht/), 'Löschen fehlgeschlagen: Keine Bestätigung (ACK) über USB von der Ruida-Steuerung.');
+});
+
 if (failed) {
   console.log(`${failed} Test(s) fehlgeschlagen`);
   process.exit(1);

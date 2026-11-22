@@ -15,6 +15,7 @@ import { CORE_PACK_TEXT } from './plugins/corePack';
 import { initPluginNet } from './plugins/netUi';
 import { meshData } from './model3d/store';
 import { imageResource } from './plugins/imageResource';
+import { installCreatorReceiver } from './criar/receive';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 canvas.tabIndex = 0;
@@ -41,6 +42,8 @@ initPluginNet();
 // Erweiterungen im Hintergrund lesen; Dialoge warten bei Bedarf darauf
 void ensurePacks();
 buildUI(editor);
+// Teile aus dem Fenster „Produkt erstellen“ in einem neuen Tab öffnen
+installCreatorReceiver(editor);
 initDialogDrag(() => t('Schließen'), () => t('Größe ändern (Doppelklick: Standardgröße)'));
 editor.setTool('select');
 // Für Tests und Fehlersuche in der Konsole erreichbar

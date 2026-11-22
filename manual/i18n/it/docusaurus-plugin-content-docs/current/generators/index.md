@@ -7,6 +7,8 @@ description: I generatori creano parti finite a partire da poche misure, come sc
 
 I generatori creano parti finite a partire da poche misure, invece di disegnarle a mano. Si trovano tutti nella **Casella degli strumenti** (**Strumenti → Casella degli strumenti …**, **Finestra → Casella degli strumenti** oppure il pulsante a riquadri nella barra Strumenti), divisi in gruppi e con una ricerca.
 
+![Finestra Casella degli strumenti a sinistra con il campo di ricerca, i filtri per gruppo, gli strumenti usati di recente e i gruppi Meccanica e Scatole e mobili come tessere; sulla pagina una scatola, un ingranaggio, una camma e una puleggia creati da lì, ognuno nel primo posto libero](/img/toolbox-en.webp)
+
 | Pagina | Generatori |
 |---|---|
 | [Ingranaggi e cremagliere](gears.md) | Ingranaggio, coppia di ingranaggi, cremagliera |
@@ -39,6 +41,8 @@ Alcune modifiche romperebbero i parametri: il ridimensionamento, la modifica dei
 ### Formule e parametri
 
 Ogni campo numerico accetta un [parametro del progetto](../features/templates-library.md#parameters) o una formula, per esempio `{Spessore}` o `{Larghezza} - 2 * {Spessore}`. I campi di scelta e sì/no ricevono un parametro con il pulsante ƒ. Così una scatola in un modello segue i valori inseriti, e cambiando lo spessore del materiale in un solo punto si aggiornano tutte le parti.
+
+![Finestra del generatore del ripiano a incastro con l’anteprima dal vivo: i campi della larghezza e dello spessore del materiale contengono i parametri del progetto Width e Thickness, in corsivo blu, con sotto i valori risultanti 240 e 4](/img/generator-dialog-formula-en.webp)
 
 ### Kerf e gioco
 

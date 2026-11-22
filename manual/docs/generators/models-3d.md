@@ -14,6 +14,8 @@ The model is stored once in the project file, so the parts can be edited again l
 
 The model is cut into stacked sheets that you glue back together: heads, figures, reliefs, terrain.
 
+![Create Layered model dialog for a toy dog: the up axis, layers from front to back, a size of 150 mm, material thickness 3 mm, the cross-section in the middle of the layer and engraved numbers; the preview shows the 13 numbered sheets, and a warning says that 10 layers consist of several pieces](/img/layered-model-dialog-en.webp)
+
 | Setting | Meaning |
 |---|---|
 | **Up in the model** | Which axis of the file points up. |
@@ -27,11 +29,15 @@ The model is cut into stacked sheets that you glue back together: heads, figures
 
 Several overlapping bodies in the file are merged per layer. Holes in the mesh up to 0.5 mm are bridged and reported. The check warns about empty layers, layers with several pieces and very many layers. The 3D view shows the stack.
 
+![The 13 numbered sheets of the layered dog on the page, and the 3D View with the sheets stacked into the model](/img/layered-model-3d-en.webp)
+
 **Tip:** with a wide model, choose the stacking direction (**Layers**) so the layers are as large as possible: fewer layers, less glueing.
 
 ## Rib model
 
 Ribs stand across an axis and slot onto a spine with half slots, like wooden animal kits.
+
+![Rib model of the same dog: 36 numbered ribs and spine plates nested on the page, and the 3D View with the ribs slotted onto the spines of the body, the legs and the two ends](/img/rib-model-3d-en.webp)
 
 | Setting | Meaning |
 |---|---|
@@ -56,6 +62,8 @@ Animals and figures need more than one spine: a body, legs, a head, a tail. In t
 Each section has a plane position (**Center** puts it in the middle of the material), its own rib spacing, a radius for the area it owns and an extension of its spine beyond the axis, so a leg plate reaches into the body and slots into the body ribs. The copy button mirrors a section, for example for the second leg. Drag points and lines to change them; in another view, dragging moves the plane.
 
 **Suggest** finds sections automatically as a starting point: the mirror plane of the model becomes the body's spine, legs are traced upward from the floor, and thin ends such as a tail get curved sections of their own. Check and correct the suggestion before creating.
+
+![Drawing area of the Rib model dialog in the front view after Suggest: the silhouette of the dog with the ribs along the axis of the body, below it the list of sections (Body, End 1, End 2 and the legs) with plane position, spacing, extension and radius, and at the bottom warnings about ribs that are left out](/img/rib-model-sections-en.webp)
 
 More options:
 

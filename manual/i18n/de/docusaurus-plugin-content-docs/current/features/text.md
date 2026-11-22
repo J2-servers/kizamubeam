@@ -12,6 +12,8 @@ Wähle das Werkzeug **Text** (Ctrl+T) und klicke auf die Arbeitsfläche, um zu s
 
 Die **Textleiste** unter der Eigenschaftenleiste enthält alle Textoptionen: Schrift, Höhe, fett, kursiv, Großbuchstaben, Zeichen- und Zeilenabstand, Ausrichtung, maximale Breite und Höhe, Vereinen, Text auf Pfad und variablen Text.
 
+![Ein Schild mit einer Überschrift und einem Textrahmen mit Umbruch; der Textrahmen ist ausgewählt, und die Textleiste zeigt seine Schrift, 11 mm Höhe, zentrierte Ausrichtung, den Zeilenabstand, 240 mm maximale Breite und die aktive Schaltfläche Umbrechen](/img/text-toolbar-de.webp)
+
 | Option | Wirkung |
 |---|---|
 | **Vereinen** | Verschmilzt überlappende Buchstaben zu einer Kontur, für Schreibschriften oder engen Zeichenabstand. |
@@ -36,6 +38,8 @@ Nutzt ein Projekt eine Schrift, die auf diesem Rechner fehlt, bietet KizamuBeam 
 
 Wähle einen Text und eine Form aus und dann **Werkzeuge → Textfunktionen → Text auf Pfad** (oder **Auf Pfad** in der Textleiste). Der Text folgt der Linie, Kurve, dem Rechteck, der Ellipse oder dem Polygon. In der Textleiste stellst du den Versatz entlang der Kurve, den Abstand zur Kurve und die Seite ein, auf der der Text steht.
 
+![Text auf Pfad: Ein Schriftzug folgt einem Kreis in einem runden Emblem, ein zweiter Text einer Wellenlinie; beide Hilfsformen liegen auf dem Werkzeuglayer T1, und für den ausgewählten Text zeigt die Textleiste Versatz, Abstand, Seite und Lösen](/img/text-on-path-de.webp)
+
 Text und Form bleiben verbunden: Bearbeitest oder verschiebst du die Form, folgt der Text. Die Form wird mitgelasert, außer sie liegt auf einem Werkzeug-Layer (T1/T2) oder ist ausgeblendet. **Werkzeuge → Textfunktionen → Text vom Pfad lösen** trennt beide wieder.
 
 ## Variabler Text und Seriennummern
@@ -50,7 +54,17 @@ Variabler Text füllt Platzhalter beim Erzeugen des Jobs aus, für Seriennummern
 
 Das Fenster **Variabler Text** (**Werkzeuge → Textfunktionen → Variabler Text …**) legt die aktuelle Nummer, Start, Ende, Schrittweite und das automatische Weiterzählen nach jedem Job oder gespeicherten G-Code fest. Die Nummer ist auch die Zeile der CSV-Datei. Jedes Objekt kann einen eigenen Versatz haben, so passen mehrere aufeinanderfolgende Nummern auf eine Seite.
 
+![Fenster Variabler Text mit der aktuellen Nummer 42, Start, Ende, Schrittweite 4 und automatischem Weiterzählen; die Liste darunter zeigt, wie aus den Platzhaltern dieser Seite Serien-Nr. 0042 bis 0045 und das Datum werden, wie auf den vier Typenschildern auf der Arbeitsfläche](/img/variable-text-de.webp)
+
 **Variablen Text festschreiben** macht aus dem aktuellen Inhalt festen Text.
+
+### Chargenprüfung
+
+Bevor eine Serie läuft, zeigt die **Chargenprüfung** (Werkzeugkasten, **Werkzeuge → Textfunktionen → Chargenprüfung …** oder der Knopf im Fenster **Variabler Text**) jedes Stück einzeln: seine Nummer, das Stück so gezeichnet, wie es graviert würde, den eingesetzten Inhalt und was daran nicht stimmt.
+
+Gemeldet werden ein leeres Feld, eine Zeile oder Spalte, die es in der CSV-Datei nicht gibt, eine Anweisung des Kunden, die im Namen stehen geblieben ist, Emoji und unsichtbare Zeichen, Zeichen, die die gewählte Schrift nicht hat, und zweimal dasselbe Stück. **Zeigen** holt diese Nummer auf die Arbeitsfläche. Den Bereich stellst du mit **Von** und **bis** ein; **Nur Stücke mit Problemen** blendet den Rest aus. Vor dem Start eines Jobs läuft dieselbe Prüfung für die Nummern, die dieser Job verbraucht, zusammen mit der Konstruktionsprüfung — eine gespeicherte G-Code- oder `.rd`-Datei zählt als Start, denn auch sie verbraucht Nummern. **Einstellungen → Laser → Vor dem Lasern prüfen und bei Problemen nachfragen** schaltet beides ab.
+
+![Fenster Chargenprüfung für Namensschilder aus einer CSV-Datei, mit den fünf Stücken mit Problemen von sieben: Jede Zeile zeigt die Nummer, den Namen und die Auftragsnummer als Umrisse, so wie sie graviert würden, den eingesetzten Inhalt und die Befunde — ein leeres Feld bei Nummer 2, eine Anweisung des Kunden bei 3, ein Emoji bei 4, fehlende Zeichen in der Schrift bei 5 und zweimal derselbe Inhalt bei 6](/img/batch-proof-de.webp)
 
 Für eine ganze Serie von Seiten aus einer Tabelle siehe [Vorlagen und Bibliothek](templates-library.md#series-from-a-table).
 
@@ -64,8 +78,12 @@ Für eine ganze Serie von Seiten aus einer Tabelle siehe [Vorlagen und Bibliothe
 
 Wähle die Fehlerkorrektur (L, M, Q, H) und die Größe in mm. **Negativ** lasert den Hintergrund samt Ruhezone, für dunkle Materialien. Die Module werden zu geschlossenen Konturen verschmolzen; lege den Code also auf einen Layer mit **Füllen**, um ihn zu gravieren. Ein Doppelklick auf einen QR-Code bearbeitet ihn.
 
+![Dialog QR-Code erstellen: Art Text / Internetadresse mit einer Internetadresse als Inhalt, Fehlerkorrektur M, 30 mm Größe, die Optionen Negativ und Variabler Text und die Vorschau des Codes](/img/qr-code-dialog-de.webp)
+
 ## Strichcodes
 
 **Werkzeugkasten → Text und Daten → Strichcode** erzeugt Code 128, EAN-13, EAN-8, UPC-A, Code 39 und ITF, mit Prüfziffer, wo das Format eine hat. Stelle Breite und Balkenhöhe ein, zeige den Klartext unter den Balken und verringere die Balkenbreite, um die Strahlbreite auszugleichen. **Negativ** lasert die Lücken statt der Balken. Der Dialog warnt, wenn Balken für den Laser zu schmal werden.
+
+![Dialog Strichcode erstellen: Art Code 128 mit dem Inhalt SN-2026-0042, 40 mm Breite, 15 mm Höhe, Klartext unter den Strichen, Strichbreitenkorrektur und die Optionen Negativ und Variabler Text; die Vorschau zeigt den Strichcode mit Modulen von 0,256 mm](/img/barcode-dialog-de.webp)
 
 QR-Codes und Strichcodes verstehen auch variablen Text und Projektparameter, etwa eine Seriennummer als Code 128.

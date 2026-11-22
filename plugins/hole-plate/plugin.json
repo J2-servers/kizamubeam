@@ -22,7 +22,7 @@
       "runtime": "wasm",
       "dialog": { "version": 1 },
       "code": "@dist/hole-plate.wasm",
-      "icon": "pattern",
+      "icon": "holePlate",
       "preview": { "center": true },
       "params": [
         { "key": "width", "type": "length", "min": 10, "max": 2000, "def": 120 },

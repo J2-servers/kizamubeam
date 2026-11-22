@@ -6,7 +6,8 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { applyAdjust, dither, resample } from '../src/images';
 import { DEFAULT_ROTARY, estimate, FIRMWARES, gcodeLines, Moves, newDevice, outAxis, packMoves, rotaryMoves, scanLines, zInserts } from '../src/gcode';
 import { defaultImageLayer, defaultLayer, inv, ImageAdjust, Mat, mul } from '../src/model';
-import { ruidaLayersFromMoves, RuidaParams, writeRuida } from '../src/ruida';
+import { ruidaLayersFromMoves, ruidaParamsForJob, RuidaParams, writeRuida } from '../src/ruida';
+import type { Job } from '../src/gcode';
 
 // Reproduzierbare Zufallszahlen
 let seed = 12345;
@@ -114,6 +115,33 @@ function ruidaCase(startFrom: 'absolute' | 'current', origin: 'top-right' | 'bot
   };
 }
 
+/** Image raster (scan mode) on a layer that also cuts a vector, with Z offset per pass (zAxis) */
+function ruidaScanCase() {
+  const mv = new Moves(0, 0);
+  mv.zCur = 0.5;
+  mv.push(9, 10, 0, 0, 2);
+  mv.push(10, 10, 6000, 0, 2);
+  mv.push(11, 10, 6000, 0.7, 2);
+  mv.push(12, 10, 6000, 0.4, 2);
+  mv.push(13, 10, 6000, 0, 2);
+  mv.push(-13, 10.1, 0, 0, 2);
+  mv.push(-12, 10.1, 6000, 0, 2);
+  mv.push(-11, 10.1, 6000, 0.55, 2);
+  mv.push(-10, 10.1, 6000, 0, 2);
+  mv.scan.push(0, mv.n, 1);
+  mv.zCur = 1.25;
+  mv.push(20, 30, 0, 0, 2);
+  mv.push(60, 30, 1200, 0.9, 2);
+  mv.zCur = 0;
+  const est = estimate(mv, newDevice({ fw: 'ruida' }));
+  const dev = newDevice({ fw: 'ruida', zAxis: true, bedW: 600, bedH: 400, ruidaOrigin: 'top-right', ruidaMagic: '88' });
+  const params = ruidaParamsForJob({ moves: mv, air: [2] } as unknown as Job, dev, (i) => ({ ...defaultLayer(i), speed: 6000, power: 70, minPower: 10, air: true }));
+  return {
+    packed: arr(packMoves(mv, est.t, JSON.stringify(params))),
+    bytes: arr(writeRuida(mv, params)),
+  };
+}
+
 const out = {
   src: { w: SW, h: SH, v: arr(src) },
   down: arr(down),
@@ -127,6 +155,7 @@ const out = {
   ruida: [
     ruidaCase('absolute', 'top-right', '88', '1'),
     ruidaCase('current', 'bottom-left', '11', 'both'),
+    ruidaScanCase(),
   ],
 };
 mkdirSync(new URL('../src-tauri/core/tests/fixtures/', import.meta.url), { recursive: true });

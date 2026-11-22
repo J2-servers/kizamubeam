@@ -251,7 +251,7 @@ await test('hole plate (WebAssembly) through the generator interface', async () 
   const m = P.parsePack(plateText).plugins[0];
   const g = pluginGenerator(m, { id: 'org.kizamubeam.hole-plate', name: 'Lochplatte' });
   assert.equal(g.name, 'Lochplatte');
-  assert.equal(g.icon, 'pattern');
+  assert.equal(g.icon, 'holePlate');
   assert.deepEqual(g.preview, { center: true });
   const p = G.defaultParams(g);
   const r = await G.buildGenAsync(g, p);

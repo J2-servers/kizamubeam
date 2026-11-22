@@ -40,6 +40,8 @@ Copy the frame for the layers 2 to 5 (Ctrl+C, Ctrl+V) and place the copies side 
 
 Keep every layer as one closed outline: check that parts that should hold together really touch the frame. Loose islands would fall out.
 
+![The five layers of the shadowbox side by side on a work area of 600 × 400 mm: the closed back panel, the sky with a moon and stars cut out, the mountains, three fir trees from the library standing on a hill, and the front frame](/img/shadowbox-layers-en.webp)
+
 ## 4. Stack them
 
 1. Select all five layers.
@@ -48,6 +50,8 @@ Keep every layer as one closed outline: check that parts that should hold togeth
 4. Click **Create**.
 
 Open **Window → 3D View**. The layers are stacked flush, and you can turn the view to judge the depth. If a layer covers too much of the one behind it, change the shapes and look again. To change the order or thickness later, select the layers and start **Multi-layer work** again. More in [Multi-layer work](../generators/multilayer.md).
+
+![The five layers on the page, and the 3D View with the finished stack: a wooden front frame, green trees, grey mountains and a blue sky, with the light back panel showing through the moon](/img/shadowbox-3d-en.webp)
 
 ## 5. Cut and glue
 

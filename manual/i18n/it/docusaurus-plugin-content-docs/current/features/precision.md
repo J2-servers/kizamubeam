@@ -27,6 +27,8 @@ Trascina una guida dal righello superiore (orizzontale) o da quello sinistro (ve
 
 **Strumenti → Misura** (o il pulsante del righello): fai clic su un punto iniziale e uno finale, con aggancio. KizamuBeam mostra lunghezza, Δx, Δy e angolo; sopra un cerchio, diametro e raggio. Esc cancella la misura.
 
+![Una piastra incorniciata da quattro guide tratteggiate trascinate dai righelli, e lo strumento Misura che mostra 120 mm, Δx, Δy e l’angolo tra i centri di due fori](/img/guides-measure-en.webp)
+
 ## Relazioni
 
 **Disponi → Relazioni** (o il gruppo di pulsanti delle relazioni nella barra Strumenti) sposta o ruota un oggetto in modo che sia in relazione con un altro. Fai clic prima sul riferimento (resta fermo), poi sull’elemento dell’oggetto che deve adattarsi.
@@ -45,6 +47,8 @@ Le relazioni si applicano una volta, come un comando; ognuna è un passo di annu
 ## Schizzi con quote {#sketches-with-dimensions}
 
 Per pezzi che devono mantenere misure esatte mentre li modifichi, usa **Casella degli strumenti → Schizzi con relazioni → Nuovo schizzo** (o **Converti in schizzo**). In uno schizzo, linee, rettangoli, cerchi e archi mantengono relazioni e quote in modo permanente, come in un programma CAD.
+
+![Uno schizzo aperto: una piastra con un angolo obliquo e un foro, quotata con lunghezze, distanze e un diametro, e la barra dello schizzo con strumenti di disegno, relazioni e i gradi di libertà rimanenti](/img/sketch-dimensions-en.webp)
 
 - Relazioni dalla barra in alto o da tastiera: coincidente (O), orizzontale (H), verticale (V), parallelo (P), perpendicolare (N), uguale (E), tangente (T), concentrico (X), punto medio (M), simmetrico (Y), fisso (F).
 - **Quota** (D): una linea riceve una lunghezza, due linee un angolo, un cerchio un diametro, un arco un raggio, due punti una distanza. Un doppio clic su una quota la modifica. Le quote possono essere formule con parametri del progetto, come `Larghezza / 2`.

@@ -6,6 +6,10 @@ await import('./builtin-generators');
 const { appGroups, appList, fold, isNewIn, pushRecent, searchApps } = await import('../src/apps');
 const { ICONS } = await import('../src/icons');
 const { GENERATORS } = await import('../src/generators/index');
+const { HINGE_KINDS } = await import('../src/hinges');
+const { WARP_KINDS } = await import('../src/warp');
+const { DITHER_MODES } = await import('../src/model');
+const { PATTERN_EDGES, PATTERN_REPEATS } = await import('../src/patternFormat');
 
 let failed = 0;
 function test(name: string, fn: () => void) {
@@ -46,6 +50,58 @@ test('Jede Kachel hat eine Aktion mit Symbol', () => {
     assert.ok(icon && ICONS[icon], `Aktion „${a.id}“ ohne bekanntes Symbol`);
   }
   for (const g of appGroups()) assert.ok(ICONS[g.icon], g.id);
+});
+
+test('Jede Kachel hat ein Beispielbild, und die Bilder bestehen nur aus Formen mit Klassen', () => {
+  const art = JSON.parse(readFileSync(new URL('../src/appArt.json', import.meta.url), 'utf8')) as Record<string, string>;
+  // „packs“ ist die Kachel „Erweiterungen verwalten“ (appsPanel.ts), keine Zeile in apps.ts
+  const ids = new Set([...apps.map((a) => a.id), 'packs']);
+  for (const id of ids) assert.ok(art[id], `kein Beispielbild für „${id}“ (scripts/app-art/tiles.ts, dann npm run build:app-art)`);
+  for (const id of Object.keys(art)) assert.ok(ids.has(id), `Beispielbild ohne Kachel: „${id}“`);
+  // The pictures go into the page as markup (h({ svg })), so they may hold nothing but these shapes and attributes
+  const element = /<(path|circle|ellipse|rect) ((?:(?:class|d|cx|cy|r|rx|ry|x|y|width|height|opacity)="[A-Za-z0-9 .\-]*" ?)+)\/>/g;
+  for (const [id, body] of Object.entries(art)) assert.equal(body.replace(element, ''), '', `fremdes Markup im Beispielbild „${id}“`);
+});
+
+test('Jede Option der Dialoge mit Beispielbildern hat eines, und die Bilder bestehen nur aus Formen mit Klassen', () => {
+  const art = JSON.parse(readFileSync(new URL('../src/optionArt.json', import.meta.url), 'utf8')) as Record<string, string>;
+  // The kinds of joint only stand in the select of the dialog
+  const jointLine = readFileSync(new URL('../src/jointDialog.ts', import.meta.url), 'utf8').split('\n').find((l) => l.includes("select('joint-kind'")) ?? '';
+  // Fill style and shape of the lead-in: the option and radio values of the layer dialog
+  const layerSrc = readFileSync(new URL('../src/layerdialog.ts', import.meta.url), 'utf8');
+  // Corners, offset and Boolean base: the radios and options inside the function of each dialog in ui.ts
+  const dialog = (name: string) => {
+    const at = ui.indexOf(`function ${name}(`);
+    assert.ok(at >= 0, `${name} in ui.ts nicht gefunden`);
+    return ui.slice(at, ui.indexOf('\nfunction ', at + 1));
+  };
+  const radios = (src: string) => [...src.matchAll(/radio\('(\w+)', t\(/g)].map((m) => m[1]);
+  const offsetSrc = dialog('openOffsetDialog');
+  const want: Record<string, string[]> = {
+    fill: [...layerSrc.matchAll(/h\('option', \{ value: '(\w+)', selected: c\.fillStyle/g)].map((m) => m[1]),
+    lead: [...layerSrc.matchAll(/name: `lead-\$\{i\}`, value: '(\w+)'/g)].map((m) => m[1]),
+    joint: [...jointLine.matchAll(/\['(\w+)', t\(/g)].map((m) => m[1]),
+    hinge: HINGE_KINDS.map(([k]) => k as string),
+    warp: [...WARP_KINDS],
+    dither: DITHER_MODES.map(([k]) => k as string),
+    corner: radios(dialog('openCornerDialog')),
+    offsetDir: [...offsetSrc.matchAll(/radio\('dir', '(\w+)'/g)].map((m) => m[1]),
+    offsetJoin: [...offsetSrc.matchAll(/h\('option', \{ value: '(\w+)', selected: st\.join/g)].map((m) => m[1]),
+    boolBase: radios(dialog('openBooleanDialog')),
+    patternRepeat: [...PATTERN_REPEATS],
+    patternEdge: [...PATTERN_EDGES],
+  };
+  for (const [group, values] of Object.entries(want)) {
+    assert.ok(values.length > 1, `keine Optionen für „${group}“ gefunden`);
+    for (const v of values) assert.ok(art[`${group}:${v}`], `kein Beispielbild für die Option „${group}:${v}“ (scripts/app-art/options.ts, dann npm run build:app-art)`);
+  }
+  for (const key of Object.keys(art)) {
+    const [group, v] = key.split(':');
+    assert.ok(want[group]?.includes(v), `Beispielbild ohne Option: „${key}“`);
+  }
+  // Like the tile pictures they go into the page as markup, so they may hold nothing but these shapes and attributes
+  const element = /<(path|circle|ellipse|rect) ((?:(?:class|d|cx|cy|r|rx|ry|x|y|width|height|opacity)="[A-Za-z0-9 .\-]*" ?)+)\/>/g;
+  for (const [key, body] of Object.entries(art)) assert.equal(body.replace(element, ''), '', `fremdes Markup im Beispielbild „${key}“`);
 });
 
 test('Ohne Suchtext alle, sonst passende Treffer', () => {

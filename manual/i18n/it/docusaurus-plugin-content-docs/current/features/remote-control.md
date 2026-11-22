@@ -26,6 +26,8 @@ Sull’altro computer:
 2. Fai clic su **Cerca host …** per trovare gli host nella rete, oppure inserisci l’indirizzo dell’host (tramite una VPN come Tailscale o WireGuard, a mano).
 3. Fai clic su **Associa …**. L’host mostra un codice di 6 cifre; digitalo su questo computer.
 
+![Impostazioni del dispositivo, scheda Connessione, sul computer che usa il laser a distanza: la connessione Altro KizamuBeam (rete), l’indirizzo dell’host, la porta host 47900 e la riga dell’associazione, non ancora effettuata, con i pulsanti Cerca host e Associa](/img/remote-pairing-device-en.webp)
+
 L’host elenca tutti i computer associati e può rimuoverli o cambiarne il ruolo:
 
 | Ruolo | Può |

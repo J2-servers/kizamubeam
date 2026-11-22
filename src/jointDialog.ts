@@ -2,6 +2,7 @@
 import { Editor } from './editor';
 import { check, numField, select } from './arrayDialogs';
 import { h } from './dom';
+import { optionPicture } from './optionArt';
 import { computeJoint, DEFAULT_JOINT, JointKind, JointOptions } from './joints';
 import { entryLabel, library } from './materials';
 import { jointFitKind, suggestFit } from './fitcheck';
@@ -79,9 +80,11 @@ export function openJointDialog(ed: Editor) {
   };
 
   const second = picks.length > 1;
+  const kindSel = select('joint-kind', st.kind, [['finger', t('Fingerzinken')], ['tenon', t('Schlitz und Zapfen')], ['lap', t('Überblattung (Kreuzverbindung)')], ['snap', t('Schnappverbindung')], ['hook', t('Hakenverbindung')], ['wedge', t('Keilzapfen')], ['tslot', t('T-Slot mit Mutter')], ['lidhinge', t('Scharnier für Deckel (mit Stift)')]], (v) => (st.kind = v));
   const body = [
     h('label', { for: 'joint-kind' }, t('Art')),
-    select('joint-kind', st.kind, [['finger', t('Fingerzinken')], ['tenon', t('Schlitz und Zapfen')], ['lap', t('Überblattung (Kreuzverbindung)')], ['snap', t('Schnappverbindung')], ['hook', t('Hakenverbindung')], ['wedge', t('Keilzapfen')], ['tslot', t('T-Slot mit Mutter')], ['lidhinge', t('Scharnier für Deckel (mit Stift)')]], (v) => (st.kind = v)),
+    kindSel,
+    optionPicture(kindSel, 'joint'),
     h('label', { for: 'joint-t' }, t('Materialdicke (mm)')),
     numField('joint-t', st.thickness, (v) => (st.thickness = v), t('Tiefe der Zinken und Zapfen, Breite der Schlitze')),
     ...row('finger',

@@ -12,6 +12,8 @@ Diese Generatoren bauen auf der Box mit Fingerzinken auf und stehen unter **Werk
 
 Eine Schublade mit vorn offenem Korpus, passendem Schubkasten und Blende. Ohne Korpus bekommst du nur den Schubkasten, für eine schon vorhandene Öffnung.
 
+![Die elf Teile einer Schublade auf der Seite und die 3D-Ansicht mit etwas aufgezogenem Regler Explosion: der Korpus, der herausgezogene Schubkasten und die Blende mit Griffloch](/img/drawer-3d-de.webp)
+
 | Feld | Bedeutung |
 |---|---|
 | **Breite**, **Höhe**, **Tiefe** | Außenmaß des Korpus. Ohne Korpus: Größe der Öffnung. |
@@ -29,6 +31,8 @@ Eine Schublade mit vorn offenem Korpus, passendem Schubkasten und Blende. Ohne K
 
 Ein Gitter aus halb eingeschnittenen Stegen, die ineinandergesteckt werden, für eine Box oder Schublade: für Schrauben, Perlen, Teebeutel oder Spielfiguren.
 
+![Einsatz mit 4 × 3 Fächern: die fünf halb eingeschnittenen Stege auf der Seite und in der 3D-Ansicht zu einem Gitter ineinandergesteckt](/img/divider-insert-3d-de.webp)
+
 | Feld | Bedeutung |
 |---|---|
 | **Innenbreite** / **Innentiefe** | Innenmaß der Box oder Schublade, in die der Einsatz kommt. |
@@ -42,6 +46,8 @@ Ein Gitter aus halb eingeschnittenen Stegen, die ineinandergesteckt werden, für
 ## Steckregal
 
 Zwei Seiten und beliebig viele Böden, verbunden über Kreuzschlitze: kein Leim, keine Schrauben.
+
+![Steckregal: drei Böden und zwei Seiten mit ihren Kreuzschlitzen auf der Seite und das zusammengesteckte Regal in der 3D-Ansicht](/img/shelf-3d-de.webp)
 
 | Feld | Bedeutung |
 |---|---|

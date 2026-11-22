@@ -30,7 +30,7 @@
       "kind": "part",
       "runtime": "js",
       "code": "@dist/street-map.js",
-      "icon": "target",
+      "icon": "streetMap",
       "host": [
         "fetch",
         "region"

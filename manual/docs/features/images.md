@@ -16,6 +16,8 @@ An image sits on a layer like every other object. Speed, power, passes, line int
 
 Each image has its own **Image Mode**, which decides how grey tones become laser dots. The workspace shows the result at laser resolution.
 
+![The same picture on four layers with the image modes Threshold, Jarvis, Newsprint and Sketch, shown on the workspace as it will be lasered](/img/image-modes-en.webp)
+
 | Mode | Good for |
 |---|---|
 | **Threshold** | Logos and line art: everything darker than the threshold is lasered. |
@@ -32,11 +34,15 @@ Each image has its own **Image Mode**, which decides how grey tones become laser
 
 **Tools → Image → Adjust Image …** sets brightness, contrast, gamma, sharpening (with radius) and denoise, with a preview, a comparison with the original and a 1:1 view. Adjustments and image mode can be saved as named presets.
 
+![Adjust Image dialog with the preview on the left and sliders for brightness, contrast, gamma, sharpen, radius and denoise, plus image mode, line interval and DPI of the layer](/img/adjust-image-dialog-en.webp)
+
 **Save Processed Bitmap …** saves the image as PNG exactly as it would be lasered.
 
 ## Removing the background
 
 **Tools → Image → Remove Background …** (or **Remove BG …** in the toolbar) works locally, without a cloud service. The background colours are taken from the image border, or you click them in the preview (Shift+click adds more). Colours within the tolerance become transparent and are not lasered. Clean-up removes small specks and fills small holes; **Crop to subject** trims the image.
+
+![Remove Background dialog: the preview shows a logo with its coloured background made transparent, below it the background colour taken from the image border, tolerance, clean-up and soft edge](/img/remove-background-dialog-en.webp)
 
 ## Cropping and masking
 
@@ -50,6 +56,8 @@ The image keeps its position and resolution; Ctrl+Z undoes both.
 ## Tracing images
 
 **Tools → Image → Trace Image …** (Alt+T) turns an image into vector paths, with a live preview. Set the threshold, ignore small specks and choose the smoothing. The result is Bézier paths with preserved corners.
+
+![Trace Image dialog with type, threshold, ignored specks and smoothing; on the workspace the traced outlines of a logo are previewed as dashed orange lines](/img/trace-image-dialog-en.webp)
 
 The type **Centerlines** traces strokes along their middle as open paths. That is the right choice for handwriting, signatures and line drawings that should be scored as a single line instead of cut around.
 

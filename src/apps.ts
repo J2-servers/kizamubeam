@@ -71,6 +71,7 @@ const coreRows = (t: (s: string) => string): AppInfo[] => [
   { id: 'barcode', group: 'text', name: t('Strichcode'), desc: t('1D-Barcode als Vektor: Code 128, EAN-13, EAN-8, UPC-A, Code 39 oder ITF, auch mit Seriennummer.'), keys: t('Barcode Strichcode EAN UPC Code 128 Code 39 ITF Artikelnummer Seriennummer|Suchwörter'), since: '1.10.0' },
   { id: 'fonts', group: 'text', name: t('Schriften'), desc: t('Schriften von Google Fonts mit Vorschau suchen und laden, eigene TTF/OTF-Dateien und Favoriten verwalten.'), keys: t('Schrift Font Google Fonts Schriftart installieren TTF OTF Favoriten|Suchwörter'), since: '1.13.0' },
   { id: 'vartext', group: 'text', name: t('Variabler Text'), desc: t('Seriennummern, Datum oder Spalten aus einer CSV-Datei in Text einsetzen.'), keys: t('Seriennummer Zähler Datum CSV Platzhalter|Suchwörter') },
+  { id: 'batchproof', group: 'text', name: t('Chargenprüfung'), desc: t('Jedes Stück einer Serie vor dem Lasern einzeln ansehen: leere Felder, Anweisungen im Namen, Emoji und fehlende Zeichen.'), keys: t('Charge Serie Probe prüfen Korrektur leeres Feld Emoji Glyphe Namensschilder Stapel|Suchwörter'), since: '2.9.0' },
   { id: 'series', group: 'text', name: t('Serie aus Tabelle'), desc: t('Aus einer Tabelle viele Varianten eines Projekts erzeugen, z. B. Namensschilder.'), keys: t('Serie Tabelle CSV Namensschilder Stapel|Suchwörter') },
   { id: 'newtemplate', group: 'text', name: t('Neu aus Vorlage'), desc: t('Projekt aus einer eigenen, mitgelieferten oder Erweiterungs-Vorlage anlegen.'), keys: t('Vorlage Template Muster neu|Suchwörter') },
   { id: 'filltemplate', group: 'text', name: t('Vorlage ausfüllen'), desc: t('Die Parameter des aktuellen Projekts mit Vorschau ändern.'), keys: t('Vorlage Parameter ausfüllen Formular|Suchwörter') },
@@ -112,13 +113,34 @@ function rows(t: (s: string) => string): AppInfo[] {
 export const appList = (): AppInfo[] => rows(t);
 
 /** Deutsche Quelltexte (mit Kontext nach „|“) */
-const source = rows((s) => s);
+/**
+ * Deutsche Quelltexte, nachgeladen, sobald weitere Generatoren da sind. Als feste Konstante stand hier beim
+ * Laden des Moduls nur der Kern: Die Generatoren tragen sich erst ein, wenn ihre Plugins fertig geladen haben.
+ * Dadurch fand die Suche KEINEN einzigen Generator — auch nicht auf Deutsch: „Zahnrad“ gab 0 Treffer, obwohl
+ * die Kachel „Zahnrad“ in der Liste stand (gemessen 22.11.2026).
+ */
+const haystacks = new Map<string, string>();
+let sourceRows: AppInfo[] = [];
+let sourceGens = -1;
+function source(): AppInfo[] {
+  if (sourceGens !== GENERATORS.length) {
+    sourceRows = rows((s) => s);
+    sourceGens = GENERATORS.length;
+    haystacks.clear();
+  }
+  return sourceRows;
+}
 
-/** Deutscher Quelltext ohne Kontext; dazu die englische Fassung, damit beide Sprachen gefunden werden */
+/**
+ * Suchtext eines Quelltexts: Deutsch (ohne Kontext), Englisch UND die laufende Sprache. Ohne die laufende
+ * Sprache fand die Suche in vier von fünf Sprachen nichts: In pt-BR gaben „dobradiça“, „gravar“, „cortar“
+ * und „vetorizar“ null Treffer, während „Scharnier“ und „hinge“ funktionierten (gemessen 22.11.2026).
+ */
 const both = (s: string) => {
   const de = s.split('|')[0];
   const tr = (en as Record<string, string>)[s];
-  return tr ? `${de} ${tr}` : de;
+  const hier = t(s);
+  return [...new Set([de, tr, hier].filter(Boolean))].join(' ');
 };
 
 /** Kleinbuchstaben ohne Akzente: „Schlüssel“ → „schlussel“, „ß“ → „ss“ */
@@ -129,11 +151,10 @@ export const fold = (s: string) =>
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '');
 
-const haystacks = new Map<string, string>();
 function haystack(id: string): string {
   let s = haystacks.get(id);
   if (s === undefined) {
-    const src = source.find((x) => x.id === id);
+    const src = source().find((x) => x.id === id);
     s = src ? fold([both(src.name), both(src.desc), both(src.keys)].join(' ')) : '';
     haystacks.set(id, s);
   }

@@ -18,6 +18,8 @@ Wähle zwei oder mehr Formen aus und dann eine der Operationen unter **Werkzeuge
 | **Abziehen** | Alt+- | Schneidet eine Form aus den anderen heraus. |
 | **Schnittmenge** | Alt+* | Behält nur die Fläche, an der sich die Formen überlappen. |
 
+![Zwei überlappende Formen, ein abgerundetes Quadrat und ein Kreis, ausgewählt, dazu die geöffnete Schaltflächengruppe der Booleschen Operationen; darunter die Ergebnisse von Vereinen, Abziehen und Schnittmenge](/img/boolean-operations-de.webp)
+
 Die **Booleschen Optionen** (in der Schaltflächengruppe oder unter **Werkzeuge → Boolesche Operationen**) legen fest, welche Form die Basis ist (zuerst gewählt, hinterste oder vorderste) und ob die Originale erhalten bleiben. Im selben Menü stehen auch **Vordere vom hinteren abziehen** und **Hintere vom vorderen abziehen**.
 
 Gut zu wissen:
@@ -31,9 +33,13 @@ Gut zu wissen:
 
 **Offset** (Alt+O) zeichnet eine neue Kontur im gewünschten Abstand, nach außen, nach innen oder beides, mit runden, spitzen oder abgeschrägten Ecken und Live-Vorschau. Offene Linien bekommen eine geschlossene Kontur drumherum. Typische Anwendungen: ein Rand um einen Text, eine Grundplatte oder eine Tasche für eine Einlegearbeit.
 
+![Dialog Offset mit 3 mm Abstand, Richtung außen und runden Ecken; die orange gestrichelte Vorschau zeichnet eine Kontur um einen Schriftzug](/img/offset-dialog-de.webp)
+
 ## Verformen
 
 **Werkzeuge → Verformen …** biegt die Auswahl über ihren Rahmen: Bogen, Bogen oben, Bogen unten, Wölbung, Fahne oder Fluchtpunkt-Perspektive, von −100 bis 100 %, wahlweise um 90° gedreht. Formen, Texte und Bilder werden gemeinsam verformt. Formen und Texte werden zu Bézierpfaden, Bilder werden in ihrer Originalauflösung neu berechnet.
+
+![Dialog Verformen mit der Art Bogen bei 50 %; die orange gestrichelte Vorschau zeigt den zum Bogen gebogenen Schriftzug](/img/warp-dialog-de.webp)
 
 ## Pfadwerkzeuge
 

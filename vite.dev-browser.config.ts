@@ -11,6 +11,9 @@ export default defineConfig({
   clearScreen: false,
   worker: { format: 'es' },
   server: { port: 1420, strictPort: true, host: true },
-  optimizeDeps: { entries: ['./index.html'] },
+  // Wie in vite.config.ts (#379): Die QuickJS-Maschine der JavaScript-Plugins findet ihre .wasm-Datei neben dem
+  // eigenen Modul (import.meta.url). Beim Vorbündeln landet das Modul ohne die Datei in .vite/deps, der Dev-Server
+  // antwortet mit index.html, und JEDES JavaScript-Plugin scheitert mit plugin-crash (alle Kern-Generatoren).
+  optimizeDeps: { entries: ['./index.html'], exclude: ['@jitl/quickjs-wasmfile-release-sync'] },
   build: { target: 'es2021', outDir: 'dist', assetsInlineLimit: 32768 },
 });

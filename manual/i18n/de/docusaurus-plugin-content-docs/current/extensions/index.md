@@ -14,6 +14,8 @@ Erweiterungspakete (`.kzp`-Dateien) fügen KizamuBeam **Gerätevorlagen, Projekt
 2. Wähle ein Paket aus dem **offiziellen Katalog** und installiere es mit einem Klick, oder klicke auf **Installieren …** und wähle eine `.kzp`-Datei. Du kannst eine `.kzp`-Datei auch auf die Arbeitsfläche ziehen.
 3. Der Dialog zeigt, was das Paket enthält und ob es ein Update ist. Bestätige die Installation.
 
+![Dialog Erweiterung installieren für das Beispielpaket 1.1.0: Er listet eine Gerätevorlage, eine Vorlage und zwei Materialien auf und weist darauf hin, dass die Datei nicht signiert ist](/img/extension-install-de.webp)
+
 Nach der Installation:
 
 - erscheinen Vorlagen unter **Datei → Neu aus Vorlage … → Aus Erweiterungen**,
@@ -22,6 +24,8 @@ Nach der Installation:
 - erscheinen Motive und Gestaltungselemente in der Bibliothek.
 
 Entfernst du ein Paket im selben Fenster, verschwinden seine Einträge wieder.
+
+![Fenster Erweiterungen: unter Installiert das Beispielpaket mit den Schaltflächen Ausschalten und Entfernen, darunter die Offline-Option und der Katalog mit geprüfter Signatur und einer Schaltfläche Installieren je Paket](/img/extensions-window-de.webp)
 
 ## Sicherheit
 

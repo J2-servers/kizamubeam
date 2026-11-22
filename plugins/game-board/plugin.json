@@ -21,7 +21,7 @@
       "kind": "part",
       "runtime": "js",
       "code": "@dist/game-board.js",
-      "icon": "grid",
+      "icon": "gameBoard",
       "dialog": { "version": 1 },
       "preview": { "center": true },
       "params": [

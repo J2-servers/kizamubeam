@@ -10,6 +10,8 @@ Questa pagina descrive tutto ciò che succede dopo il progetto. Come collegare u
 
 Le finestre della macchina stanno a destra per impostazione predefinita: **Laser** (lavoro, stato, dispositivi), **Sposta** (movimento e origine) e **Console**.
 
+![Finestra principale con la finestra Laser (dispositivo, connessione, Start, Pausa, Stop, Cornice, Anteprima, punto di partenza, origine del lavoro e opzioni per l’ordine dei tagli) e sotto la finestra Sposta con i pulsanti di movimento](/img/machine-windows-en.webp)
+
 ## Anteprima
 
 **Laser → Anteprima …** (Alt+P) simula il lavoro prima che qualcosa si muova:
@@ -92,6 +94,8 @@ Ogni laser è un **dispositivo** con connessione, area di lavoro e impostazioni 
 - **Script G-code**: comandi da eseguire prima e dopo ogni lavoro,
 - **Puntatore punto rosso**: lo spostamento tra raggio e puntatore, così frame e spostamenti con clic possono mirare con il punto rosso,
 - funzioni extra **FluidNC** (vedi sotto).
+
+![Finestra Impostazioni dispositivo di un laser a diodo, scheda Generale: nome, controller, area di lavoro, valore S, modulo laser, velocità rapida e accelerazione, assi e air assist; altre schede per connessione, cornice e puntatore, energia, G-code e avanzate](/img/device-settings-dialog-en.webp)
 
 ## Funzioni extra FluidNC
 

@@ -1,11 +1,12 @@
 // Editor: Auswahl automatisch verschachteln (Nesting) – Teile bestimmen, Platte wählen, Ergebnis anwenden.
 import ClipperLib from 'clipper-lib';
 import type { Editor } from '../editor';
-import { cloneObj, isCutLayer, leaves, mul, Obj } from '../model';
+import { cloneObj, isCutLayer, leaves, Mat, mul, newId, Obj, Pt, SubPath } from '../model';
 import { shapeSubs, textLayout, textOutline } from '../geom';
 import { execute, flattenSub, Paths, SCALE } from '../clip';
-import { autoCell, DEFAULT_NEST, nestSteps, NestResult, Poly } from '../nest';
-import { t, tn } from '../i18n';
+import { autoCell, DEFAULT_NEST, leftover, nestSteps, NestResult, Poly, regionArea } from '../nest';
+import { createNestClient, NestCancelled, workersAvailable } from '../nestClient';
+import { dec, t, tn } from '../i18n';
 
 /** Einstellungen des Dialogs „Verschachteln“ (Koordinaten wie angezeigt: Ursprung unten links) */
 export interface NestSettings {
@@ -29,21 +30,71 @@ export interface NestSettings {
   /** Was nicht passt, auf neue Seiten legen */
   newPages: boolean;
   quality: 'fast' | 'normal' | 'fine';
+  /** Nach dem Verschachteln zeichnen, was von der Platte übrig bleibt (Werkzeug-Layer T1, wird nicht gelasert) */
+  rest: boolean;
+  /** Kleinstes noch brauchbares Reststück in mm (Schmaleres fällt weg) */
+  restMin: number;
   /** Nur mit sheet = 'shape': ID der Form, die als Platte dient (sonst die größte gewählte) */
   container?: number;
 }
 
 export const DEFAULT_NEST_SETTINGS: NestSettings = {
   sheet: 'bed', w: 300, h: 200, x: 0, y: 0, gap: 2, margin: 3, rotStep: 90, corner: 'bl',
-  holes: true, avoid: true, newPages: true, quality: 'normal',
+  holes: true, avoid: true, newPages: true, quality: 'normal', rest: false, restMin: 15,
 };
 
-const QUALITY = { fast: { cell: 1, time: 0 }, normal: { cell: 0.5, time: 1500 }, fine: { cell: 0.25, time: 5000 } };
+/**
+ * Je Genauigkeit: gewünschte Rasterweite, Rechenzeit und wie viele Zellen die Grade haben darf.
+ * Das Zellenbudget ist der Punkt: Ohne eigenes Budget zwang die Obergrenze auf einer großen Platte alle drei
+ * Stufen zur SELBEN Rasterweite (gemessen 22.11.2026: 1,84 mm auf 2750 × 1850, bei „Schnell“ wie bei
+ * „Gründlich“) — die Wahl der Genauigkeit tat dort nichts. Und die Rasterweite ist genau das, was zwischen
+ * zwei Teilen verloren geht: Der wirksame Abstand ist `Abstand + Zelle · √2`.
+ * Speicher: 3 Byte je Zelle (occ 1 + prev 2), also 4,5 / 9 / 24 MB je Grade.
+ */
+export const QUALITY = {
+  fast: { cell: 1, time: 0, maxCells: 1.5e6 },
+  normal: { cell: 0.5, time: 1500, maxCells: 3e6 },
+  fine: { cell: 0.25, time: 5000, maxCells: 8e6 },
+};
 
 /** Zusammengehörige Objekte, die gemeinsam bewegt werden (Teil samt Gravuren, Löchern, verknüpftem Text) */
 export interface NestUnit {
   objs: Obj[];
   region: Poly[];
+}
+
+/** Werkzeug-Layer T1: Was darauf liegt, wird gezeichnet, aber nicht gelasert */
+const TOOL_LAYER = 30;
+
+/** Vorzeichenbehaftete Fläche: positiv = Außenkontur, negativ = Loch darin */
+function signedArea(poly: Poly): number {
+  let a = 0;
+  for (let i = 0; i < poly.length; i++) {
+    const p = poly[i], q = poly[(i + 1) % poly.length];
+    a += p.x * q.y - q.x * p.y;
+  }
+  return a / 2;
+}
+
+/** Punkt mit einer Matrix abbilden */
+const ap = (m: Mat, p: Pt): Pt => ({ x: m[0] * p.x + m[2] * p.y + m[4], y: m[1] * p.x + m[3] * p.y + m[5] });
+
+/** Das Reststück als geschlossener Pfad auf dem Werkzeug-Layer (Weltkoordinaten, Matrix bleibt die Einheit) */
+function restObj(polys: Poly[]): Obj {
+  const subs: SubPath[] = polys.filter((p) => p.length >= 3).map((p) => ({ closed: true, nodes: p.map((q) => ({ x: q.x, y: q.y })) }));
+  return { id: newId(), m: [1, 0, 0, 1, 0, 0], layer: TOOL_LAYER, name: t('Reststück'), shape: { kind: 'path', subs } };
+}
+
+/** Was applyNest braucht, um das Reststück zu zeichnen */
+export interface RestInput {
+  /** Nutzbare Fläche der Platte (Weltkoordinaten) */
+  area: Poly[];
+  /** Flächen, die auf der ersten Platte schon belegt waren */
+  obstacles: Poly[][];
+  /** Was um jedes Teil herum verloren geht (halber Teileabstand) */
+  grow: number;
+  /** Kleinstes noch brauchbares Reststück in mm */
+  minWidth: number;
 }
 
 export interface NestOutcome {
@@ -301,39 +352,55 @@ export class EditorNest {
     const step = s.rotStep > 0 ? s.rotStep : 360;
     const rotations: number[] = [];
     for (let a = 0; a < 360 - 1e-6; a += step) rotations.push(a);
-    const steps = nestSteps(
-      units.map((u, i) => ({ key: i, region: u.region })),
-      { area, obstacles },
-      {
-        ...DEFAULT_NEST,
-        gap: Math.max(0, s.gap),
-        margin: Math.max(0, s.margin),
-        rotations,
-        // Angezeigt wird mit y nach oben: „unten“ sind die großen internen y-Werte
-        flipX: s.corner === 'br' || s.corner === 'tr',
-        flipY: s.corner === 'bl' || s.corner === 'br',
-        cell: autoCell(x1 - x0, y1 - y0, q.cell),
-        newSheets: s.newPages,
-        timeLimit: q.time,
-      },
-    );
+    const nestParts = units.map((u, i) => ({ key: i, region: u.region }));
+    const nestSheetIn = { area, obstacles };
+    const nestOpt = {
+      ...DEFAULT_NEST,
+      gap: Math.max(0, s.gap),
+      margin: Math.max(0, s.margin),
+      rotations,
+      // Angezeigt wird mit y nach oben: „unten“ sind die großen internen y-Werte
+      flipX: s.corner === 'br' || s.corner === 'tr',
+      flipY: s.corner === 'bl' || s.corner === 'br',
+      cell: autoCell(x1 - x0, y1 - y0, q.cell, q.maxCells),
+      newSheets: s.newPages,
+      timeLimit: q.time,
+    };
     let r: NestResult;
-    let tick = Date.now();
-    for (;;) {
-      const it = steps.next();
-      if (it.done) {
-        r = it.value;
-        break;
+    if (workersAvailable()) {
+      // Eigener Thread: Zwischen zwei Zwischenständen rechnet die Suche bis zu einer halben Sekunde am Stück.
+      // Im Haupt-Thread fror die Oberfläche genau so lange ein; hier merkt sie davon nichts.
+      const client = createNestClient();
+      try {
+        r = await client.run(nestParts, nestSheetIn, nestOpt, (p) => onProgress?.(p.done));
+      } catch (e) {
+        client.dispose();
+        if (e instanceof NestCancelled) return null;
+        return fail(t('Verschachteln fehlgeschlagen: {error}', { error: e instanceof Error ? e.message : String(e) }));
       }
-      if (onProgress && onProgress(it.value.done) === false) return null;
-      // Der Oberfläche zwischendurch Luft lassen
-      if (onProgress && Date.now() - tick > 40) {
-        await new Promise((res) => setTimeout(res, 0));
-        tick = Date.now();
+      client.dispose();
+    } else {
+      // Ohne Worker (Tests, Plugin-Umgebung): wie bisher im selben Thread, mit Luft für die Oberfläche
+      const steps = nestSteps(nestParts, nestSheetIn, nestOpt);
+      let tick = Date.now();
+      for (;;) {
+        const it = steps.next();
+        if (it.done) {
+          r = it.value;
+          break;
+        }
+        if (onProgress && onProgress(it.value.done) === false) return null;
+        if (onProgress && Date.now() - tick > 40) {
+          await new Promise((res) => setTimeout(res, 0));
+          tick = Date.now();
+        }
       }
     }
     if (onProgress && onProgress(1) === false) return null;
-    const out = this.applyNest(units, r, container);
+    // Das Reststück wird aus derselben Fläche und demselben Abstand gerechnet, mit dem verschachtelt wurde:
+    // Jedes Teil beansprucht seinen halben Teileabstand, so stoßen die Ansprüche zweier Nachbarn in der Mitte
+    // zusammen und das Reststück fällt eher zu klein aus als zu groß.
+    const out = this.applyNest(units, r, container, s.rest ? { area, obstacles, grow: Math.max(0, s.gap) / 2, minWidth: Math.max(0, s.restMin) } : undefined);
     // Unselected objects take up room: say so, an unselected stock outline is easily mistaken for the sheet
     if (obstacles.length && (out.unplaced.length || out.newPages)) {
       this.hint += ' ' + t('Nicht gewählte Objekte auf der Seite wurden umgangen. Soll eine gezeichnete Form das Material sein, sie mit auswählen und „Gewählte Form (Reststück)“ nehmen, oder „Andere Objekte auf der Seite umgehen“ ausschalten.');
@@ -343,7 +410,7 @@ export class EditorNest {
   }
 
   /** Ergebnis übernehmen: Teile bewegen, Teile für weitere Platten auf neue Seiten hinter der aktuellen */
-  applyNest(this: Editor, units: NestUnit[], r: NestResult, container: Obj | null): NestOutcome {
+  applyNest(this: Editor, units: NestUnit[], r: NestResult, container: Obj | null, rest?: RestInput): NestOutcome {
     const placed = r.placed.filter((p) => units[p.key]);
     const out: NestOutcome = {
       placed: placed.map((p) => units[p.key].objs),
@@ -376,12 +443,37 @@ export class EditorNest {
     const here = pages[0];
     for (const o of here.objs.filter((x) => target.has(x))) pages[target.get(o)!].objs.push(o);
     here.objs = here.objs.filter((x) => !target.has(x));
+    // Was von jeder Platte übrig bleibt, als Umriss auf den Werkzeug-Layer: Er wird nicht gelasert und ist
+    // beim nächsten Mal die Platte („Gewählte Form (Reststück)“).
+    let restText = '';
+    if (rest) {
+      for (let k = 0; k < pages.length; k++) {
+        const belegt = [
+          ...(k === 0 ? rest.obstacles : []),
+          ...placed.filter((p) => p.sheet === k).map((p) => units[p.key].region.map((poly) => poly.map((q) => ap(p.m, q)))),
+        ];
+        const polys = leftover(rest.area, belegt, { grow: rest.grow, minWidth: rest.minWidth });
+        if (!polys.length) continue;
+        pages[k].objs.push(restObj(polys));
+        // Nur für die erste Platte in die Meldung: Das ist die Platte, die der Benutzer gerade vor sich hat.
+        // Die Zahl ist der Grund, warum sich das Verschachteln lohnt — ohne sie bleibt die Ersparnis unsichtbar.
+        if (k === 0) {
+          // Nur die Fläche und die Zahl der Stücke: Ein Umgebungskasten über ein L-förmiges Reststück würde
+          // eine Platte versprechen, die es nicht gibt.
+          const stücke = polys.filter((q) => signedArea(q) > 0).length || polys.length;
+          restText = '. ' + tn('Reststück: {n} Stück mit {area} cm².', 'Reststück: {n} Stücke mit {area} cm².', stücke, {
+            n: stücke,
+            area: dec((regionArea(polys) / 100).toFixed(0)),
+          });
+        }
+      }
+    }
     this.setSel(this.sel.filter((o) => here.objs.includes(o)));
     const n = placed.length;
     let msg = tn('Verschachteln: {n} Teil platziert', 'Verschachteln: {n} Teile platziert', n);
     if (sheets) msg += ', ' + tn('{n} neue Seite', '{n} neue Seiten', sheets);
     if (out.unplaced.length) msg += ', ' + tn('{n} Teil passt nicht', '{n} Teile passen nicht', out.unplaced.length);
-    this.hint = `${msg}. ${t('Ausnutzung {pct} %', { pct: Math.round((r.usage[0] ?? 0) * 100) })}`;
+    this.hint = `${msg}. ${t('Ausnutzung {pct} %', { pct: Math.round((r.usage[0] ?? 0) * 100) })}${restText}`;
     this.emit('doc');
     this.emit('sel');
     return out;

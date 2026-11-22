@@ -19,6 +19,8 @@ The gear generators make real involute teeth, generated the way a hob cuts them,
 | **Kerf** | Width of the laser cut; the outline is offset outward by half of it, the bore inward. |
 | **Bore** | None, **Round**, **D-shaft (flat)** with the size across the flat, or **With keyway** with keyway width and depth. |
 
+![Create Gear dialog: 24 teeth, module 2, pressure angle 20°, backlash, kerf and a bore with keyway; the preview shows the gear, and below it the pitch, tip, root and base circle](/img/gear-dialog-en.webp)
+
 Under **Advanced**:
 
 - **Profile shift x**: positive values make the tooth roots stronger and avoid undercut on small gears; the centre distance changes by x × module.
@@ -29,6 +31,8 @@ Backlash and kerf are separate on purpose: backlash makes room between the teeth
 ## Gear pair
 
 **Gear pair** creates two matching gears at the right centre distance, as one assembly. In the [3D view](../features/construction-3d.md#3d-view) they mesh and can turn.
+
+![Gear pair with 16 and 40 teeth and a base plate with two axle holes on the page; in the 3D View the two gears mesh on the plate](/img/gear-pair-3d-en.webp)
 
 | Field | Meaning |
 |---|---|
@@ -42,6 +46,8 @@ Backlash and kerf are separate on purpose: backlash makes room between the teeth
 ## Rack
 
 A **Rack** is a straight gear that meshes with a spur gear: rotation becomes linear motion.
+
+![Create Rack dialog: 16 teeth, module 2, pressure angle 20°, backlash, kerf and a backing height of 8 mm; below the preview the length of 100.68 mm, the pitch and the position of the pitch line](/img/rack-dialog-en.webp)
 
 | Field | Meaning |
 |---|---|

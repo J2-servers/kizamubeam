@@ -16,6 +16,8 @@ Un’immagine sta su un livello come ogni altro oggetto. Velocità, potenza, pas
 
 Ogni immagine ha la propria **Modalità immagine**, che decide come i toni di grigio diventano punti laser. L’area di lavoro mostra il risultato alla risoluzione del laser.
 
+![La stessa immagine su quattro livelli con le modalità Soglia, Jarvis, Stampa da giornale e Schizzo, mostrata sull’area di lavoro come verrà lavorata](/img/image-modes-en.webp)
+
 | Modalità | Adatta a |
 |---|---|
 | **Soglia** | Loghi e disegni al tratto: viene lavorato tutto ciò che è più scuro della soglia. |
@@ -32,11 +34,15 @@ Ogni immagine ha la propria **Modalità immagine**, che decide come i toni di gr
 
 **Strumenti → Immagine → Modifica immagine …** imposta luminosità, contrasto, gamma, nitidezza (con raggio) e riduzione del rumore, con anteprima, confronto con l’originale e vista 1:1. Regolazioni e modalità immagine si possono salvare come preimpostazioni con nome.
 
+![Finestra Modifica immagine con l’anteprima a sinistra e i cursori per luminosità, contrasto, gamma, nitidezza, raggio e riduzione del rumore, più modalità immagine, interlinea e DPI del livello](/img/adjust-image-dialog-en.webp)
+
 **Salva bitmap elaborato …** salva l’immagine come PNG esattamente come verrebbe lavorata.
 
 ## Rimuovere lo sfondo
 
 **Strumenti → Immagine → Rimuovi sfondo …** (o **Rimuovi sfondo …** nella barra) lavora in locale, senza servizi cloud. I colori dello sfondo vengono presi dal bordo dell’immagine, oppure li clicchi nell’anteprima (Maiusc+clic ne aggiunge altri). I colori entro la tolleranza diventano trasparenti e non vengono lavorati. La pulizia elimina piccole macchie e riempie piccoli buchi; **Ritaglia al soggetto** rifila l’immagine.
+
+![Finestra Rimuovi sfondo: l’anteprima mostra un logo con lo sfondo colorato reso trasparente, sotto il colore di sfondo preso dal bordo dell’immagine, tolleranza, pulizia e bordo morbido](/img/remove-background-dialog-en.webp)
 
 ## Ritagliare e mascherare
 
@@ -50,6 +56,8 @@ L’immagine mantiene posizione e risoluzione; Ctrl+Z annulla entrambe le operaz
 ## Ricalcare le immagini
 
 **Strumenti → Immagine → Ricalca immagine …** (Alt+T) trasforma un’immagine in percorsi vettoriali, con anteprima dal vivo. Imposta la soglia, ignora le macchie piccole e scegli la levigatura. Il risultato sono percorsi di Bézier con angoli conservati.
+
+![Finestra Ricalca immagine con tipo, soglia, macchie ignorate e levigatura; sull’area di lavoro i contorni ricalcati di un logo appaiono in anteprima come linee arancioni tratteggiate](/img/trace-image-dialog-en.webp)
 
 Il tipo **Linee centrali** ricalca i tratti lungo il loro centro come percorsi aperti. È la scelta giusta per scrittura a mano, firme e disegni al tratto da marcare come linea singola invece di tagliarci intorno.
 

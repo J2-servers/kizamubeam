@@ -14,6 +14,8 @@ Il livello contiene **tutte le impostazioni laser**. Gli oggetti, immagini compr
 
 La finestra **Tagli / Livello** elenca i livelli in uso con modalità, velocità, potenza, air assist e uscita. I valori si modificano direttamente nella tabella; trascina le righe per cambiare l’ordine in cui vengono lavorati i livelli.
 
+![Finestra Tagli / Livello a destra con cinque livelli (Engrave, Cut, Lettering, Score e il livello strumento T1), con modalità, velocità, potenza e caselle; il livello Cut è selezionato e i suoi valori si modificano sotto la tabella](/img/layers-window-en.webp)
+
 ## Modalità
 
 | Modalità | Cosa succede |
@@ -35,6 +37,8 @@ T1 e T2 non vengono mai lavorati. Usali per linee di costruzione, il contorno di
 ## Impostazioni di taglio
 
 Un doppio clic su un livello apre le sue **Impostazioni di taglio**. I campi visibili dipendono dalla modalità.
+
+![Finestra Impostazioni di taglio di un livello in modalità Linea: velocità, potenza, passate e offset del kerf, linguette attivate con dimensione e numero, e la sezione aperta dell’attacco e del sovrataglio](/img/cut-settings-line-en.webp)
 
 ### Comuni a tutte le modalità
 
@@ -69,6 +73,8 @@ Un doppio clic su un livello apre le sue **Impostazioni di taglio**. I campi vis
 | **Bidirezionale** | Lavora in entrambe le direzioni (più veloce). |
 | **Overscan (%)** | Supera i bordi con il laser spento, così la testa è a piena velocità quando si accende. Evita bordi più scuri. |
 | **Stile riempimento** | **Riga per riga** o **Riempimento a offset**: anelli che seguono il contorno verso l’interno. |
+
+![Finestra Impostazioni di taglio di un livello in modalità Riempimento: stile di riempimento, interlinea, linee per pollice, angolo di scansione, overscan, bidirezionale e tratteggio incrociato](/img/cut-settings-fill-en.webp)
 
 **Valori predefiniti** riporta i campi ai valori predefiniti della modalità scelta.
 
