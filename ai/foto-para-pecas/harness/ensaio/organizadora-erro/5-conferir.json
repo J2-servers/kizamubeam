@@ -1,0 +1,20 @@
+{
+  "spec": "kz-diferencas/1",
+  "_ensaio": "escrito a mao",
+  "observacoes_por_vista": [
+    {
+      "vista": "iso",
+      "o_que_vejo": "caixa com divisoria"
+    },
+    {
+      "vista": "topo",
+      "o_que_vejo": "dois compartimentos"
+    },
+    {
+      "vista": "frente",
+      "o_que_vejo": "frente com dedos"
+    }
+  ],
+  "diferencas": [],
+  "veredito": "igual"
+}

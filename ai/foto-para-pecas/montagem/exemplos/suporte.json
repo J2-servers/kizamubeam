@@ -1,0 +1,12 @@
+{
+  "spec": "kz-montagem/1",
+  "nome": "Suporte em cruz 100 x 100 x 60",
+  "espessura": 3,
+  "medida_real": "largura 100 mm (exemplo)",
+  "placas": [
+    { "id": "nervura-x", "nome": "Nervura ao longo de X", "x": [0, 100], "y": [48.5, 51.5], "z": [0, 60] },
+    { "id": "nervura-y", "nome": "Nervura ao longo de Y", "x": [48.5, 51.5], "y": [0, 100], "z": [0, 60] }
+  ],
+  "ligacoes": "auto",
+  "moveis": []
+}

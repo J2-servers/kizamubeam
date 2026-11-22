@@ -1,0 +1,251 @@
+{
+  "spec": "kz-vistas/1",
+  "espessura": 3,
+  "medidas_reais": [
+    {
+      "o_que": "largura total por fora",
+      "eixo": "x",
+      "mm": 200,
+      "alvo": "envolvente"
+    }
+  ],
+  "vistas": {
+    "frente": [
+      {
+        "placa": "fundo",
+        "x": [
+          0,
+          200
+        ],
+        "z": [
+          0,
+          3
+        ]
+      },
+      {
+        "placa": "frente",
+        "x": [
+          0,
+          200
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "tras",
+        "x": [
+          0,
+          200
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "esquerda",
+        "x": [
+          0,
+          3
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "direita",
+        "x": [
+          197,
+          200
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "divisoria",
+        "x": [
+          110,
+          113
+        ],
+        "z": [
+          0,
+          60
+        ]
+      }
+    ],
+    "lado": [
+      {
+        "placa": "fundo",
+        "y": [
+          0,
+          120
+        ],
+        "z": [
+          0,
+          3
+        ]
+      },
+      {
+        "placa": "frente",
+        "y": [
+          0,
+          3
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "tras",
+        "y": [
+          117,
+          120
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "esquerda",
+        "y": [
+          0,
+          120
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "direita",
+        "y": [
+          0,
+          120
+        ],
+        "z": [
+          0,
+          60
+        ]
+      },
+      {
+        "placa": "divisoria",
+        "y": [
+          0,
+          120
+        ],
+        "z": [
+          0,
+          60
+        ]
+      }
+    ],
+    "topo": [
+      {
+        "placa": "fundo",
+        "x": [
+          0,
+          200
+        ],
+        "y": [
+          0,
+          120
+        ]
+      },
+      {
+        "placa": "frente",
+        "x": [
+          0,
+          200
+        ],
+        "y": [
+          0,
+          3
+        ]
+      },
+      {
+        "placa": "tras",
+        "x": [
+          0,
+          200
+        ],
+        "y": [
+          117,
+          120
+        ]
+      },
+      {
+        "placa": "esquerda",
+        "x": [
+          0,
+          3
+        ],
+        "y": [
+          0,
+          120
+        ]
+      },
+      {
+        "placa": "direita",
+        "x": [
+          197,
+          200
+        ],
+        "y": [
+          0,
+          120
+        ]
+      },
+      {
+        "placa": "divisoria",
+        "x": [
+          98.5,
+          101.5
+        ],
+        "y": [
+          0,
+          120
+        ]
+      }
+    ]
+  },
+  "cotas": [
+    {
+      "o_que": "largura total (X)",
+      "mm": 200,
+      "origem": "usuario",
+      "conta": "medida informada"
+    },
+    {
+      "o_que": "espessura",
+      "mm": 3,
+      "origem": "usuario",
+      "conta": "informada"
+    },
+    {
+      "o_que": "profundidade total (Y)",
+      "mm": 120,
+      "origem": "hipotese",
+      "conta": "proporcao 0,6 da largura; o usuario precisa confirmar"
+    },
+    {
+      "o_que": "altura total (Z)",
+      "mm": 60,
+      "origem": "hipotese",
+      "conta": "proporcao 0,3 da largura; o usuario precisa confirmar"
+    },
+    {
+      "o_que": "posicao da divisoria (X)",
+      "mm": 98.5,
+      "origem": "derivada",
+      "conta": "(200 - 3) / 2, divisoria no meio"
+    }
+  ],
+  "_ensaio": "errado de proposito: a divisoria esta em x=110 na frente e em x=98.5 no topo"
+}

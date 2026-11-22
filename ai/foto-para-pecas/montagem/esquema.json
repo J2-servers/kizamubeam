@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kz-montagem/1",
+  "title": "Especificacao de montagem kz-montagem/1",
+  "description": "Objeto feito de placas cortadas a laser. Eixos: X largura (direita), Y profundidade (fundo), Z altura (cima), em mm. Cada placa e uma caixa alinhada aos eixos cuja MENOR dimensao e exatamente a espessura. Canto em L e cruzamento se escrevem com as duas placas indo ate a face de fora (o volume espessura x espessura fica dividido pelos dedos). O que o esquema nao consegue dizer (colisao, placa solta, espessura) e conferido por validar.mjs.",
+  "type": "object",
+  "required": ["spec", "nome", "espessura", "placas"],
+  "additionalProperties": false,
+  "properties": {
+    "spec": { "const": "kz-montagem/1" },
+    "nome": { "type": "string", "minLength": 1 },
+    "espessura": { "type": "number", "exclusiveMinimum": 0, "maximum": 30, "description": "Espessura real do material, em mm (medida com paquimetro)." },
+    "medida_real": { "type": "string", "description": "A medida que o usuario informou e de onde veio a escala (uma foto nao tem escala)." },
+    "placas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "nome", "x", "y", "z"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+          "nome": { "type": "string", "minLength": 1 },
+          "x": { "$ref": "#/$defs/faixa" },
+          "y": { "$ref": "#/$defs/faixa" },
+          "z": { "$ref": "#/$defs/faixa" },
+          "recortes": {
+            "type": "array",
+            "description": "Furos na face da placa. u e v sao medidos do canto de menor coordenada da placa, nos dois eixos que nao sao o da espessura, na ordem x, y, z.",
+            "items": {
+              "type": "object",
+              "required": ["tipo", "u", "v"],
+              "additionalProperties": false,
+              "properties": {
+                "tipo": { "enum": ["retangulo", "circulo"] },
+                "u": { "type": "number" },
+                "v": { "type": "number" },
+                "largura": { "type": "number", "exclusiveMinimum": 0 },
+                "altura": { "type": "number", "exclusiveMinimum": 0 },
+                "diametro": { "type": "number", "exclusiveMinimum": 0 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ligacoes": {
+      "description": "\"auto\" = o validador classifica cada par pela geometria. Lista = so estes pares recebem encaixe.",
+      "oneOf": [
+        { "const": "auto" },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["a", "b", "tipo"],
+            "additionalProperties": false,
+            "properties": {
+              "a": { "type": "string" },
+              "b": { "type": "string" },
+              "tipo": { "enum": ["dedos", "espiga", "meia-madeira", "colado", "dobradica"] }
+            }
+          }
+        }
+      ]
+    },
+    "moveis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["placa", "tipo"],
+        "properties": {
+          "placa": { "type": "string" },
+          "tipo": { "enum": ["dobradica", "desliza", "gira"] },
+          "eixo": { "enum": ["x", "y", "z"] },
+          "curso": { "type": "number" },
+          "folga": { "type": "number", "minimum": 0 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "faixa": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }],
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[inicio, fim] em mm, com fim maior que inicio."
+    }
+  }
+}

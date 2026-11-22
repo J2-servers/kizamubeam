@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kz-montagem/1",
+  "description": "Contrato entre a IA (Agente B) e o construtor deterministico (Agente A). Eixos: X largura, Y profundidade, Z altura, em mm. Cada placa e uma caixa alinhada aos eixos cuja menor dimensao e exatamente a espessura.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "nome", "espessura", "placas", "ligacoes", "moveis"],
+  "properties": {
+    "spec": { "const": "kz-montagem/1" },
+    "nome": { "type": "string", "minLength": 1 },
+    "espessura": { "type": "number", "exclusiveMinimum": 0 },
+    "placas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "nome", "x", "y", "z"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+          "nome": { "type": "string" },
+          "x": { "$ref": "#/$defs/intervalo" },
+          "y": { "$ref": "#/$defs/intervalo" },
+          "z": { "$ref": "#/$defs/intervalo" },
+          "recortes": { "type": "array", "items": { "type": "object" }, "description": "Opcional. Formato definido pelo construtor." }
+        }
+      }
+    },
+    "ligacoes": {
+      "oneOf": [
+        { "const": "auto" },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["a", "b", "tipo"],
+            "properties": {
+              "a": { "type": "string" },
+              "b": { "type": "string" },
+              "tipo": { "enum": ["dedos", "espiga", "meia-madeira", "colado", "dobradica"] }
+            }
+          }
+        }
+      ]
+    },
+    "moveis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["placa", "tipo"],
+        "properties": {
+          "placa": { "type": "string" },
+          "tipo": { "enum": ["dobradica", "desliza", "gira"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "intervalo": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "[inicio, fim] em mm, com fim > inicio" }
+  }
+}

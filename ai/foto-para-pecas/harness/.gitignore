@@ -1,0 +1,4 @@
+config/chaves.env
+node_modules/
+execucoes/
+*.log

@@ -1,0 +1,15 @@
+{
+  "spec": "kz-montagem/1",
+  "nome": "Caixa aberta 120 x 80 x 50",
+  "espessura": 3,
+  "medida_real": "largura de fora 120 mm (exemplo)",
+  "placas": [
+    { "id": "fundo", "nome": "Fundo", "x": [0, 120], "y": [0, 80], "z": [0, 3] },
+    { "id": "frente", "nome": "Frente", "x": [0, 120], "y": [0, 3], "z": [0, 50] },
+    { "id": "tras", "nome": "Tras", "x": [0, 120], "y": [77, 80], "z": [0, 50] },
+    { "id": "esquerda", "nome": "Lateral esquerda", "x": [0, 3], "y": [0, 80], "z": [0, 50] },
+    { "id": "direita", "nome": "Lateral direita", "x": [117, 120], "y": [0, 80], "z": [0, 50] }
+  ],
+  "ligacoes": "auto",
+  "moveis": []
+}

@@ -1,0 +1,75 @@
+{
+ "dispositivos_antes": [
+  {
+   "nome": "Swiitol E6 Pro",
+   "fw": "fluidnc",
+   "area": "400x400",
+   "conn": "serial"
+  }
+ ],
+ "leitura_lightburn": {
+  "dispositivos": []
+ },
+ "passo1": "ok: Dispositivos …",
+ "passo2": "ok: Importar do LightBurn …",
+ "lista_tem": "Importar do LightBurn\n✕\nLer o LightBurn neste computador\nEscolher arquivo …\n3 dispositivos em C:\\Users\\jujug\\AppData\\Local\\LightBurn\\prefs.ini\nRuida\nLightBurn „CDM“ → Ruida (DSP / CO2)\n3 importados · 5 convertidos · 4 sem equivalente\nConvertido: Controlador: LightBurn “CDM” → Ruida (DSP / CO2)\nConvertido: Avanço rápido 400 mm/s → 24000 mm/min (estimativa de tempo)\nAceita: Aceleração 3000 mm/s² (estimativa de tempo)\nAceita: Área de trabalho 600 × 400 mm\nConvertido: Origem: espelhar X ligado, Y ligado → origem da máquina Traseira direita (padrão)\nConvertido: Conexão: cabo USB (serial); a porta é escolhida na janela Laser\nAceita: Referenciar ao conectar: ligado (como no LightBurn)\nConvertido: Coordenadas da máquina → iniciar de: absoluto\nNão importado: Velocidade máxima X 500 / Y 400 mm/s (pré-visualização do LightBurn): sem equivalente, o controlador limita sozinho.\nNão importado: Sem equi",
+ "marcados": "3 caixas, marcadas: 3",
+ "passo3": "ok: Importar marcados",
+ "resultado_dialogo": [
+  "Dispositivos\n✕\n\tNome\tControlador\tÁrea (mm)\t\n\tSwiitol E6 Pro\tFluidNC\t400 × 400\t\nEditar\nCopiar\nExcluir\n\n\tRuida\tRuida (DSP / CO2)\t600 × 400\t\nEditar\nCopiar\nExcluir\n\n\tJCZFiber (LMC4)\tJCZ / EZCad (Galvo fibra)\t110 × 110\t\nEditar\nCopiar\nExcluir\n\n\tJCZFiber (Unknown)\tJCZ / EZCad (Galvo fibra)\t150 × 150\t\nEditar\nCopiar\nExcluir\nNovo dispositivo a partir de modelo\nACMER P1 S Pro (6 W) · GRBL 1.1\nACMER P1 S Pro (10 W) · GRBL 1.1\nACMER P1 S Pro (20 W) · GRBL 1.1\nAlgoLaser Alpha MK2 · GRBL 1.1\nAtomstack A20 Pro · GRBL 1.1\nAtomstack P1 (1.2 W IR) · GRBL 1.1\nAtomstack P1 (5 W) · GRBL 1.1\nAtomstack S10 Pro · GRBL 1.1\nComgrow Z1 · GRBL 1.1\nCreality CR-Laser Falcon 10W · GRBL 1.1\nCreality Falcon 2 · GRBL 1.1\nCrea",
+  "Importar do LightBurn\n✕\nLer o LightBurn neste computador\nEscolher arquivo …\n3 dispositivos em C:\\Users\\jujug\\AppData\\Local\\LightBurn\\prefs.ini\nRuida\nLightBurn „CDM“ → Ruida (DSP / CO2)\n3 importados · 5 convertidos · 4 sem equivalente\nConvertido: Controlador: LightBurn “CDM” → Ruida (DSP / CO2)\nConvertido: Avanço rápido 400 mm/s → 24000 mm/min (estimativa de tempo)\nAceita: Aceleração 3000 mm/s² (estimativa de tempo)\nAceita: Área de trabalho 600 × 400 mm\nConvertido: Origem: espelhar X ligado, Y ligado → origem da máquina Traseira direita (padrão)\nConvertido: Conexão: cabo USB (serial); a porta é escolhida na janela Laser\nAceita: Referenciar ao conectar: ligado (como no LightBurn)\nConvertido: C"
+ ],
+ "dispositivos_depois": [
+  {
+   "nome": "Swiitol E6 Pro",
+   "fw": "fluidnc",
+   "area": "400x400",
+   "conn": "serial"
+  },
+  {
+   "nome": "Ruida",
+   "fw": "ruida",
+   "area": "600x400",
+   "conn": "serial"
+  },
+  {
+   "nome": "JCZFiber (LMC4)",
+   "fw": "jcz",
+   "area": "110x110",
+   "conn": "serial",
+   "campo": 110
+  },
+  {
+   "nome": "JCZFiber (Unknown)",
+   "fw": "jcz",
+   "area": "150x150",
+   "conn": "serial",
+   "campo": 150
+  }
+ ],
+ "jcz_list": [],
+ "jcz_sim": {
+  "conectar": {
+   "connected": true,
+   "busy": false,
+   "raw": 32,
+   "progress": 0,
+   "simulated": true,
+   "inputs": 0,
+   "mode": "idle"
+  },
+  "contorno": "ok",
+  "parar": "ok",
+  "marcar_simulado": "ok",
+  "status": {
+   "connected": true,
+   "busy": false,
+   "raw": 32,
+   "progress": 1,
+   "simulated": true,
+   "inputs": 0,
+   "mode": "idle"
+  },
+  "desconectar": "ok"
+ }
+}

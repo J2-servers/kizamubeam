@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "pecas": 2,
+  "encaixes": [
+    "nervura-x+nervura-y: X -> make_joint lap"
+  ],
+  "saida": "D:\\CLAUDE\\sistema para corte a laser\\kizamubeam\\ai\\foto-para-pecas\\montagem\\saida"
+}

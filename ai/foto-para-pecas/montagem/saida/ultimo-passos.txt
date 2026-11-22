@@ -1,0 +1,7 @@
+[01:21:00] encaixe lat-esq+prat-1 (T)
+[01:21:00] encaixe lat-esq+prat-2 (T)
+[01:21:00] encaixe lat-esq+prat-3 (T)
+[01:21:00] encaixe lat-dir+prat-1 (T)
+[01:21:00] encaixe lat-dir+prat-2 (T)
+[01:21:00] encaixe lat-dir+prat-3 (T)
+[01:21:00] fotos e vista 3D

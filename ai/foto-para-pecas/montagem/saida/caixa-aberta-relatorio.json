@@ -1,0 +1,359 @@
+{
+  "ok": true,
+  "nome": "Caixa aberta 120 x 80 x 50",
+  "espessura": 3,
+  "pecas": [
+    {
+      "placa": "fundo",
+      "id": 1,
+      "x": 10,
+      "y": 10,
+      "largura": 120,
+      "altura": 80,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    },
+    {
+      "placa": "frente",
+      "id": 2,
+      "x": 142,
+      "y": 10,
+      "largura": 120,
+      "altura": 50,
+      "eixos": [
+        "x",
+        "z"
+      ]
+    },
+    {
+      "placa": "tras",
+      "id": 3,
+      "x": 10,
+      "y": 102,
+      "largura": 120,
+      "altura": 50,
+      "eixos": [
+        "x",
+        "z"
+      ]
+    },
+    {
+      "placa": "esquerda",
+      "id": 4,
+      "x": 142,
+      "y": 102,
+      "largura": 80,
+      "altura": 50,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "direita",
+      "id": 5,
+      "x": 234,
+      "y": 102,
+      "largura": 80,
+      "altura": 50,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    }
+  ],
+  "encaixes": [
+    {
+      "a": "fundo",
+      "b": "frente",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 120,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          2
+        ],
+        "message": "Junta criada: 13 campos de 9,23 mm."
+      }
+    },
+    {
+      "a": "fundo",
+      "b": "tras",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 120,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          3
+        ],
+        "message": "Junta criada: 13 campos de 9,23 mm."
+      }
+    },
+    {
+      "a": "fundo",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          4
+        ],
+        "message": "Junta criada: 9 campos de 8,89 mm."
+      }
+    },
+    {
+      "a": "fundo",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          5
+        ],
+        "message": "Junta criada: 9 campos de 8,89 mm."
+      }
+    },
+    {
+      "a": "frente",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 50,
+      "aviso": "aresta de 47 / 47 mm para contato de 50 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          4
+        ],
+        "message": "Junta criada: 5 campos de 9,4 mm."
+      }
+    },
+    {
+      "a": "frente",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 50,
+      "aviso": "aresta de 47 / 47 mm para contato de 50 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          5
+        ],
+        "message": "Junta criada: 5 campos de 9,4 mm."
+      }
+    },
+    {
+      "a": "tras",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 50,
+      "aviso": "aresta de 47 / 47 mm para contato de 50 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          3,
+          4
+        ],
+        "message": "Junta criada: 5 campos de 9,4 mm."
+      }
+    },
+    {
+      "a": "tras",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 50,
+      "aviso": "aresta de 47 / 47 mm para contato de 50 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          3,
+          5
+        ],
+        "message": "Junta criada: 5 campos de 9,4 mm."
+      }
+    }
+  ],
+  "nao_feito": [],
+  "avisos": [],
+  "medidas": [
+    {
+      "placa": "fundo",
+      "esperado": [
+        120,
+        80
+      ],
+      "medido": [
+        120,
+        80
+      ],
+      "ok": true
+    },
+    {
+      "placa": "frente",
+      "esperado": [
+        120,
+        50
+      ],
+      "medido": [
+        120,
+        50
+      ],
+      "ok": true
+    },
+    {
+      "placa": "tras",
+      "esperado": [
+        120,
+        50
+      ],
+      "medido": [
+        120,
+        50
+      ],
+      "ok": true
+    },
+    {
+      "placa": "esquerda",
+      "esperado": [
+        80,
+        50
+      ],
+      "medido": [
+        80,
+        50
+      ],
+      "ok": true
+    },
+    {
+      "placa": "direita",
+      "esperado": [
+        80,
+        50
+      ],
+      "medido": [
+        80,
+        50
+      ],
+      "ok": true
+    }
+  ],
+  "recortes": [],
+  "gravuras": [],
+  "cena": null,
+  "custo_ia": {
+    "chamadas": [],
+    "usd": 0
+  },
+  "vista3d_dados": {
+    "pecas": 5,
+    "conjuntos": 1,
+    "placas": [
+      {
+        "placa": "fundo",
+        "min": [
+          102,
+          -359,
+          0
+        ],
+        "max": [
+          222,
+          -279,
+          3
+        ]
+      },
+      {
+        "placa": "frente",
+        "min": [
+          102,
+          -359,
+          0
+        ],
+        "max": [
+          222,
+          -356,
+          50
+        ]
+      },
+      {
+        "placa": "tras",
+        "min": [
+          102,
+          -282,
+          0
+        ],
+        "max": [
+          222,
+          -279,
+          50
+        ]
+      },
+      {
+        "placa": "esquerda",
+        "min": [
+          102,
+          -359,
+          0
+        ],
+        "max": [
+          105,
+          -279,
+          50
+        ]
+      },
+      {
+        "placa": "direita",
+        "min": [
+          219,
+          -359,
+          0
+        ],
+        "max": [
+          222,
+          -279,
+          50
+        ]
+      }
+    ],
+    "colisoes": []
+  },
+  "check_design": {
+    "total": 0,
+    "resumo": null
+  },
+  "vista3d": "Peças: 5 (Conjuntos: 1) · Sem sobreposições",
+  "erros_da_pagina": [],
+  "perguntas_do_app": []
+}

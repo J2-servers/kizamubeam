@@ -1,0 +1,433 @@
+{
+  "ok": true,
+  "erros": [],
+  "avisos": [],
+  "nome": "Caixa aberta 120 x 80 x 50",
+  "espessura": 3,
+  "tamanho": {
+    "x": 120,
+    "y": 80,
+    "z": 50
+  },
+  "placas": [
+    {
+      "id": "fundo",
+      "nome": "Fundo",
+      "x": [
+        0,
+        120
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        0,
+        3
+      ],
+      "fino": 2,
+      "eixo_espessura": "z",
+      "eixos_peca": [
+        "x",
+        "y"
+      ],
+      "peca": [
+        120,
+        80
+      ],
+      "recortes": []
+    },
+    {
+      "id": "frente",
+      "nome": "Frente",
+      "x": [
+        0,
+        120
+      ],
+      "y": [
+        0,
+        3
+      ],
+      "z": [
+        0,
+        50
+      ],
+      "fino": 1,
+      "eixo_espessura": "y",
+      "eixos_peca": [
+        "x",
+        "z"
+      ],
+      "peca": [
+        120,
+        50
+      ],
+      "recortes": []
+    },
+    {
+      "id": "tras",
+      "nome": "Tras",
+      "x": [
+        0,
+        120
+      ],
+      "y": [
+        77,
+        80
+      ],
+      "z": [
+        0,
+        50
+      ],
+      "fino": 1,
+      "eixo_espessura": "y",
+      "eixos_peca": [
+        "x",
+        "z"
+      ],
+      "peca": [
+        120,
+        50
+      ],
+      "recortes": []
+    },
+    {
+      "id": "esquerda",
+      "nome": "Lateral esquerda",
+      "x": [
+        0,
+        3
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        0,
+        50
+      ],
+      "fino": 0,
+      "eixo_espessura": "x",
+      "eixos_peca": [
+        "y",
+        "z"
+      ],
+      "peca": [
+        80,
+        50
+      ],
+      "recortes": []
+    },
+    {
+      "id": "direita",
+      "nome": "Lateral direita",
+      "x": [
+        117,
+        120
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        0,
+        50
+      ],
+      "fino": 0,
+      "eixo_espessura": "x",
+      "eixos_peca": [
+        "y",
+        "z"
+      ],
+      "peca": [
+        80,
+        50
+      ],
+      "recortes": []
+    }
+  ],
+  "pares": [
+    {
+      "a": "fundo",
+      "b": "frente",
+      "eixo": "x",
+      "comprimento": 120,
+      "contato": {
+        "x": [
+          0,
+          120
+        ],
+        "y": [
+          0,
+          3
+        ],
+        "z": [
+          0,
+          3
+        ]
+      },
+      "borda_a": {
+        "eixo": "y",
+        "lado": "inicio"
+      },
+      "borda_b": {
+        "eixo": "z",
+        "lado": "inicio"
+      },
+      "tipo": "L"
+    },
+    {
+      "a": "fundo",
+      "b": "tras",
+      "eixo": "x",
+      "comprimento": 120,
+      "contato": {
+        "x": [
+          0,
+          120
+        ],
+        "y": [
+          77,
+          80
+        ],
+        "z": [
+          0,
+          3
+        ]
+      },
+      "borda_a": {
+        "eixo": "y",
+        "lado": "fim"
+      },
+      "borda_b": {
+        "eixo": "z",
+        "lado": "inicio"
+      },
+      "tipo": "L"
+    },
+    {
+      "a": "fundo",
+      "b": "esquerda",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          0,
+          3
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          0,
+          3
+        ]
+      },
+      "borda_a": {
+        "eixo": "x",
+        "lado": "inicio"
+      },
+      "borda_b": {
+        "eixo": "z",
+        "lado": "inicio"
+      },
+      "tipo": "L"
+    },
+    {
+      "a": "fundo",
+      "b": "direita",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          117,
+          120
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          0,
+          3
+        ]
+      },
+      "borda_a": {
+        "eixo": "x",
+        "lado": "fim"
+      },
+      "borda_b": {
+        "eixo": "z",
+        "lado": "inicio"
+      },
+      "tipo": "L"
+    },
+    {
+      "a": "frente",
+      "b": "esquerda",
+      "eixo": "z",
+      "comprimento": 50,
+      "contato": {
+        "x": [
+          0,
+          3
+        ],
+        "y": [
+          0,
+          3
+        ],
+        "z": [
+          0,
+          50
+        ]
+      },
+      "borda_a": {
+        "eixo": "x",
+        "lado": "inicio"
+      },
+      "borda_b": {
+        "eixo": "y",
+        "lado": "inicio"
+      },
+      "tipo": "L"
+    },
+    {
+      "a": "frente",
+      "b": "direita",
+      "eixo": "z",
+      "comprimento": 50,
+      "contato": {
+        "x": [
+          117,
+          120
+        ],
+        "y": [
+          0,
+          3
+        ],
+        "z": [
+          0,
+          50
+        ]
+      },
+      "borda_a": {
+        "eixo": "x",
+        "lado": "fim"
+      },
+      "borda_b": {
+        "eixo": "y",
+        "lado": "inicio"
+      },
+      "tipo": "L"
+    },
+    {
+      "a": "tras",
+      "b": "esquerda",
+      "eixo": "z",
+      "comprimento": 50,
+      "contato": {
+        "x": [
+          0,
+          3
+        ],
+        "y": [
+          77,
+          80
+        ],
+        "z": [
+          0,
+          50
+        ]
+      },
+      "borda_a": {
+        "eixo": "x",
+        "lado": "inicio"
+      },
+      "borda_b": {
+        "eixo": "y",
+        "lado": "fim"
+      },
+      "tipo": "L"
+    },
+    {
+      "a": "tras",
+      "b": "direita",
+      "eixo": "z",
+      "comprimento": 50,
+      "contato": {
+        "x": [
+          117,
+          120
+        ],
+        "y": [
+          77,
+          80
+        ],
+        "z": [
+          0,
+          50
+        ]
+      },
+      "borda_a": {
+        "eixo": "x",
+        "lado": "fim"
+      },
+      "borda_b": {
+        "eixo": "y",
+        "lado": "fim"
+      },
+      "tipo": "L"
+    }
+  ],
+  "ligacoes": [
+    {
+      "a": "fundo",
+      "b": "frente",
+      "tipo": "dedos",
+      "contato": "L"
+    },
+    {
+      "a": "fundo",
+      "b": "tras",
+      "tipo": "dedos",
+      "contato": "L"
+    },
+    {
+      "a": "fundo",
+      "b": "esquerda",
+      "tipo": "dedos",
+      "contato": "L"
+    },
+    {
+      "a": "fundo",
+      "b": "direita",
+      "tipo": "dedos",
+      "contato": "L"
+    },
+    {
+      "a": "frente",
+      "b": "esquerda",
+      "tipo": "dedos",
+      "contato": "L"
+    },
+    {
+      "a": "frente",
+      "b": "direita",
+      "tipo": "dedos",
+      "contato": "L"
+    },
+    {
+      "a": "tras",
+      "b": "esquerda",
+      "tipo": "dedos",
+      "contato": "L"
+    },
+    {
+      "a": "tras",
+      "b": "direita",
+      "tipo": "dedos",
+      "contato": "L"
+    }
+  ]
+}

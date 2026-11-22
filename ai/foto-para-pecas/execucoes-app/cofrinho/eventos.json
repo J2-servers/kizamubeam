@@ -1,0 +1,4689 @@
+[
+ {
+  "kind": "stage",
+  "stage": "0-entrada",
+  "title": "Conferir a entrada (fotos, medidas, espessura)",
+  "status": "start"
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "stage",
+  "stage": "0-entrada",
+  "title": "Conferir a entrada (fotos, medidas, espessura)",
+  "status": "done",
+  "detail": "1 foto(s), 3 medida(s), chapa de 3 mm, mesa 600 x 400 mm"
+ },
+ {
+  "kind": "stage",
+  "stage": "1-compreender",
+  "title": "Entender o produto",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 0.4535,
+  "calls": 1
+ },
+ {
+  "kind": "step",
+  "label": "IA 1-compreender",
+  "detail": "anthropic/claude-fable-5.2: 5101 tokens de entrada, 10318 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 1-compreender, resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "assistant",
+  "stage": "1-compreender",
+  "text": "Entendi um cofrinho em caixa de sombras de 400 x 400 x 100 mm: caixa azul de placas, com moldura clara de janela arredondada na frente e faixa inferior com a trilha R$20 a R$1.000 gravada.\nA decoracao vai em camadas: mapa do Brasil (silhueta, estados, coracoes), aviao, mala, veleiro, Cristo, palmeira, montanhas, nuvem, 4 setas de destino sobre postes e a plaqueta 'Nossa Aventura'.\nO dinheiro aparece na faixa de baixo da janela, atras de uma chapa transparente.\nSupus sem ver: costas, base, lateral esquerda, fenda no topo, costas removiveis e painel do mapa como placa intermediaria com o dinheiro caindo por tras.\nPreciso confirmar entrada e retirada do dinheiro, posicao do painel do mapa e o acrilico; fotos de cima, de tras e de lado resolvem."
+ },
+ {
+  "kind": "stage",
+  "stage": "1-compreender",
+  "title": "Entender o produto",
+  "status": "done",
+  "detail": "Cofrinho de viagem em caixa de sombras ('Nossa Aventura'): caixa rasa de pe, com moldura e janela na frente, cena decorativa em camadas (mapa do Brasil e figuras) na parte de cima e camara de dinheiro visivel na faixa de baixo. — rota placas"
+ },
+ {
+  "kind": "confirm",
+  "resumo": "Entendi um cofrinho em caixa de sombras de 400 x 400 x 100 mm: caixa azul de placas, com moldura clara de janela arredondada na frente e faixa inferior com a trilha R$20 a R$1.000 gravada.\nA decoracao vai em camadas: mapa do Brasil (silhueta, estados, coracoes), aviao, mala, veleiro, Cristo, palmeira, montanhas, nuvem, 4 setas de destino sobre postes e a plaqueta 'Nossa Aventura'.\nO dinheiro aparece na faixa de baixo da janela, atras de uma chapa transparente.\nSupus sem ver: costas, base, lateral esquerda, fenda no topo, costas removiveis e painel do mapa como placa intermediaria com o dinheiro caindo por tras.\nPreciso confirmar entrada e retirada do dinheiro, posicao do painel do mapa e o acrilico; fotos de cima, de tras e de lado resolvem.",
+  "perguntas": [
+   {
+    "question": "Por onde o dinheiro entra e como sai? Supus uma fenda no topo e costas removiveis, mas a foto nao mostra nem o topo nem as costas. Uma foto de cima e outra de tras resolvem.",
+    "blocks": true
+   },
+   {
+    "question": "O painel azul do mapa fica a que distancia da frente, e o dinheiro cai por tras dele ate a faixa de baixo? Uma foto de lado ou essa medida define o tamanho das pecas internas.",
+    "blocks": true
+   },
+   {
+    "question": "A janela leva chapa transparente (acrilico)? Cobre a janela inteira ou so a faixa do dinheiro, e em que espessura? E uma peca a mais, em outro material.",
+    "blocks": true
+   },
+   {
+    "question": "Os circulos das metas (R$20 a R$1.000) sao so gravados para pintar ou marcar, ou voce quer furos?",
+    "blocks": false
+   }
+  ],
+  "hipoteses": [
+   "Todas as chapas de madeira em 3 mm; o azul e a cor clara sao pintura ou acabamento, nao materiais diferentes",
+   "A borda azul larga na frente e uma placa frontal azul inteira (400 x 400) atras da moldura clara, nao material mais grosso",
+   "O painel da cena e uma placa intermediaria que nao desce ate a base: o dinheiro entra por cima, cai por tras dele e aparece so na faixa de baixo",
+   "Camara unica de dinheiro: os 4 postes sao tiras decorativas na frente, nao divisorias, porque as notas passam continuas por tras deles",
+   "Fenda de entrada no topo e costas removiveis para retirar o dinheiro: nada disso aparece na foto",
+   "Visor de acrilico transparente atras da frente, cobrindo a janela inteira",
+   "Proporcoes tiradas da foto, nao medidas: barras da moldura ~15-20 mm, faixa inferior ~55 mm, faixa visivel do dinheiro ~75 mm de altura",
+   "Na foto a caixa parece mais rasa que 100 mm; mantenho os 100 mm informados, mas a divisao interna dessa profundidade e suposicao",
+   "Placas de 400 x 400 ocupam toda a altura da mesa de 400 mm, sem margem",
+   "Os 6 circulos da trilha de metas sao gravados, nao furos",
+   "A foto não mostra: Costas da caixa: nao aparecem (porta, tampa, parafusos?)",
+   "A foto não mostra: Face de cima: nao da para ver se existe a fenda para moedas e notas",
+   "A foto não mostra: Base e lateral esquerda",
+   "A foto não mostra: Interior: a que profundidade fica o painel da cena, e se a camara do dinheiro passa por tras dele",
+   "A foto não mostra: Se o visor transparente cobre a janela toda ou so a faixa do dinheiro",
+   "A foto não mostra: Como o dinheiro e retirado"
+  ]
+ },
+ {
+  "kind": "step",
+  "label": "usuario confirmou",
+  "detail": "6 resposta(s)",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "2-vistas",
+  "title": "Desenhar as três vistas",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 0.9587,
+  "calls": 2
+ },
+ {
+  "kind": "step",
+  "label": "IA 2-vistas",
+  "detail": "anthropic/claude-fable-5.2: 9440 tokens de entrada, 10742 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 2-vistas, resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "2-vistas",
+  "title": "Desenhar as três vistas",
+  "status": "done",
+  "detail": "8 placa(s); 400 x 100 x 400 mm"
+ },
+ {
+  "kind": "stage",
+  "stage": "3-especificar",
+  "title": "Especificar as placas e os encaixes",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 1.2149,
+  "calls": 3
+ },
+ {
+  "kind": "step",
+  "label": "IA 3-especificar",
+  "detail": "anthropic/claude-fable-5.2: 6670 tokens de entrada, 5070 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 3-especificar, resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "3-especificar",
+  "title": "Especificar as placas e os encaixes",
+  "status": "done",
+  "detail": "8 placa(s), ligações auto"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-cena",
+  "title": "Janelas, textos e peças decorativas",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.7459,
+  "calls": 4
+ },
+ {
+  "kind": "step",
+  "label": "IA 4-cena",
+  "detail": "anthropic/claude-fable-5.2: 11682 tokens de entrada, 35939 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 4-cena, resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "4-cena",
+  "title": "Janelas, textos e peças decorativas",
+  "status": "done",
+  "detail": "24 peça(s) decorativa(s) em 3 camada(s)"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-montar",
+  "title": "Construir as peças no programa",
+  "status": "start"
+ },
+ {
+  "kind": "step",
+  "label": "new_document",
+  "detail": "documento novo",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect moldura_clara",
+  "detail": "400 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect apoio_visor",
+  "detail": "394 x 394 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect painel_cena",
+  "detail": "394 x 267 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect fundo",
+  "detail": "400 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect lateral_esquerda",
+  "detail": "100 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect lateral_direita",
+  "detail": "100 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect topo",
+  "detail": "400 x 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect base",
+  "detail": "400 x 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+lateral_esquerda",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+lateral_direita",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+topo",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+base",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+lateral_esquerda",
+  "detail": "a espiga tem 267 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+lateral_direita",
+  "detail": "a espiga tem 267 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+topo",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+lateral_esquerda",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+lateral_direita",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+topo",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+base",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+lateral_esquerda",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+lateral_direita",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+topo",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+base",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_esquerda+topo",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_esquerda+base",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_direita+topo",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_direita+base",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+lateral_esquerda",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+lateral_direita",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+topo",
+  "detail": "2 furo(s), 0 mm ao longo, 87 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+base",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+lateral_esquerda",
+  "detail": "2 furo(s), 63.5 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+lateral_direita",
+  "detail": "2 furo(s), -63.5 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+topo",
+  "detail": "2 furo(s), 0 mm ao longo, 57 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "medidas das pecas",
+  "detail": "8 de 8 exatas",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte moldura_clara",
+  "detail": "360 x 325 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "PLANEJE, ECONOMIZE, VIAJE!",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$20",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$50",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$100",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$200",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$500",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$1.000",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte apoio_visor",
+  "detail": "348 x 319 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte topo",
+  "detail": "120 x 6 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "face gravada moldura_clara",
+  "detail": "dentro -> fora (placa espelhada)",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil outline map silhouette svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mapa_base",
+  "name": "Base do mapa (silhueta do Brasil)",
+  "score": 0,
+  "source": "nenhuma",
+  "image": null,
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca placa_titulo: forma retangulo",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "placa_titulo",
+  "name": "Plaqueta de titulo",
+  "score": 10,
+  "source": "forma retangulo",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura placa_titulo",
+  "detail": "Nossa Aventura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura placa_titulo",
+  "detail": "Para a próxima viagem juntos",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.7559,
+  "calls": 5
+ },
+ {
+  "kind": "step",
+  "label": "peca nuvem: biblioteca builtin:cloud",
+  "detail": "nota 7 — Silhueta de nuvem fechada, com uma cúpula grande no centro e lóbulos laterais menores, base plana e cantos arredondados. Contorno único e contínuo em vermelho, sem moldura, legenda ou peças soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "nuvem",
+  "name": "Nuvem",
+  "score": 7,
+  "source": "biblioteca builtin:cloud",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.7668,
+  "calls": 6
+ },
+ {
+  "kind": "step",
+  "label": "peca aviao: biblioteca builtin:airplane",
+  "detail": "nota 5 — Silhueta de um avião de passageiros visto de cima, com nariz para cima, asas enflechadas e cauda com estabilizadores, em um único contorno vermelho fechado. Está reto na vertical, simétrico e sem detalhes internos.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: airliner top view silhouette svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: airplane top view silhouette vector, passenger jet airliner plan view with engines, commercial airplane icon svg, plane taking off diagonal silhouette, laser cut airplane outline",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "aviao",
+  "name": "Aviao",
+  "score": 5,
+  "source": "biblioteca builtin:airplane",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.7778,
+  "calls": 7
+ },
+ {
+  "kind": "step",
+  "label": "peca palmeira: biblioteca builtin:palm",
+  "detail": "nota 4 — Contorno vermelho de uma palmeira estilizada com tronco inclinado dividido em segmentos e copa de folhas pontudas. Dá para reconhecer uma palmeira, mas o desenho é irregular e parece um esboço fino, não uma silhueta sólida de corte.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: palm tree silhouette svg",
+  "detail": "1 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 2.7893,
+  "calls": 8
+ },
+ {
+  "kind": "step",
+  "label": "peca palmeira: web: File:Palme d'Or gold silhouette.svg (https://commons.wikimedia.org/wiki/File:Palme_d%27Or_gold_silhouette.svg)",
+  "detail": "nota 3 — Uma folha de palma/samambaia estilizada na diagonal (o ramo da Palma de Ouro de Cannes), com folíolos separados, caule curvo à esquerda e vários recortes internos abertos. Não é uma palmeira com tronco e copa como a da foto.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: palm tree silhouette vector, single coconut palm tree, curved trunk, drooping fronds, solid filled shape, laser cut, tropical palm silhouette svg, no segments",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: palm tree silhouette vector, coconut palm tree silhouette svg, single tropical palm tree with curved trunk, simple palm tree stencil, palm tree laser cut file",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "palmeira",
+  "name": "Palmeira",
+  "score": 4,
+  "source": "biblioteca builtin:palm",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.8205,
+  "calls": 9
+ },
+ {
+  "kind": "cost",
+  "usd": 2.8321,
+  "calls": 10
+ },
+ {
+  "kind": "step",
+  "label": "peca mala: desenho da IA",
+  "detail": "nota 6 — Silhueta de mala de viagem em pé, vista de frente: corpo quadrado com cantos arredondados, alça no topo com abertura interna e dois pés pequenos na base. Há dois recortes retangulares internos no corpo, que seriam os selos ou etiquetas. O contorno externo é fechado e limpo.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: vintage suitcase with straps and travel stickers line art svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: vintage suitcase silhouette vector, retro luggage with two straps and corner protectors, upright old travel suitcase front view, laser cut suitcase svg, travel suitcase with stickers outline",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mala",
+  "name": "Mala de viagem",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.8435,
+  "calls": 11
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: biblioteca builtin:sailboat",
+  "detail": "nota 6 — Silhueta de veleiro em vetor vermelho com contornos fechados: duas velas triangulares separadas por um mastro vertical com bandeira, casco trapezoidal com cantos arredondados e uma faixa ondulada de onda separada embaixo. Reconhece-se claramente um veleiro de desenho simples.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette svg",
+  "detail": "3 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 2.8565,
+  "calls": 12
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: web: File:Simpleicons Places sailboat-black-silhouette.svg (https://commons.wikimedia.org/wiki/File:Simpleicons_Places_sailboat-black-silhouette.svg)",
+  "detail": "nota 4 — Silhueta de veleiro em contorno vermelho: uma vela grande curva à esquerda, uma vela menor à direita, um mastro central estreito e um casco curvo na base. As formas são fechadas e o desenho é reconhecível como veleiro, mas está fragmentado em várias peças soltas.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.867,
+  "calls": 13
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: web: File:Burgee of the Seadog Owners Association.svg (https://commons.wikimedia.org/wiki/File:Burgee_of_the_Seadog_Owners_Association.svg)",
+  "detail": "nota 1 — Uma bandeira triangular tipo flâmula (burgee) apontando para a direita, com três pequenos triângulos recortados lá dentro. Não parece um veleiro: não tem casco, mastro nem velas na posição de um barco.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.8786,
+  "calls": 14
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: web: File:Segeln.svg (https://commons.wikimedia.org/wiki/File:Segeln.svg)",
+  "detail": "nota 3 — Um desenho de veleiro em linhas vermelhas finas, com uma vela grande curva à direita, duas velas triangulares à esquerda (uma delas com traço duplo), uma linha ondulada curva na base das velas e um casco achatado e alongado, separado, com a parte inferior ondulada. As velas lembram um veleiro, mas o conjunto está desmontado e confuso.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette vector, simple sailboat with two sails and hull, solid filled boat icon, laser cut sailboat with thick mast, sailing boat on wave svg, single connected shape",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: small sailboat silhouette vector, simple sailboat solid silhouette two triangular sails with hull, sailboat on waves clipart SVG, single closed outline, laser cut sailboat, no internal gaps",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette vector, small sailing boat two sails hull, sailboat laser cut file, sailboat side view svg, simple yacht silhouette with waves, layered sailboat papercut template",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette vector, small sailing boat with two sails and hull, solid closed shape, simple yacht icon, laser cut sailboat, boat with mainsail and jib connected by mast, svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "veleiro",
+  "name": "Veleiro",
+  "score": 6,
+  "source": "biblioteca builtin:sailboat",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.8907,
+  "calls": 15
+ },
+ {
+  "kind": "step",
+  "label": "peca ondas: biblioteca builtin:wave",
+  "detail": "nota 3 — Uma única onda grande, tipo crista curvada (estilo onda de surfe/Hokusai), com um contorno externo e um recorte interno fino em forma de lâmina curva. O desenho tem a base irregular e levemente ondulada. É uma peça isolada, de cerca de 17 x 13 unidades, em contorno vermelho.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: ocean waves strip silhouette svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: wave band silhouette, horizontal sea waves strip, ocean waves border vector, simple rolling waves banner, layered paper cut waves, calm sea waves silhouette for laser cut, flat wave pattern with foam crest",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "ondas",
+  "name": "Ondas sob o veleiro",
+  "score": 3,
+  "source": "biblioteca builtin:wave",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.9016,
+  "calls": 16
+ },
+ {
+  "kind": "step",
+  "label": "peca montanhas: biblioteca builtin:mountains",
+  "detail": "nota 3 — Uma silhueta triangular larga de montanhas, com base reta e dois grupos de picos irregulares, mais um círculo separado (sol/lua) no canto superior direito. O contorno tem um pequeno gancho/laço estreito no vale central.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: mountain peaks with snow cap silhouette svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: two mountain peaks silhouette vector, simple mountain pair with snow cap, layered paper cut mountains, closed outline svg, laser cut mountain icon without sun",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "montanhas",
+  "name": "Montanhas cinzas",
+  "score": 3,
+  "source": "biblioteca builtin:mountains",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.9282,
+  "calls": 17
+ },
+ {
+  "kind": "cost",
+  "usd": 2.9401,
+  "calls": 18
+ },
+ {
+  "kind": "step",
+  "label": "peca rocha: desenho da IA",
+  "detail": "nota 3 — Uma cúpula ou semicírculo achatado, com contorno fechado e base reta. A borda curva é feita de segmentos poligonais visíveis e a base tem pequenos cantos inclinados nas pontas. É uma forma genérica de monte liso, com cerca de 42 mm de largura por 22 mm de altura.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: rock mound hill silhouette svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: rocky hill silhouette vector, mountain rock outcrop silhouette, jagged rock formation outline, Corcovado hill silhouette, layered paper cut mountain, laser cut rock cliff, boulder pile silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "rocha",
+  "name": "Rocha clara do Cristo",
+  "score": 3,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_rio: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_rio",
+  "name": "Placa de direcao RIO DE JANEIRO",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_rio",
+  "detail": "RIO DE JANEIRO",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_salvador: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_salvador",
+  "name": "Placa de direcao SALVADOR",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_salvador",
+  "detail": "SALVADOR",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_foz: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_foz",
+  "name": "Placa de direcao FOZ DO IGUAÇU",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_foz",
+  "detail": "FOZ DO IGUAÇU",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_manaus: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_manaus",
+  "name": "Placa de direcao MANAUS",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_manaus",
+  "detail": "MANAUS",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 1 - bases e figuras coladas direto no painel",
+  "detail": "13 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil blank map states svg",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 2.9522,
+  "calls": 19
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Coronavirus Brazil map.svg (https://commons.wikimedia.org/wiki/File:Coronavirus_Brazil_map.svg)",
+  "detail": "nota 4 — Mapa do Brasil dividido em estados, só com linhas vermelhas de contorno (vetor), reconhecível como o país. Há seis quadradinhos soltos no canto inferior esquerdo e um pequeno retângulo do Distrito Federal dentro de Goiás.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Brazil Blank Map light.svg (https://commons.wikimedia.org/wiki/File:Brazil_Blank_Map_light.svg)",
+  "detail": "peca complexa demais para cortar (31984 nos depois de simplificar; tinha 75715)",
+  "ok": false
+ },
+ {
+  "kind": "cost",
+  "usd": 2.9632,
+  "calls": 20
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:BlankMap-World-Equirectangular.svg (https://commons.wikimedia.org/wiki/File:BlankMap-World-Equirectangular.svg)",
+  "detail": "nota 1 — Tres contornos vermelhos soltos e isolados, tirados de um mapa-mundi. Em cima ha uma forma pequena e irregular, parecida com a Alemanha. No meio ha uma forma maior, com cara de Sudao. Embaixo ha um fragmento minusculo e estreito, parecido com o Malawi. Nao e o mapa do Brasil nem tem divisao em estados.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Brazil Blank Map.svg (https://commons.wikimedia.org/wiki/File:Brazil_Blank_Map.svg)",
+  "detail": "peca complexa demais para cortar (31984 nos depois de simplificar; tinha 75715)",
+  "ok": false
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil states map vector SVG simplified, Brazil map puzzle laser cut, Brazil political map separate states closed paths, Brazil map layered papercut DXF, Brazil map without legend smooth outline",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil map with states vector, Brazil states separate pieces SVG, Brazil political map 26 states and Federal District, Brazil states puzzle map laser cut, Brazil map outline DXF, Brazil layered map cut file",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mapa_estados",
+  "name": "Estados do Brasil",
+  "score": 4,
+  "source": "web: File:Coronavirus Brazil map.svg (https://commons.wikimedia.org/wiki/File:Coronavirus_Brazil_map.svg)",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer statue silhouette svg",
+  "detail": "3 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 2.9753,
+  "calls": 21
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Christ and Liberty.svg (https://commons.wikimedia.org/wiki/File:Christ_and_Liberty.svg)",
+  "detail": "nota 3 — Duas silhuetas vermelhas de contorno no mesmo arquivo: a esquerda, o Cristo Redentor de bracos abertos sobre uma base pequena e estreita; a direita, a Estatua da Liberdade com coroa de raios, tocha e um pedestal largo em degraus. O Cristo e reconhecivel, mas a peca vem junto com uma estatua que nao pertence ao projeto.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.988,
+  "calls": 22
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Height comparison of notable statues (vector).svg (https://commons.wikimedia.org/wiki/File:Height_comparison_of_notable_statues_(vector).svg)",
+  "detail": "nota 2 — Um gráfico de comparação de altura de estátuas famosas, com uma régua vertical vermelha à esquerda, uma linha de base horizontal e cinco silhuetas de tamanhos diferentes (uma estátua grande, uma estátua de Buda em pé, a Estátua da Liberdade, uma figura com braço erguido e, bem à direita, um pequeno Cristo Redentor de braços abertos). O Cristo é só uma figura minúscula, sem pedestal retangular e sem a palavra REAIS.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 2.9994,
+  "calls": 23
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Height comparison of notable statues whether or not FoP.svg (https://commons.wikimedia.org/wiki/File:Height_comparison_of_notable_statues_whether_or_not_FoP.svg)",
+  "detail": "nota 1 — Um grafico de comparacao de altura de varias estatuas famosas, com uma regua vermelha vertical a esquerda e uma linha de base horizontal. Mostra 5 silhuetas: duas grandes com circulos concentricos (alvos), a Estatua da Liberdade, uma figura de braco erguido e, no extremo direito, um pequeno Cristo Redentor de bracos abertos. O Cristo e so uma das silhuetas, minusculo, sem pedestal com REAIS.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, Cristo Redentor Rio de Janeiro statue outline with rectangular pedestal, single closed path, laser cut SVG, thick arms, simplified smooth contour, front view, no other monuments",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, Cristo Redentor statue with pedestal vector, Christ the Redeemer Rio de Janeiro outline svg, single closed-contour silhouette for laser cutting, arms outstretched statue on rectangular base stencil",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, Cristo Redentor Rio de Janeiro statue with pedestal, laser cut svg, single closed outline, arms open, front view, stencil",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "cristo",
+  "name": "Cristo Redentor sobre pedestal",
+  "score": 3,
+  "source": "web: File:Christ and Liberty.svg (https://commons.wikimedia.org/wiki/File:Christ_and_Liberty.svg)",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "step",
+  "label": "gravura cristo",
+  "detail": "REAIS",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 2 - estados do mapa e Cristo",
+  "detail": "2 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 3.01,
+  "calls": 24
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_1: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coração simples de contorno vermelho fechado, com dois lóbulos arredondados no topo, entalhe central e ponta inferior em V. Fica levemente assimétrico: o lóbulo direito é um pouco mais alto e mais largo. Tem aproximadamente 9,5 x 9 unidades, proporção quase quadrada, orientação vertical com a ponta para baixo.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_1",
+  "name": "Coracao (Amazonas)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.0195,
+  "calls": 25
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_2: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração em contorno vermelho único e fechado, com dois lóbulos arredondados no topo, entalhe central e ponta inferior em V. É reconhecível como o pino de coração da foto. Sem moldura, legenda ou fiapos.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_2",
+  "name": "Coracao (Mato Grosso)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.0296,
+  "calls": 26
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_3: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração em contorno vermelho único e fechado, com dois lóbulos arredondados no topo, entalhe central e ponta inferior em V. Fica em torno de 9,5 x 8,9 unidades, quase tão larga quanto alta.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_3",
+  "name": "Coracao (Nordeste interior)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.0394,
+  "calls": 27
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_4: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coracao classico com contorno vermelho unico e fechado, dois lobos arredondados no topo, entalhe central e ponta inferior em V. Silhueta limpa, sem moldura, legenda ou pecas soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_4",
+  "name": "Coracao (Goias)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.0495,
+  "calls": 28
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_5: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração simples em contorno vermelho fechado, com dois lóbulos arredondados no topo, entalhe central e ponta inferior em V com laterais retas. Tem cerca de 11 x 9 unidades, é limpa e de linha única, sem peças soltas, moldura ou legenda.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_5",
+  "name": "Coracao (Minas Gerais)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.0602,
+  "calls": 29
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_6: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coração simples com contorno vermelho fechado, de linha única. Tem dois lóbulos arredondados, uma reentrância central e a ponta inferior em V. Fica sobre fundo cinza do software, com réguas nas bordas. Mede cerca de 9,7 mm de largura por 8,9 mm de altura.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_6",
+  "name": "Coracao (litoral da Bahia)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.0702,
+  "calls": 30
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_7: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração simétrica, com contorno vermelho fechado e contínuo, dois lóbulos arredondados, entalhe central no topo e ponta inferior em V. Não tem moldura, legenda nem peças soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_7",
+  "name": "Coracao (Sao Paulo)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.0963,
+  "calls": 31
+ },
+ {
+  "kind": "cost",
+  "usd": 3.1061,
+  "calls": 32
+ },
+ {
+  "kind": "step",
+  "label": "peca morros_azuis: desenho da IA",
+  "detail": "nota 6 — Uma faixa baixa de morros arredondados, com tres ondulacoes (a do meio maior) e base reta, em contorno vermelho fechado. Lembra a faixa de ondas/morros azuis na frente do pe do Cristo.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: rolling hills landscape silhouette svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: rolling hills silhouette vector, layered waves hills border svg, paper cut layered hills landscape, laser cut hill layer, simple mountain wave silhouette flat bottom",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "morros_azuis",
+  "name": "Morros azuis da frente",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 3 - coracoes do mapa e morros da frente",
+  "detail": "8 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "cena em camadas",
+  "detail": "3 camada(s) sobre \"painel_cena\"",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "colisoes no 3D",
+  "detail": "0 (pecas: 74, conjuntos: 2)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "check_design",
+  "detail": "99 achado(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "fotos do 3D",
+  "detail": "3 (iso, topo, frente)",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-montar",
+  "title": "Construir as peças no programa",
+  "status": "done",
+  "detail": "8 placa(s), 19 encaixe(s), colisões no 3D: 0"
+ },
+ {
+  "kind": "stage",
+  "stage": "5-conferir",
+  "title": "Conferir o 3D com a foto",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.479,
+  "calls": 33
+ },
+ {
+  "kind": "step",
+  "label": "IA 5-conferir",
+  "detail": "anthropic/claude-fable-5.2: 7713 tokens de entrada, 7780 de saida",
+  "ok": true
+ },
+ {
+  "kind": "assistant",
+  "stage": "5-conferir",
+  "text": "Veredito: corrigir\niso: Caixa fechada, fina e alta, com dentes de encaixe em todas as arestas. A face grande visivel e inteirica: sem janela, sem acrilico e sem nenhuma peca da cena. A face estreita ao lado tambem e lisa. O tampo tem tres rasgos pequenos. Mapa, placa de titulo, setas e compartimento de moedas nao aparecem.\ntopo: Retangulo estreito em X e comprido em Y, cerca de 1 para 4, com dentes nas bordas. Ha dois rasgos pequenos perto da borda esquerda e duas linguetas pequenas saindo dessa borda. Nenhuma peca da cena aparece.\nfrente: Retangulo estreito e alto, cerca de 1 de largura para 4 de altura, madeira lisa com dentes nas quatro bordas e duas linguetas pequenas na borda esquerda. E a lateral estreita da caixa, nao a face com a janela e o mapa.\n[grave] Base do mapa (silhueta do Brasil) presa ao fundo da moldura: esperado Na foto, a silhueta do Brasil e uma camada apoiada no fundo azul, e os estados ficam por cima dela.; no 3D As verificacoes do programa dao mapa_base com ok=false e encaixe nao feito (\"nenhuma tentativa deu certo\"). Nenhuma das vistas recebidas mostra o mapa. O programa conta 2 conjuntos para um objeto que na foto e um so; possivelmente a cena ficou solta da caixa.\n[grave] Estados do mapa e Cristo Redentor: esperado Na foto, o mapa do Brasil e dividido em estados coloridos como pecas separadas sobre a base. A direita ha um Cristo de bracos abertos sobre um pedestal.; no 3D As verificacoes dao mapa_estados com ok=false e nota 4 (origem: arquivo \"Coronavirus Brazil map\") e cristo com ok=false e nota 3 (origem: arquivo \"Christ and Liberty\", que pelo nome pode trazer outra figura junto). Nenhuma vista recebida mostra essas pecas.\n[grave] Pecas de cenario: aviao, palmeira, mala, veleiro, ondas, montanhas, rocha, morros azuis: esperado Na foto: aviao no alto a direita, palmeira atras do Cristo, mala com etiquetas a esquerda, veleiro sobre ondas, montanhas e rocha sob o Cristo, morros azuis na base direita.; no 3D As verificacoes dao ok=false para todas: ondas 3, montanhas 3, rocha 3, palmeira 4, aviao 5, mala 6, veleiro 6, morros_azuis 6. Nenhuma aparece nas vistas recebidas.\n[grave] Face da frente: moldura com janela, acrilico e compartimento de moedas: esperado Na foto, a face grande da frente e uma moldura com janela larga de cantos arredondados. Por ela se ve a cena e, embaixo, o compartimento transparente com notas e moedas, separado por quatro postes. Abaixo da janela ha uma faixa cheia com as metas de R$20 a R$1.000.; no 3D Na vista iso, a unica face grande visivel e inteirica, sem abertura. As vistas topo e frente nao mostram nenhuma face grande. Nao da para saber se a face fechada e a frente (janela faltando) ou a traseira (frente virada para o lado nao fotografado). Faltaram a vista lateral, a segunda isometrica e o angulo parecido com o da foto.\n[media] Orientacao do objeto nos eixos: esperado A face grande com a janela deve ficar no plano X-Z, virada para a frente: objeto largo em X e raso em Y, como na foto.; no 3D Na vista frente aparece a lateral estreita. Na vista topo, o objeto e estreito em X e comprido em Y. O quadro esta girado 90 graus: a face grande ficou virada para o lado.\n[media] Profundidade da caixa em relacao a largura: esperado Na foto, a lateral visivel e uma faixa fina; a caixa parece bem mais rasa que um quarto da largura. Isto e leitura de proporcao da foto, portanto hipotese.; no 3D Nas vistas topo e frente, a profundidade e cerca de um quarto da largura e da altura. As verificacoes nao apontam medida errada, ou seja, o 3D segue o que foi especificado.\n[leve] Partes que a foto nao mostra: verso, tampo, fenda de moedas, modo de abrir: esperado A foto nao mostra a traseira nem o tampo por cima. Nao da para ver onde fica a fenda das moedas nem como se abre para retirar o dinheiro.; no 3D Nas vistas iso e topo, o tampo tem alguns rasgos pequenos e ha duas linguetas numa borda. Nao da para dizer se sao a fenda de moedas, travas ou encaixes de divisoria."
+ },
+ {
+  "kind": "stage",
+  "stage": "5-conferir",
+  "title": "Conferir o 3D com a foto",
+  "status": "done",
+  "detail": "veredito corrigir; 7 diferença(s), 4 grave(s); sistema com erro"
+ },
+ {
+  "kind": "stage",
+  "stage": "2-vistas",
+  "title": "Desenhar as três vistas (volta 2)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 3.7902,
+  "calls": 34
+ },
+ {
+  "kind": "step",
+  "label": "IA 2-vistas",
+  "detail": "anthropic/claude-fable-5.2: 16239 tokens de entrada, 4532 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 2-vistas (volta 2), resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "2-vistas",
+  "title": "Desenhar as três vistas (volta 2)",
+  "status": "done",
+  "detail": "8 placa(s); 400 x 100 x 400 mm"
+ },
+ {
+  "kind": "stage",
+  "stage": "3-especificar",
+  "title": "Especificar as placas e os encaixes (volta 2)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 4.087,
+  "calls": 35
+ },
+ {
+  "kind": "step",
+  "label": "IA 3-especificar",
+  "detail": "anthropic/claude-fable-5.2: 6670 tokens de entrada, 6087 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 3-especificar (volta 2), resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "3-especificar",
+  "title": "Especificar as placas e os encaixes (volta 2)",
+  "status": "done",
+  "detail": "8 placa(s), ligações auto"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-cena",
+  "title": "Janelas, textos e peças decorativas (volta 2)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.0954,
+  "calls": 36
+ },
+ {
+  "kind": "step",
+  "label": "IA 4-cena",
+  "detail": "anthropic/claude-fable-5.2: 22006 tokens de entrada, 20809 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 4-cena (volta 2), resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "4-cena",
+  "title": "Janelas, textos e peças decorativas (volta 2)",
+  "status": "done",
+  "detail": "24 peça(s) decorativa(s) em 3 camada(s)"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-montar",
+  "title": "Construir as peças no programa (volta 2)",
+  "status": "start"
+ },
+ {
+  "kind": "step",
+  "label": "new_document",
+  "detail": "documento novo",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect moldura_clara",
+  "detail": "400 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect apoio_visor",
+  "detail": "394 x 394 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect painel_cena",
+  "detail": "394 x 267 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect fundo",
+  "detail": "400 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect lateral_esquerda",
+  "detail": "100 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect lateral_direita",
+  "detail": "100 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect topo",
+  "detail": "400 x 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect base",
+  "detail": "400 x 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+lateral_esquerda",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+lateral_direita",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+topo",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+base",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+lateral_esquerda",
+  "detail": "a espiga tem 267 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+lateral_direita",
+  "detail": "a espiga tem 267 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+topo",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+lateral_esquerda",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+lateral_direita",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+topo",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+base",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+lateral_esquerda",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+lateral_direita",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+topo",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+base",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_esquerda+topo",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_esquerda+base",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_direita+topo",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_direita+base",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+lateral_esquerda",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+lateral_direita",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+topo",
+  "detail": "2 furo(s), 0 mm ao longo, 87 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+base",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+lateral_esquerda",
+  "detail": "2 furo(s), 63.5 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+lateral_direita",
+  "detail": "2 furo(s), -63.5 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+topo",
+  "detail": "2 furo(s), 0 mm ao longo, 57 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "medidas das pecas",
+  "detail": "8 de 8 exatas",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte moldura_clara",
+  "detail": "360 x 325 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "PLANEJE, ECONOMIZE, VIAJE!",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$20",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$50",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$100",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$200",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$500",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$1.000",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte apoio_visor",
+  "detail": "348 x 319 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte topo",
+  "detail": "120 x 6 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "face gravada moldura_clara",
+  "detail": "dentro -> fora (placa espelhada)",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil Blank Map",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 5.1072,
+  "calls": 37
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:Blank Map of Brazil.svg (https://commons.wikimedia.org/wiki/File:Blank_Map_of_Brazil.svg)",
+  "detail": "nota 3 — Mapa político do Brasil em linhas vermelhas sobre fundo cinza, com o contorno externo e todas as divisas internas dos estados. Tem réguas de coordenadas nas bordas (captura de tela de software). Dá para reconhecer o país, mas é o mapa dos estados, não a silhueta maciça.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.1194,
+  "calls": 38
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:Coronavirus Brazil map.svg (https://commons.wikimedia.org/wiki/File:Coronavirus_Brazil_map.svg)",
+  "detail": "nota 2 — Mapa do Brasil com as divisas internas dos estados, em linhas vermelhas de corte, mais seis quadradinhos soltos empilhados no canto inferior esquerdo e um retangulo minusculo dentro de Goias/DF. Nao e uma silhueta macica. O formato do pais e reconhecivel e a orientacao esta correta, com o norte para cima.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:Brazil Blank Map light.svg (https://commons.wikimedia.org/wiki/File:Brazil_Blank_Map_light.svg)",
+  "detail": "peca complexa demais para cortar (31984 nos depois de simplificar; tinha 75715)",
+  "ok": false
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:Brazil Blank Map.svg (https://commons.wikimedia.org/wiki/File:Brazil_Blank_Map.svg)",
+  "detail": "peca complexa demais para cortar (31984 nos depois de simplificar; tinha 75715)",
+  "ok": false
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil silhouette vector, Brazil country outline solid black, Brazil map silhouette SVG no borders, Brazil shape single path simplified, Brazil outline map laser cut DXF",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil silhouette vector, Brazil outline map solid shape, Brazil country border only SVG, Brazil map single path no states, blank Brazil map silhouette laser cut",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mapa_base",
+  "name": "Base do mapa (silhueta do Brasil)",
+  "score": 3,
+  "source": "web: File:Blank Map of Brazil.svg (https://commons.wikimedia.org/wiki/File:Blank_Map_of_Brazil.svg)",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca placa_titulo: forma retangulo",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "placa_titulo",
+  "name": "Plaqueta de titulo",
+  "score": 10,
+  "source": "forma retangulo",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura placa_titulo",
+  "detail": "Nossa Aventura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura placa_titulo",
+  "detail": "Para a próxima viagem juntos",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.1293,
+  "calls": 39
+ },
+ {
+  "kind": "step",
+  "label": "peca nuvem: biblioteca builtin:cloud",
+  "detail": "nota 7 — Silhueta de nuvem em contorno vermelho fechado: base reta e larga, laterais arredondadas e um lobo grande no topo central. Dá para reconhecer como nuvem. Não há fiapos, moldura ou legenda.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "nuvem",
+  "name": "Nuvem",
+  "score": 7,
+  "source": "biblioteca builtin:cloud",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.164,
+  "calls": 40
+ },
+ {
+  "kind": "cost",
+  "usd": 5.1757,
+  "calls": 41
+ },
+ {
+  "kind": "step",
+  "label": "peca aviao: desenho da IA",
+  "detail": "nota 6 — Silhueta vermelha fechada de um avião de passageiros visto de cima, inclinado na diagonal com o nariz arredondado no canto superior direito e a cauda no canto inferior esquerdo. Tem fuselagem, duas asas enflechadas para trás e estabilizador na cauda. É reconhecível como avião, mas bem geométrica e angulosa.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: airliner top view silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: airplane top view silhouette vector, passenger jet plan view silhouette, commercial airliner top view svg, airplane icon swept wings two engines, aircraft silhouette from above clean outline, laser cut airplane silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "aviao",
+  "name": "Aviao",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.2159,
+  "calls": 42
+ },
+ {
+  "kind": "cost",
+  "usd": 5.228,
+  "calls": 43
+ },
+ {
+  "kind": "step",
+  "label": "peca palmeira: desenho da IA",
+  "detail": "nota 4 — Contorno vermelho em linha fina de uma palmeira: tronco longo, estreito e quase reto, com leve inclinação, e uma copa de cerca de 7 folhas arqueadas com pontas serrilhadas. Há vários traços abertos e soltos no centro da copa. Não há preenchimento, só linhas.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: coconut palm tree silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: palm tree silhouette vector, coconut tree solid silhouette, curved leaning trunk, drooping fronds, single closed path, laser cut palm tree SVG, tropical palm tree stencil",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "palmeira",
+  "name": "Palmeira",
+  "score": 4,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.2687,
+  "calls": 44
+ },
+ {
+  "kind": "cost",
+  "usd": 5.2814,
+  "calls": 45
+ },
+ {
+  "kind": "step",
+  "label": "peca mala: desenho da IA",
+  "detail": "nota 6 — Contorno de uma mala de viagem vista de frente, mais alta que larga, com cantos arredondados e alca em arco no topo. Por dentro ha duas cintas verticais em cada lado, quatro cantoneiras em forma de quarto de circulo nos cantos, duas pequenas fivelas retangulares e tres selos retangulares tortos na metade de baixo. Tudo em linhas vermelhas de corte.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: vintage suitcase front view straps silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: vintage suitcase silhouette vector, retro travel luggage front view, suitcase with two straps and corner protectors, solid outline with handle, laser cut suitcase svg, old travel trunk icon",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mala",
+  "name": "Mala de viagem",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.3107,
+  "calls": 46
+ },
+ {
+  "kind": "cost",
+  "usd": 5.3224,
+  "calls": 47
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: desenho da IA",
+  "detail": "nota 3 — Silhueta de veleiro com uma vela triangular grande e alta, de ponta truncada no topo, sobre um casco largo em forma de trapézio. O casco e a vela estão divididos em contornos separados, e há uma fenda no centro entre eles. Visualmente lembra um barco, mas o desenho é simplificado e geométrico demais.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat two sails side view silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette vector, sailing boat side view solid silhouette, sailboat with mainsail and jib, single closed outline, laser cut sailboat svg, half-moon hull yacht silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "veleiro",
+  "name": "Veleiro",
+  "score": 3,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.3517,
+  "calls": 48
+ },
+ {
+  "kind": "cost",
+  "usd": 5.3631,
+  "calls": 49
+ },
+ {
+  "kind": "step",
+  "label": "peca ondas: desenho da IA",
+  "detail": "nota 6 — Faixa horizontal comprida e baixa, com base reta e borda superior ondulada com cerca de 3 cristas suaves. A ultima onda, a direita, termina em um caracol (enrolamento) e uma ponta fina que se alonga para a direita ao nivel da base. Contorno vermelho de corte em um unico tracado, sem moldura ou legenda.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: ocean wave border strip silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: ocean wave border silhouette vector, sea wave strip with curl crest, solid filled wave banner svg, simple wave laser cut file, curling wave crest flat base, thick wave silhouette without thin tail",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "ondas",
+  "name": "Ondas sob o veleiro",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.3891,
+  "calls": 50
+ },
+ {
+  "kind": "cost",
+  "usd": 5.4001,
+  "calls": 51
+ },
+ {
+  "kind": "step",
+  "label": "peca montanhas: desenho da IA",
+  "detail": "nota 7 — Silhueta fechada de uma montanha com dois picos e base reta, em vermelho sobre fundo cinza. O pico esquerdo é alto e largo, e o direito é mais baixo, com um pequeno vale entre eles. O contorno é um polígono único, sem fiapos, sem peças soltas, sem moldura e sem legenda.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "montanhas",
+  "name": "Montanhas cinzas",
+  "score": 7,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.4281,
+  "calls": 52
+ },
+ {
+  "kind": "cost",
+  "usd": 5.4393,
+  "calls": 53
+ },
+ {
+  "kind": "step",
+  "label": "peca rocha: desenho da IA",
+  "detail": "nota 7 — Uma silhueta fechada de um morro baixo e largo, com base reta e um pequeno recorte chanfrado no canto inferior direito. O lado esquerdo sobe quase vertical e arredonda num pico alto. O topo desce de forma suave e ondulada até a direita, com um pequeno degrau por volta de x=335. É um contorno vermelho único, sem fiapos, sem peças soltas e sem moldura ou legenda.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "rocha",
+  "name": "Rocha clara do Cristo",
+  "score": 7,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_rio: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_rio",
+  "name": "Placa de direcao RIO DE JANEIRO",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_rio",
+  "detail": "RIO DE JANEIRO",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_salvador: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_salvador",
+  "name": "Placa de direcao SALVADOR",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_salvador",
+  "detail": "SALVADOR",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_foz: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_foz",
+  "name": "Placa de direcao FOZ DO IGUAÇU",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_foz",
+  "detail": "FOZ DO IGUAÇU",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_manaus: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_manaus",
+  "name": "Placa de direcao MANAUS",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_manaus",
+  "detail": "MANAUS",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 1 - bases e figuras coladas direto no painel",
+  "detail": "14 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil Blank Map",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 5.4519,
+  "calls": 54
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Blank Map of Brazil.svg (https://commons.wikimedia.org/wiki/File:Blank_Map_of_Brazil.svg)",
+  "detail": "nota 4 — Mapa do Brasil em vermelho com o contorno do pais e as divisas internas dos estados, sobre fundo cinza do software. Da para reconhecer o Brasil e a orientacao esta correta, mas os tracos sao linhas finas e irregulares, sem pecas fechadas e limpas para recorte.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.4643,
+  "calls": 55
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Coronavirus Brazil map.svg (https://commons.wikimedia.org/wiki/File:Coronavirus_Brazil_map.svg)",
+  "detail": "nota 4 — Mapa do Brasil em contorno vermelho, com as divisas dos estados como linhas fechadas. O país é reconhecível e a orientação (norte para cima) bate com a foto. Na lateral esquerda há uma coluna de 6 quadradinhos que não pertence ao mapa. Dentro do mapa há um pequeno retângulo no lugar do Distrito Federal.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Brazil Blank Map light.svg (https://commons.wikimedia.org/wiki/File:Brazil_Blank_Map_light.svg)",
+  "detail": "peca complexa demais para cortar (31984 nos depois de simplificar; tinha 75715)",
+  "ok": false
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Brazil Blank Map.svg (https://commons.wikimedia.org/wiki/File:Brazil_Blank_Map.svg)",
+  "detail": "peca complexa demais para cortar (31984 nos depois de simplificar; tinha 75715)",
+  "ok": false
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil states map vector SVG simplified, Brazil map separate closed paths each state, Brazil map puzzle laser cut, Brazil blank map outline with state borders low detail, Brazil map layered papercut template DXF",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil map vector outline with state borders, blank Brazil states map SVG, simplified Brazil silhouette with internal state boundaries, Brazil map laser cut file, no legend, no labels, no neighboring countries",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mapa_estados",
+  "name": "Estados do Brasil",
+  "score": 4,
+  "source": "web: File:Blank Map of Brazil.svg (https://commons.wikimedia.org/wiki/File:Blank_Map_of_Brazil.svg)",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.5101,
+  "calls": 56
+ },
+ {
+  "kind": "cost",
+  "usd": 5.5231,
+  "calls": 57
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: desenho da IA",
+  "detail": "nota 5 — Silhueta frontal simétrica de uma figura com braços abertos na horizontal, cabeça oval pequena, corpo afunilando para baixo e pedestal retangular com base mais larga. Dentro do corpo há três fendas verticais longas (dobras da túnica) e, no pedestal, uma fenda horizontal. Todos os contornos são vermelhos e fechados. Lembra o Cristo Redentor, mas de forma genérica e rústica.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Cristo Redentor Rio de Janeiro statue",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 5.5356,
+  "calls": 58
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Height comparison of notable statues whether or not FoP.svg (https://commons.wikimedia.org/wiki/File:Height_comparison_of_notable_statues_whether_or_not_FoP.svg)",
+  "detail": "nota 1 — Não é uma peça única do Cristo Redentor. É um gráfico de comparação de alturas de estátuas famosas: uma régua vermelha com marcações à esquerda, uma linha de base horizontal e cinco silhuetas lado a lado (duas grandes estátuas com círculos concêntricos, a Estátua da Liberdade, uma figura com braço erguido e, por fim, um Cristo Redentor minúsculo de braços abertos à direita, sem pedestal proporcional).",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.5477,
+  "calls": 59
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Height comparison of notable statues (vector).svg (https://commons.wikimedia.org/wiki/File:Height_comparison_of_notable_statues_(vector).svg)",
+  "detail": "nota 2 — Um grafico de comparacao de altura de estatuas famosas: uma regua vertical vermelha com marcas, uma linha de base horizontal e cinco silhuetas de estatuas de tamanhos diferentes. Da esquerda para a direita: uma estatua muito grande, uma estatua grande sobre base, a Estatua da Liberdade, uma figura com braco levantado e, no canto direito, uma pequena silhueta do Cristo Redentor de bracos abertos. Nao e uma peca unica.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.5609,
+  "calls": 60
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Christ and Liberty.svg (https://commons.wikimedia.org/wiki/File:Christ_and_Liberty.svg)",
+  "detail": "nota 2 — A imagem mostra duas silhuetas vermelhas lado a lado, no formato de contorno vetorial: o Cristo Redentor pequeno à esquerda e a Estátua da Liberdade bem maior à direita, com pedestal largo. São dois contornos separados, vindos do arquivo 'Christ and Liberty'. O Cristo é reconhecível, de braços abertos, mas é só uma silhueta fina e irregular.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.5739,
+  "calls": 61
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:2747202 Noun Cristo Redentor.svg (https://commons.wikimedia.org/wiki/File:2747202_Noun_Cristo_Redentor.svg)",
+  "detail": "nota 2 — Um pictograma geometrico de linhas arredondadas, com cabeca oval grande (com furo interno), uma barra horizontal longa de bracos com pontas arredondadas, torso e tunica em tracos de espessura uniforme e uma base horizontal. Os contornos se sobrepoem e se cruzam, sem formar uma silhueta unica e fechada. Lembra vagamente um Cristo de bracos abertos, mas esta mais para um icone abstrato de linhas.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer Rio de Janeiro statue silhouette vector, front view, arms outstretched, with plain rectangular pedestal, solid single-contour laser cut SVG, no internal cutouts, simple clean outline",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, Cristo Redentor statue front view with pedestal, arms outstretched, single closed outline, SVG laser cut file, stencil, clean black silhouette, Rio de Janeiro landmark",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer statue silhouette vector, front view, symmetric, outstretched arms, with pedestal, solid black silhouette, single figure, laser cut SVG, Cristo Redentor Rio de Janeiro clipart",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, Cristo Redentor statue front view with pedestal, symmetrical outline, solid filled silhouette, laser cut SVG, Rio de Janeiro landmark clipart, black and white, single closed path",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, solid filled single outline, front view, arms outstretched, long robe, small head, rectangular pedestal, Rio de Janeiro statue, SVG laser cut, no text, no background",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "cristo",
+  "name": "Cristo Redentor sobre pedestal",
+  "score": 5,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "step",
+  "label": "gravura cristo",
+  "detail": "REAIS",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6021,
+  "calls": 62
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6136,
+  "calls": 63
+ },
+ {
+  "kind": "step",
+  "label": "peca morros_azuis: desenho da IA",
+  "detail": "nota 6 — Uma faixa baixa e larga de base reta, com três morros arredondados emendados, que descem da esquerda para a direita. O contorno é vermelho e fechado, sem moldura, legenda ou fiapos. As laterais são verticais, a esquerda um pouco mais alta que a direita. Não há linha de crista gravada.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: rolling hills strip silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: rolling hills silhouette vector, three smooth rounded hills, flat bottom, laser cut layer, soft wave mountain landscape, paper cut hills layer, simple hill border svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "morros_azuis",
+  "name": "Morros azuis da frente",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 2 - estados do mapa, Cristo e morros azuis",
+  "detail": "3 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6247,
+  "calls": 64
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_1: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coração simples, de contorno vermelho fechado e único, com dois lóbulos arredondados no topo, uma reentrância central e ponta inferior em V com laterais retas. Tem proporção quase quadrada (cerca de 9,5 x 9 unidades) e fica na orientação normal, com a ponta para baixo. Não há moldura, legenda nem fragmentos soltos.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_1",
+  "name": "Coracao (Amazonas)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6346,
+  "calls": 65
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_2: biblioteca builtin:heart",
+  "detail": "nota 7 — Um coração vermelho de contorno único e fechado, com duas lobas arredondadas, entalhe central no topo e ponta inferior em V com laterais retas. Sem moldura, legenda ou fiapos. A silhueta é limpa e reconhecível como coração.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_2",
+  "name": "Coracao (Mato Grosso)",
+  "score": 7,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6445,
+  "calls": 66
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_3: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração com contorno vermelho fechado e único, com dois lóbulos arredondados no topo, entalhe central e ponta inferior em V. Fica sobre fundo cinza, sem moldura, legenda ou peças soltas. Mede cerca de 10 x 9 unidades.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_3",
+  "name": "Coracao (Nordeste interior)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6536,
+  "calls": 67
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_4: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coracao simples e simetrico, com contorno vermelho unico e fechado, lobos arredondados e ponta inferior em V. Nao ha miolo, moldura, legenda nem pedacos soltos.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_4",
+  "name": "Coracao (Goias)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6634,
+  "calls": 68
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_5: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração simples com contorno vermelho fechado e único, com duas curvas no topo, entalhe central e ponta inferior em V. Não tem moldura, legenda ou peças soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_5",
+  "name": "Coracao (Minas Gerais)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.674,
+  "calls": 69
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_6: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração em contorno vermelho fechado e contínuo, com dois lóbulos arredondados, entalhe central no topo e ponta inferior em V. Tem cerca de 9,7 x 9,0 unidades, quase tão larga quanto alta. Não há moldura, legenda nem peças soltas dentro da área de corte. As réguas e o fundo cinza são só da interface do programa.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_6",
+  "name": "Coracao (litoral da Bahia)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 5.6845,
+  "calls": 70
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_7: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração simples, em contorno vermelho fechado e contínuo, com dois lóbulos arredondados, entalhe central no topo e ponta inferior em V. Largura e altura são quase iguais, cerca de 10 x 9 unidades. Não há moldura, legenda nem peças soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_7",
+  "name": "Coracao (Sao Paulo)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 3 - coracoes do mapa",
+  "detail": "7 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "cena em camadas",
+  "detail": "3 camada(s) sobre \"painel_cena\"",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "colisoes no 3D",
+  "detail": "0 (pecas: 39, conjuntos: 2)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "check_design",
+  "detail": "264 achado(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "fotos do 3D",
+  "detail": "3 (iso, topo, frente)",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-montar",
+  "title": "Construir as peças no programa (volta 2)",
+  "status": "done",
+  "detail": "8 placa(s), 19 encaixe(s), colisões no 3D: 0"
+ },
+ {
+  "kind": "stage",
+  "stage": "5-conferir",
+  "title": "Conferir o 3D com a foto (volta 2)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 6.0832,
+  "calls": 71
+ },
+ {
+  "kind": "step",
+  "label": "IA 5-conferir",
+  "detail": "anthropic/claude-fable-5.2: 7646 tokens de entrada, 8438 de saida",
+  "ok": true
+ },
+ {
+  "kind": "assistant",
+  "stage": "5-conferir",
+  "text": "Veredito: corrigir\niso: Caixa fechada em pé, com encaixes de dentes em todas as arestas. Aparecem a face estreita (à esquerda), uma face grande (à direita) e o topo com 3 ou 4 rasgos pequenos. A face grande visível é inteiriça: sem janela, sem moldura, sem nenhuma peça decorativa.\ntopo: Retângulo estreito em X e comprido em Y, proporção de cerca de 1:4. Há dois rasgos junto à borda esquerda e dois um pouco mais para dentro, todos do lado esquerdo (-X). Não há fenda de moedas nem abertura.\nfrente: Retângulo estreito e alto, proporção de cerca de 1:4, totalmente fechado. Há duas pequenas marcas na borda esquerda, em duas alturas. Não se vê janela, mapa, placa de título, setas nem divisórias.\n[media] Orientação do objeto inteiro (eixos X e Y): esperado Na foto, a face larga e quase quadrada, com a janela e o mapa, é a FRENTE (plano XZ, em Y=0). A caixa é rasa em profundidade (Y).; no 3D Na vista de frente aparece a face estreita (cerca de 1:4). No topo a caixa é estreita em X e comprida em Y. A face grande está virada para ±X, ou seja, largura e profundidade estão trocadas.\n[grave] Face frontal: janela e moldura: esperado A frente é uma moldura com uma janela grande de cantos arredondados, que ocupa cerca de 3/4 da altura. Abaixo há uma faixa inteiriça com os círculos de metas (R$20 a R$1.000). Pela janela se veem o painel de fundo azul e o compartimento das moedas atrás do acrílico.; no 3D A única face grande visível (iso) é uma chapa inteiriça sem abertura. A face grande oposta não aparece em nenhuma das 3 vistas recebidas; faltaram a vista lateral, a segunda isométrica e o ângulo parecido com o da foto. Portanto a janela está ausente ou está numa face que não pude conferir.\n[media] Interior: painel de fundo, acrílico, hastes divisórias e posição das peças decorativas: esperado A foto mostra um painel de fundo azul recuado com mapa em camadas, placa de título no alto e, na base da cena, mala, veleiro, Cristo, palmeira e morros. Mostra também 4 hastes verticais com as setas (Rio de Janeiro, Salvador, Foz do Iguaçu, Manaus), que dividem o compartimento inferior das moedas, e um acrílico na frente.; no 3D Nada disso aparece em nenhuma vista do 3D, porque a caixa está fechada nas faces mostradas. Só os rasgos do topo, perto do lado -X, sugerem painéis internos paralelos à face grande. Não dá para conferir o número de hastes, a posição delas nem o lado em que cada enfeite ficou.\n[grave] Peças da cena reprovadas pela verificação do programa: esperado Silhuetas reconhecíveis como na foto: contorno do Brasil com os estados em peças separadas sobre uma base azul um pouco maior, veleiro com casco e duas velas, palmeira, Cristo de braços abertos sobre pedestal, avião, mala, ondas e morros.; no 3D Em pecas_da_cena, vieram com ok=false: mapa_base (nota 3), veleiro (3), palmeira (4), mapa_estados (4), cristo (5), aviao (6), mala (6), ondas (6) e morros_azuis (6). Erro do programa conta como diferença grave, mesmo sem a peça aparecer nas vistas.\n[media] Montagem: número de conjuntos: esperado A foto mostra um único objeto montado; nenhuma parte solta é visível.; no 3D A verificação informa conjuntos = 2 para 39 peças, ou seja, há um grupo de peças que não está ligado ao resto. Pode ser uma tampa ou um acrílico removível (hipótese), ou enfeites sem apoio no painel de fundo.\n[media] check_design: esperado Um resultado legível das regras de projeto, aprovado ou com a lista de problemas.; no 3D check_design veio com total = 264 e resumo = null. Não dá para saber se são 264 regras conferidas ou 264 avisos, então não pode ser tratado como aprovado.\n[leve] Profundidade da caixa (Y): esperado Na foto a caixa parece rasa, mas a perspectiva não permite medir a profundidade; a foto não tem escala.; no 3D No 3D (topo e frente) a dimensão menor é cerca de 1/4 da maior. A face grande é quase quadrada, o que combina com a foto.\n[leve] Partes que a foto não mostra: fundo, topo e entrada ou retirada do dinheiro: esperado A foto não mostra a parte de trás nem o topo por inteiro. Não se vê fenda de moedas nem tampa de retirada.; no 3D No 3D o topo só tem rasgos pequenos de encaixe, sem fenda de moedas, e a face grande visível é fechada."
+ },
+ {
+  "kind": "stage",
+  "stage": "5-conferir",
+  "title": "Conferir o 3D com a foto (volta 2)",
+  "status": "done",
+  "detail": "veredito corrigir; 8 diferença(s), 2 grave(s); sistema sem erro"
+ },
+ {
+  "kind": "stage",
+  "stage": "2-vistas",
+  "title": "Desenhar as três vistas (volta 3)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 6.4267,
+  "calls": 72
+ },
+ {
+  "kind": "step",
+  "label": "IA 2-vistas",
+  "detail": "anthropic/claude-fable-5.2: 23545 tokens de entrada, 3878 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 2-vistas (volta 3), resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "2-vistas",
+  "title": "Desenhar as três vistas (volta 3)",
+  "status": "done",
+  "detail": "8 placa(s); 400 x 100 x 400 mm"
+ },
+ {
+  "kind": "stage",
+  "stage": "3-especificar",
+  "title": "Especificar as placas e os encaixes (volta 3)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 6.708,
+  "calls": 73
+ },
+ {
+  "kind": "step",
+  "label": "IA 3-especificar",
+  "detail": "anthropic/claude-fable-5.2: 6670 tokens de entrada, 5698 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 3-especificar (volta 3), resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "3-especificar",
+  "title": "Especificar as placas e os encaixes (volta 3)",
+  "status": "done",
+  "detail": "8 placa(s), ligações auto"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-cena",
+  "title": "Janelas, textos e peças decorativas (volta 3)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.7346,
+  "calls": 74
+ },
+ {
+  "kind": "step",
+  "label": "IA 4-cena",
+  "detail": "anthropic/claude-fable-5.2: 34256 tokens de entrada, 18815 de saida",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "conferidor 4-cena (volta 3), resposta 1",
+  "detail": "aceita",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "4-cena",
+  "title": "Janelas, textos e peças decorativas (volta 3)",
+  "status": "done",
+  "detail": "24 peça(s) decorativa(s) em 3 camada(s)"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-montar",
+  "title": "Construir as peças no programa (volta 3)",
+  "status": "start"
+ },
+ {
+  "kind": "step",
+  "label": "new_document",
+  "detail": "documento novo",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect moldura_clara",
+  "detail": "400 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect apoio_visor",
+  "detail": "394 x 394 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect painel_cena",
+  "detail": "394 x 267 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect fundo",
+  "detail": "400 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect lateral_esquerda",
+  "detail": "100 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect lateral_direita",
+  "detail": "100 x 400 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect topo",
+  "detail": "400 x 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "create_shape rect base",
+  "detail": "400 x 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+lateral_esquerda",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+lateral_direita",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+topo",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) apoio_visor+base",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+lateral_esquerda",
+  "detail": "a espiga tem 267 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+lateral_direita",
+  "detail": "a espiga tem 267 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint tenon (slotOffset) painel_cena+topo",
+  "detail": "a espiga tem 394 mm de aresta e a borda de referencia dos furos tem 400 mm: os furos podem nao casar",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+lateral_esquerda",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+lateral_direita",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+topo",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger moldura_clara+base",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+lateral_esquerda",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+lateral_direita",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+topo",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger fundo+base",
+  "detail": "contato L",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_esquerda+topo",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_esquerda+base",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_direita+topo",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "make_joint finger lateral_direita+base",
+  "detail": "aresta de 94 / 94 mm para contato de 100 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+lateral_esquerda",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+lateral_direita",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+topo",
+  "detail": "2 furo(s), 0 mm ao longo, 87 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados apoio_visor+base",
+  "detail": "2 furo(s), 0 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+lateral_esquerda",
+  "detail": "2 furo(s), 63.5 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+lateral_direita",
+  "detail": "2 furo(s), -63.5 mm ao longo, 0 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "furos alinhados painel_cena+topo",
+  "detail": "2 furo(s), 0 mm ao longo, 57 mm na espessura",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "medidas das pecas",
+  "detail": "8 de 8 exatas",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte moldura_clara",
+  "detail": "360 x 325 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "PLANEJE, ECONOMIZE, VIAJE!",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$20",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$50",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$100",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$200",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$500",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura moldura_clara",
+  "detail": "R$1.000",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte apoio_visor",
+  "detail": "348 x 319 mm",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "recorte topo",
+  "detail": "120 x 6 mm",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "face gravada moldura_clara",
+  "detail": "dentro -> fora (placa espelhada)",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.7685,
+  "calls": 75
+ },
+ {
+  "kind": "cost",
+  "usd": 7.7822,
+  "calls": 76
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: desenho da IA",
+  "detail": "nota 4 — Um unico contorno vermelho fechado, sem preenchimento, em polilinha de poucos vertices com cantos angulosos. Lembra vagamente o Brasil: ponta oeste (Acre) a esquerda, saliencia norte, leste pontudo e ponta sul embaixo. Nao ha moldura, legenda nem furos, so a regua do programa ao redor.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil silhouette",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 7.794,
+  "calls": 77
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:Brazil Panhandle.svg (https://commons.wikimedia.org/wiki/File:Brazil_Panhandle.svg)",
+  "detail": "nota 1 — Contorno vermelho fechado de um unico recorte: o extremo sul do Brasil (Rio Grande do Sul, com a Lagoa dos Patos e o litoral recortado), fechado no topo por um arco circular. Nao e o Brasil inteiro. Parece um mapa de estado ou 'panhandle' cortado por um arco artificial.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.8051,
+  "calls": 78
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:SVG Human Silhouette.svg (https://commons.wikimedia.org/wiki/File:SVG_Human_Silhouette.svg)",
+  "detail": "nota 0 — Contorno vermelho de uma silhueta humana de frente (corpo inteiro, em pé, braços ao lado) sobre fundo cinza, com réguas de coordenadas do programa. Não tem nenhuma relação com o mapa do Brasil.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.8165,
+  "calls": 79
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:Chironectes Silhouette by Milena Cavalcanti, Patricia Pilatti and Diego Astúa.svg (https://commons.wikimedia.org/wiki/File:Chironectes_Silhouette_by_Milena_Cavalcanti,_Patricia_Pilatti_and_Diego_Ast%C3%BAa.svg)",
+  "detail": "nota 0 — Silhueta vermelha de um gambá-d'água (Chironectes, tipo marsupial) de perfil, com cauda longa e enrolada, patas com dedos separados e boca aberta. Não tem nenhuma relação com o contorno do Brasil.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.8294,
+  "calls": 80
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_base: web: File:Silhouette of Third Reich.svg (https://commons.wikimedia.org/wiki/File:Silhouette_of_Third_Reich.svg)",
+  "detail": "nota 0 — Um contorno vermelho irregular que lembra o mapa da Alemanha do Terceiro Reich (silhueta de 1930-40), com um círculo perfeito solto dentro. Não é o Brasil. O contorno é muito recortado, com costa serrilhada e pequenos detalhes e fiapos no norte, e o formato é largo, com uma saliência a leste e outra ao sul.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil country silhouette vector, Brazil map outline SVG, single closed path, smooth coastline, no states borders, no islands, solid fill, Brazil shape clipart, laser cut Brazil map",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil country silhouette vector, Brazil outline map solid black, simplified Brazil shape SVG, Brazil map without states, Brazil contour single closed path, Brazil mask silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil country silhouette vector, Brazil map outline solid black, Brazil shape SVG without states, simple Brazil border outline, Brazil map single closed path",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil country silhouette vector, Brazil map outline solid black, Brazil shape SVG without state borders, Brazil territory simplified silhouette, Brazil map laser cut DXF",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil country silhouette vector, solid black Brazil map outline, simplified smooth coastline, no states, no internal borders, no neighboring countries, single closed path SVG",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mapa_base",
+  "name": "Base do mapa (silhueta do Brasil)",
+  "score": 4,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca placa_titulo: forma retangulo",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "placa_titulo",
+  "name": "Plaqueta de titulo",
+  "score": 10,
+  "source": "forma retangulo",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura placa_titulo",
+  "detail": "Nossa Aventura",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura placa_titulo",
+  "detail": "Para a próxima viagem juntos",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.8398,
+  "calls": 81
+ },
+ {
+  "kind": "step",
+  "label": "peca nuvem: biblioteca builtin:cloud",
+  "detail": "nota 7 — Silhueta fechada de uma nuvem de contorno unico, com base reta, lobos laterais baixos e um grande lobo central semicircular no topo. Mede cerca de 23 mm de largura por 17 mm de altura. Esta limpa e sem pecas soltas, legenda ou moldura.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "nuvem",
+  "name": "Nuvem",
+  "score": 7,
+  "source": "biblioteca builtin:cloud",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.8735,
+  "calls": 82
+ },
+ {
+  "kind": "cost",
+  "usd": 7.8855,
+  "calls": 83
+ },
+ {
+  "kind": "step",
+  "label": "peca aviao: desenho da IA",
+  "detail": "nota 7 — Silhueta fechada de um aviao de passageiros visto de cima, em contorno vermelho unico, com nariz arredondado no canto superior direito e cauda no canto inferior esquerdo. Tem duas asas enflechadas em triangulo e aletas na cauda. Sem furos, sem linhas internas e sem moldura ou legenda. Reconhecivel como aviao, na mesma diagonal da foto.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "aviao",
+  "name": "Aviao",
+  "score": 7,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: palm tree silhouette",
+  "detail": "1 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 7.8964,
+  "calls": 84
+ },
+ {
+  "kind": "step",
+  "label": "peca palmeira: web: File:Palme d'Or gold silhouette.svg (https://commons.wikimedia.org/wiki/File:Palme_d%27Or_gold_silhouette.svg)",
+  "detail": "nota 1 — Contorno vermelho de uma folha de palma horizontal, tipo ramo de samambaia ou pena, com folíolos finos e separados ao longo de uma haste diagonal. É o emblema da Palma de Ouro (Palme d'Or) e não uma palmeira/coqueiro. Não tem tronco nem copa.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: coconut palm tree silhouette vector, single palm tree with curved trunk and drooping fronds, solid filled black silhouette, tropical palm tree clipart svg, beach palm tree silhouette without ground or island",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "palmeira",
+  "name": "Palmeira",
+  "score": 1,
+  "source": "web: File:Palme d'Or gold silhouette.svg (https://commons.wikimedia.org/wiki/File:Palme_d%27Or_gold_silhouette.svg)",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.935,
+  "calls": 85
+ },
+ {
+  "kind": "cost",
+  "usd": 7.9479,
+  "calls": 86
+ },
+ {
+  "kind": "step",
+  "label": "peca mala: desenho da IA",
+  "detail": "nota 6 — Uma mala de viagem vista de frente, de pe, com corpo retangular de cantos arredondados e alca no topo. Tem quatro cortes estreitos e verticais (duas cintas, cada uma com duas linhas) e tres selos retangulares duplos e tortos na metade de baixo. Fica reconhecivel como mala e a proporcao e a orientacao batem com a foto.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: suitcase silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: vintage suitcase silhouette vector, simple luggage front view with handle, suitcase outline with straps and stickers, travel bag icon laser cut, single closed outline, engraving lines for straps",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mala",
+  "name": "Mala de viagem",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.9599,
+  "calls": 87
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: biblioteca builtin:sailboat",
+  "detail": "nota 6 — Silhueta de veleiro de lado, só contornos vermelhos. Tem casco trapezoidal baixo, mastro alto com bandeirola, duas velas triangulares separadas (uma à esquerda e outra à direita do mastro) e uma faixa de onda ondulada como peça separada embaixo. Dá para reconhecer como veleiro.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 7.9708,
+  "calls": 88
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: web: File:Antonov An-225 silhouette vertical.svg (https://commons.wikimedia.org/wiki/File:Antonov_An-225_silhouette_vertical.svg)",
+  "detail": "nota 0 — Um avião de carga de grande porte (Antonov An-225) visto de cima, com seis motores nas asas, fuselagem longa e vertical, asas abertas e estabilizador traseiro. Não tem relação com um veleiro.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.9814,
+  "calls": 89
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: web: File:Airplane profile silhouette.svg (https://commons.wikimedia.org/wiki/File:Airplane_profile_silhouette.svg)",
+  "detail": "nota 0 — Silhueta de um avião comercial de perfil, com fuselagem longa e fina, cauda com estabilizador vertical à direita, uma janela de cabine à esquerda, um retângulo de asa/motor embaixo e um círculo pequeno (roda ou motor). Não tem relação com um veleiro.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 7.9917,
+  "calls": 90
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: web: File:Antonov An-124 Ruslan silhouette.svg (https://commons.wikimedia.org/wiki/File:Antonov_An-124_Ruslan_silhouette.svg)",
+  "detail": "nota 0 — Silhueta de um avião de grande porte visto de cima (tipo Antonov An-124), com fuselagem, asas inclinadas, quatro motores e cauda. O contorno vermelho é fechado e limpo, mas é um avião e não um veleiro.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.0018,
+  "calls": 91
+ },
+ {
+  "kind": "step",
+  "label": "peca veleiro: web: File:Silhouette Smartphone.svg (https://commons.wikimedia.org/wiki/File:Silhouette_Smartphone.svg)",
+  "detail": "nota 0 — Silhueta de uma pessoa de perfil (mulher com coque) olhando para um smartphone, com uma fita ou cordão pendurado na cintura. Não tem nenhuma relação com um veleiro.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette solid, simple sailboat side view, boat with two triangular sails and hull, single closed outline, laser cut sailboat vector, thick mast, no separate waves",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette side view, two triangular sails (mainsail and jib), simple low hull, closed solid shape, vector SVG, laser cut, no background, no text",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette vector, sailing boat side view two triangular sails, simple yacht silhouette closed outline, sailboat icon solid shape SVG, dinghy with jib and mainsail silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette side view vector, simple sailing boat two triangular sails and low hull, sloop silhouette svg, dinghy clipart black silhouette closed outline",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: sailboat silhouette vector, simple sailboat side view two triangular sails, boat hull and two sails solid shape, sailing boat clipart svg, laser cut sailboat",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "veleiro",
+  "name": "Veleiro",
+  "score": 6,
+  "source": "biblioteca builtin:sailboat",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.0285,
+  "calls": 92
+ },
+ {
+  "kind": "cost",
+  "usd": 8.0388,
+  "calls": 93
+ },
+ {
+  "kind": "step",
+  "label": "peca ondas: desenho da IA",
+  "detail": "nota 8 — Faixa horizontal comprida e baixa, com base reta, lados retos e borda superior em 4 ondas arredondadas (semicirculos) iguais, formando um festao. E um contorno unico, fechado, sem furos nem linhas internas. Os vales entre as ondas formam pontas em V bem agudas, e a altura dos vales parece ser de cerca de 5 mm (de 860 a 865), como pedido.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "ondas",
+  "name": "Ondas sob o veleiro",
+  "score": 8,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.0665,
+  "calls": 94
+ },
+ {
+  "kind": "cost",
+  "usd": 8.0776,
+  "calls": 95
+ },
+ {
+  "kind": "step",
+  "label": "peca montanhas: desenho da IA",
+  "detail": "nota 4 — Um único pico de montanha em polilinha vermelha fechada por uma base reta, com ombro esquerdo, cume alto e um pequeno degrau/entalhe na encosta direita. Não há segundo pico pontudo nem linha de neve em zigue-zague.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: two mountain peaks snow cap silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: mountain range silhouette vector two peaks, twin peaks mountain icon solid, snow cap zigzag line mountain vector, simple mountain silhouette flat base, laser cut mountain layer svg",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "montanhas",
+  "name": "Montanhas cinzas",
+  "score": 4,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.1074,
+  "calls": 96
+ },
+ {
+  "kind": "cost",
+  "usd": 8.1183,
+  "calls": 97
+ },
+ {
+  "kind": "step",
+  "label": "peca rocha: desenho da IA",
+  "detail": "nota 7 — Uma silhueta fechada, vermelha, de morro baixo e largo com base reta e horizontal. A lateral esquerda e vertical e o topo e arredondado e suave. O ponto mais alto fica perto da esquerda, e o contorno desce em ondulacoes suaves ate a ponta direita, que e estreita e arredondada. Nao ha fiapos, legenda, moldura nem pedacos soltos.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "rocha",
+  "name": "Rocha clara do Cristo",
+  "score": 7,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_rio: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_rio",
+  "name": "Placa de direcao RIO DE JANEIRO",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_rio",
+  "detail": "RIO DE JANEIRO",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_salvador: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_salvador",
+  "name": "Placa de direcao SALVADOR",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_salvador",
+  "detail": "SALVADOR",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_foz: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_foz",
+  "name": "Placa de direcao FOZ DO IGUAÇU",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_foz",
+  "detail": "FOZ DO IGUAÇU",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca seta_manaus: forma placa_seta",
+  "detail": "nota 10 — forma exata do sistema",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "seta_manaus",
+  "name": "Placa de direcao MANAUS",
+  "score": 10,
+  "source": "forma placa_seta",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "step",
+  "label": "gravura seta_manaus",
+  "detail": "MANAUS",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 1 - bases e figuras coladas direto no painel",
+  "detail": "14 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 8.2256,
+  "calls": 98
+ },
+ {
+  "kind": "cost",
+  "usd": 8.2383,
+  "calls": 99
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: desenho da IA",
+  "detail": "nota 4 — Um contorno vermelho fechado e poligonal, de aspecto vagamente parecido com o Brasil, com cerca de 20 segmentos retos finos e alongados no interior. Os segmentos são ranhuras duplas (retângulos estreitos), não divisas conectadas. Pelo contorno dá para adivinhar o Brasil, mas a forma é muito grosseira.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil states map",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 8.2523,
+  "calls": 100
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Coronavirus Brazil map.svg (https://commons.wikimedia.org/wiki/File:Coronavirus_Brazil_map.svg)",
+  "detail": "nota 5 — Um mapa vetorial do Brasil em linhas vermelhas finas, com o contorno externo e as divisas internas dos estados, sobre fundo cinza de um editor. Dá para reconhecer o Brasil e os estados, mas há uma coluna de 6 quadradinhos soltos no canto inferior esquerdo e um retângulo minúsculo (Distrito Federal) dentro do mapa.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.2663,
+  "calls": 101
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:2026 Brazilian States Governors elections map results.svg (https://commons.wikimedia.org/wiki/File:2026_Brazilian_States_Governors_elections_map_results.svg)",
+  "detail": "nota 5 — Mapa do Brasil em vetor, com contorno vermelho e divisas internas dos estados, reconhecivel e com orientacao correta (norte em cima). Ha uma coluna de 8 quadradinhos vermelhos no canto inferior esquerdo, fora do mapa. O contorno e muito detalhado, com litoral recortado, reentrancias, ilhas e pontos densos na foz do Amazonas e no Maranhao.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.2804,
+  "calls": 102
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Map of the Brazilian states by literacy rate (2019).svg (https://commons.wikimedia.org/wiki/File:Map_of_the_Brazilian_states_by_literacy_rate_(2019).svg)",
+  "detail": "nota 6 — Mapa do Brasil com as divisas dos estados, todo em vetor vermelho de linha fina. Tem o contorno externo e as fronteiras internas, sem legenda, sem nomes e sem moldura. Os estados do Norte, Nordeste, Centro-Oeste, Sudeste e Sul podem ser identificados, e a orientacao e a proporcao (largura quase igual a altura, ponta sul embaixo, Nordeste a direita) batem com a foto. O canto inferior esquerdo esta vazio, como pedido.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "peca mapa_estados: web: File:Brazil States With ID and State Name inside svg.svg (https://commons.wikimedia.org/wiki/File:Brazil_States_With_ID_and_State_Name_inside_svg.svg)",
+  "detail": "peca complexa demais para cortar (31984 nos depois de simplificar; tinha 75715)",
+  "ok": false
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil map vector with state borders, Brazil states outline SVG, Brazil political map simplified, Mapa do Brasil por estados vetor, Brazil map silhouette with internal state boundaries, laser cut Brazil map layered",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil map vector outline with state borders, simplified smooth coastline, no islands, no legend, no neighboring countries, single closed silhouette SVG, Brazil states map clean line art, laser cut Brazil map",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Brazil map simplified outline vector SVG, Brazil states map silhouette smooth coastline no islands, Brazil political map 26 states clean borders, Brazil map laser cut template, Brazil map single closed outline with state boundary lines, no legend no labels",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: simplified Brazil map vector outline with states borders, low-poly smooth coastline, Brazil states map SVG simple, Brazil political map without islands, Brazil map puzzle laser cut template, Brazil silhouette closed path DXF",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "mapa_estados",
+  "name": "Estados do Brasil",
+  "score": 6,
+  "source": "web: File:Map of the Brazilian states by literacy rate (2019).svg (https://commons.wikimedia.org/wiki/File:Map_of_the_Brazilian_states_by_literacy_rate_(2019).svg)",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.3177,
+  "calls": 103
+ },
+ {
+  "kind": "cost",
+  "usd": 8.3297,
+  "calls": 104
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: desenho da IA",
+  "detail": "nota 6 — Silhueta vermelha fechada e única de uma figura em cruz larga: cabeça redonda, pescoço fino, braços horizontais um pouco inclinados, corpo em coluna que se alarga levemente e pedestal retangular embaixo. Lembra o Cristo Redentor de forma simplificada e é cortável, sem furos, linhas internas ou legendas.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer",
+  "detail": "4 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 8.342,
+  "calls": 105
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Cross of the Order of the Redeemer (Heraldry).svg (https://commons.wikimedia.org/wiki/File:Cross_of_the_Order_of_the_Redeemer_(Heraldry).svg)",
+  "detail": "nota 1 — Um brasao heraldico: cruz de Malta de oito pontas com coroa e argola no topo, ramos de louro e carvalho dos lados e medalhao circular central com uma figura pequena. Sao muitas linhas de contorno finas, sobrepostas e abertas. Nao e a silhueta do Cristo Redentor.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.3571,
+  "calls": 106
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:2747202 Noun Cristo Redentor.svg (https://commons.wikimedia.org/wiki/File:2747202_Noun_Cristo_Redentor.svg)",
+  "detail": "nota 3 — Uma figura estilizada em linhas vermelhas, com cabeça oval e braços horizontais em forma de cruz sobre uma base. O desenho é feito de vários contornos sobrepostos, e não de uma silhueta única. A cabeça tem um furo oval interno. Há uma faixa horizontal comprida atravessando o peito, e um contorno curvo em forma de S ou gancho no tronco. Há ainda uma coluna retangular com linhas verticais internas e uma base em pílula. As formas parecem sobrepostas, como um ícone de contorno com várias peças empilhadas.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.3702,
+  "calls": 107
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Wikimedia Brasil 2025 Strategic Process - cristo.svg (https://commons.wikimedia.org/wiki/File:Wikimedia_Brasil_2025_Strategic_Process_-_cristo.svg)",
+  "detail": "nota 3 — Contorno em linhas vermelhas do Cristo Redentor de frente, com braços abertos na horizontal, cabeça no topo e corpo longo que termina em uma base trapezoidal estreita. Dá para reconhecer a figura, mas é um desenho de linhas (line art) com muitos traços internos: dobras da túnica, mangas, pescoço e gola. A silhueta externa não está limpa.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.3839,
+  "calls": 108
+ },
+ {
+  "kind": "step",
+  "label": "peca cristo: web: File:Christ and Liberty.svg (https://commons.wikimedia.org/wiki/File:Christ_and_Liberty.svg)",
+  "detail": "nota 3 — A imagem mostra duas silhuetas vermelhas de contorno em um fundo cinza: à esquerda o Cristo Redentor sobre um pedestal pequeno e estreito, e à direita a Estátua da Liberdade sobre um pedestal largo e escalonado. O arquivo vem de 'Christ and Liberty', então as duas figuras estão juntas.",
+  "ok": false
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, front view, arms straight horizontal, on rectangular pedestal, solid filled, symmetrical, single closed path, laser cut SVG, Cristo Redentor Rio de Janeiro statue silhouette",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, Cristo Redentor statue front view silhouette, arms outstretched, on pedestal, solid black filled shape, simple stencil, laser cut SVG, no background",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer Rio de Janeiro silhouette vector, solid filled single path, front view, symmetrical, arms outstretched horizontal, simple pedestal base, no internal details, black silhouette svg, icon, laser cut stencil",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, solid black filled, front view, symmetrical, simple outline, no details, with rectangular pedestal, cut-ready SVG, laser cut file, Cristo Redentor stencil",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "busca Wikimedia: Christ the Redeemer silhouette vector, front view, solid filled, symmetrical, with rectangular pedestal, arms outstretched horizontal, simple black silhouette SVG, Cristo Redentor Rio de Janeiro clip art, laser cut",
+  "detail": "0 candidato(s)",
+  "ok": true
+ },
+ {
+  "kind": "part",
+  "id": "cristo",
+  "name": "Cristo Redentor sobre pedestal",
+  "score": 6,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": false
+ },
+ {
+  "kind": "step",
+  "label": "gravura cristo",
+  "detail": "REAIS",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4117,
+  "calls": 109
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4234,
+  "calls": 110
+ },
+ {
+  "kind": "step",
+  "label": "peca morros_azuis: desenho da IA",
+  "detail": "nota 7 — Uma silhueta única, fechada, de base reta e lados retos. O topo tem três lombadas largas e suaves emendadas, com vales pequenos entre elas. A da esquerda é a mais alta e as outras descem para a direita. Tem cerca de 72 mm de largura por 15-20 mm de altura. É um contorno vermelho simples, sem furos, linhas internas, legenda ou moldura.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "morros_azuis",
+  "name": "Morros azuis da frente",
+  "score": 7,
+  "source": "desenho da IA",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 2 - estados do mapa, Cristo e morros azuis",
+  "detail": "3 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4348,
+  "calls": 111
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_1: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coração simples em contorno vermelho fechado, com dois lóbulos arredondados no topo, uma reentrância central e a ponta para baixo. É uma única peça contínua, sem furos, sem texto e sem fragmentos soltos. Mede cerca de 9,5 mm de largura por 8,5 mm de altura, num fundo cinza de editor com régua.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_1",
+  "name": "Coracao (Amazonas)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4453,
+  "calls": 112
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_2: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coração vermelho de contorno único e fechado, com duas lobos arredondados, entalhe central no topo e ponta inferior em V. Os lados descem em linhas retas até a ponta. Não há moldura, legenda nem peças soltas. Mede cerca de 10 x 8,7 unidades, é praticamente simétrico e está de pé, na orientação certa.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_2",
+  "name": "Coracao (Mato Grosso)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4549,
+  "calls": 113
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_3: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração com contorno vermelho único e fechado, dois lóbulos arredondados no topo, entalhe central e ponta inferior em V. Mede cerca de 10 x 9 unidades. Sem moldura, legenda ou peças soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_3",
+  "name": "Coracao (Nordeste interior)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4652,
+  "calls": 114
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_4: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coração simples, de contorno único, fechado e limpo, em linha vermelha de corte. Tem dois lóbulos arredondados no topo, uma reentrância central e a ponta para baixo, com lados retos. Está de pé e é aproximadamente tão largo quanto alto.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_4",
+  "name": "Coracao (Goias)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4755,
+  "calls": 115
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_5: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coracao classico em contorno vermelho unico e fechado, com dois lobos arredondados no topo, entalhe central e ponta inferior em V com lados retos. Mede cerca de 9,7 x 8,9 cm na regua do software. Nao ha moldura, texto nem pecas soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_5",
+  "name": "Coracao (Minas Gerais)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4854,
+  "calls": 116
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_6: biblioteca builtin:heart",
+  "detail": "nota 8 — Um coração simples em contorno vermelho fechado, com dois lóbulos arredondados, entalhe central e ponta inferior em V. Tem aproximadamente 9,5 x 8,5 unidades, quase tão largo quanto alto, e o contorno é limpo e contínuo, sem fiapos nem peças soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_6",
+  "name": "Coracao (litoral da Bahia)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.4959,
+  "calls": 117
+ },
+ {
+  "kind": "step",
+  "label": "peca coracao_7: biblioteca builtin:heart",
+  "detail": "nota 8 — Silhueta de coração simples e simétrica, com um único contorno vermelho fechado, dois lóbulos arredondados no topo, entalhe central em V e ponta inferior em ângulo. Mede cerca de 9,5 x 9 unidades. Sem moldura, sem texto e sem peças soltas.",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "part",
+  "id": "coracao_7",
+  "name": "Coracao (Sao Paulo)",
+  "score": 8,
+  "source": "biblioteca builtin:heart",
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSU...",
+  "accepted": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "camada da cena: Camada 3 - coracoes do mapa",
+  "detail": "7 peca(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "cena em camadas",
+  "detail": "3 camada(s) sobre \"painel_cena\"",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "colisoes no 3D",
+  "detail": "0 (pecas: 45, conjuntos: 2)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "check_design",
+  "detail": "106 achado(s)",
+  "ok": true
+ },
+ {
+  "kind": "step",
+  "label": "fotos do 3D",
+  "detail": "3 (iso, topo, frente)",
+  "ok": true
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "stage",
+  "stage": "4-montar",
+  "title": "Construir as peças no programa (volta 3)",
+  "status": "done",
+  "detail": "8 placa(s), 19 encaixe(s), colisões no 3D: 0"
+ },
+ {
+  "kind": "stage",
+  "stage": "5-conferir",
+  "title": "Conferir o 3D com a foto (volta 3)",
+  "status": "start"
+ },
+ {
+  "kind": "cost",
+  "usd": 8.8877,
+  "calls": 118
+ },
+ {
+  "kind": "step",
+  "label": "IA 5-conferir",
+  "detail": "anthropic/claude-fable-5.2: 7683 tokens de entrada, 8259 de saida",
+  "ok": true
+ },
+ {
+  "kind": "assistant",
+  "stage": "5-conferir",
+  "text": "Veredito: corrigir\niso: Caixa fechada, alta e fina, com encaixes de dentes em todas as arestas. A face grande visível é inteiriça, sem janela. A face estreita ao lado tem dois rasgos pequenos e a face de cima tem pequenos rasgos em fila perto da aresta oposta. Nenhuma peça da cena, haste ou abertura aparece. A outra face grande fica escondida.\ntopo: Retângulo estreito em X e comprido em Y, cerca de 1:4, fechado. Tem quatro rasgos pequenos, todos perto da borda esquerda (X baixo). Não se vê o interior nem uma fenda larga.\nfrente: Retângulo alto e estreito, cerca de 1 de largura por 4 de altura, inteiriço. Tem dentes nas bordas e dois rasgos pequenos perto da borda esquerda. Não há janela, moldura nem cena: é a lateral fina da caixa, não a face larga.\n[grave] Orientação do objeto nos eixos (face da frente): esperado Na foto a frente é a face larga, quase quadrada, com a moldura e a janela. Pela convenção, a largura grande fica em X e a profundidade pequena em Y.; no 3D Na vista frente aparece a face estreita (cerca de 1:4) e fechada. Na vista topo o lado comprido corre em Y e o curto em X. O objeto está girado 90° em torno de Z: as faces grandes ficaram viradas para os lados.\n[grave] Janela frontal e cena em camadas: esperado Moldura frontal com janela grande de cantos arredondados. Por ela se veem o fundo azul, a placa de título no alto, o mapa em camadas no centro e as quatro setas de destino. Embaixo há um painel inteiriço gravado com as metas de R$20 a R$1.000.; no 3D Nenhuma das três vistas mostra abertura ou peça da cena. Na iso a face grande visível é inteiriça. A face grande oposta não aparece em nenhuma vista, e não recebi as vistas de lado, a segunda isométrica nem o ângulo parecido com o da foto. Não dá para confirmar que a janela existe, nem de que lado ficou.\n[media] Compartimentos do dinheiro (terço inferior): esperado Quatro hastes verticais, cada uma sustentando uma seta de destino, separam o espaço das notas e moedas. Há uma folha transparente na frente desse espaço.; no 3D Não aparecem em nenhuma vista. Os rasgos pequenos no topo e na lateral sugerem camadas internas, mas não permitem conferir número nem posição das hastes ou da folha transparente.\n[grave] Peça da cena: palmeira (verificação do programa, nota 1): esperado Coqueiro com tronco fino curvado e copa de folhas, à direita do Cristo.; no 3D A verificação reprovou a peça (ok=false, nota 1). A origem é a silhueta da Palme d'Or, que é um ramo de palma de troféu e não uma árvore.\n[grave] Peças da cena reprovadas pela verificação do programa: esperado Base do mapa do Brasil um pouco maior que os estados, mala com alça, veleiro, montanhas, estados do Brasil recortados e Cristo de braços abertos sobre pedestal, todos reconhecíveis como na foto.; no 3D A verificação marcou ok=false em mapa_base (nota 4), montanhas (nota 4), mala (nota 6), veleiro (nota 6), mapa_estados (nota 6) e cristo (nota 6). A fonte de mapa_estados é um mapa temático de taxa de alfabetização, que pode trazer legenda ou elementos extras. Nenhuma dessas peças aparece nas vistas para conferência visual.\n[media] Montagem: número de conjuntos: esperado Um objeto único montado. A foto mostra travas pequenas nas laterais e embaixo, que podem indicar um painel removível.; no 3D A verificação informa 2 conjuntos para 45 peças. Pelas vistas não dá para saber se o segundo conjunto é uma tampa ou fundo removível (aceitável) ou a cena solta, sem ligação com a caixa (erro).\n[media] check_design: esperado Resultado legível, com aprovado ou lista de problemas.; no 3D O resultado veio com total 106 e resumo nulo. Não dá para saber se são 106 avisos ou 106 verificações feitas, então não posso tratar como aprovado.\n[leve] Profundidade do quadro: esperado A foto mostra só uma fatia da lateral direita, em perspectiva. O quadro parece fino, mas a profundidade real não pode ser medida pela imagem.; no 3D Nas vistas topo e frente a profundidade é cerca de um quarto da largura e da altura.\n[leve] Partes que a foto não mostra (topo, fundo, lateral esquerda): esperado A foto não mostra a face de cima, a de trás nem a lateral esquerda. Não se vê por onde entra o dinheiro nem como se abre.; no 3D A vista topo mostra a face de cima fechada, só com quatro rasgos pequenos de encaixe, sem fenda evidente para moedas e notas. O fundo é inteiriço, se a face grande da iso for a de trás."
+ },
+ {
+  "kind": "stage",
+  "stage": "5-conferir",
+  "title": "Conferir o 3D com a foto (volta 3)",
+  "status": "done",
+  "detail": "veredito corrigir; 9 diferença(s), 4 grave(s); sistema sem erro"
+ },
+ {
+  "kind": "stage",
+  "stage": "6-entregar",
+  "title": "Entregar",
+  "status": "start"
+ },
+ {
+  "kind": "model"
+ },
+ {
+  "kind": "step",
+  "label": "versao entregue",
+  "detail": "a melhor foi a da volta 2",
+  "ok": true
+ },
+ {
+  "kind": "stage",
+  "stage": "6-entregar",
+  "title": "Entregar",
+  "status": "done",
+  "detail": "pronto para conferir e cortar"
+ },
+ {
+  "kind": "result",
+  "ok": true,
+  "summary": "Cofrinho de viagem em caixa de sombras ('Nossa Aventura'): caixa rasa de pe, com moldura e janela na frente, cena decorativa em camadas (mapa do Brasil e figuras) na parte de cima e camara de dinheiro visivel na faixa de baixo.: 8 placa(s) (Frente (moldura clara com janela) 400 x 400 mm; Apoio do visor de acrilico 400 x 400 mm; Painel de fundo da cena (posicao em profundidade e hipotese) 400 x 270 mm; Tampa traseira removivel 400 x 400 mm; Lateral esquerda 100 x 400 mm; Lateral direita 100 x 400 mm; Topo (com fenda para moedas e notas) 400 x 100 mm; Base 400 x 100 mm), 24 peça(s) decorativa(s). Colisões no 3D: 0. Medidas erradas: 0. Custo estimado: US$ 8.8877 em 118 chamada(s).",
+  "warnings": [
+   "Hipótese da análise: Todas as chapas de madeira em 3 mm; o azul e a cor clara sao pintura ou acabamento, nao materiais diferentes",
+   "Hipótese da análise: A borda azul larga na frente e uma placa frontal azul inteira (400 x 400) atras da moldura clara, nao material mais grosso",
+   "Hipótese da análise: O painel da cena e uma placa intermediaria que nao desce ate a base: o dinheiro entra por cima, cai por tras dele e aparece so na faixa de baixo",
+   "Hipótese da análise: Camara unica de dinheiro: os 4 postes sao tiras decorativas na frente, nao divisorias, porque as notas passam continuas por tras deles",
+   "Hipótese da análise: Fenda de entrada no topo e costas removiveis para retirar o dinheiro: nada disso aparece na foto",
+   "Hipótese da análise: Visor de acrilico transparente atras da frente, cobrindo a janela inteira",
+   "Hipótese da análise: Proporcoes tiradas da foto, nao medidas: barras da moldura ~15-20 mm, faixa inferior ~55 mm, faixa visivel do dinheiro ~75 mm de altura",
+   "Hipótese da análise: Na foto a caixa parece mais rasa que 100 mm; mantenho os 100 mm informados, mas a divisao interna dessa profundidade e suposicao",
+   "Hipótese da análise: Placas de 400 x 400 ocupam toda a altura da mesa de 400 mm, sem margem",
+   "Hipótese da análise: Os 6 circulos da trilha de metas sao gravados, nao furos",
+   "Cota por hipótese (da proporção da foto, não medida): apoio_visor - face da frente (Y) = 5 mm — 3 (moldura) + 2 (acrilico). A forma do apoio e proposta minha, a foto nao mostra: um quadro inteiro com janela, atras do acrilico, que o prende contra a moldura. E uma placa a mais; confirmar",
+   "Cota por hipótese (da proporção da foto, não medida): painel_cena - face da frente (Y) = 20 mm — posicao proposta a pedido do usuario: do acrilico (Y=5) ate o painel sobram 20 - 5 = 15 mm, para 3 camadas de decoracao (9 mm) mais 6 mm de folga",
+   "Cota por hipótese (da proporção da foto, não medida): Faixa inferior da moldura (altura, da base ate a borda de baixo da janela) = 55 mm — proporcao da foto; define o recorte da janela na etapa seguinte, nao muda o tamanho das placas",
+   "Cota por hipótese (da proporção da foto, não medida): Altura visivel da faixa do dinheiro na janela = 75 mm — proporcao da foto",
+   "Cota por hipótese (da proporção da foto, não medida): painel_cena - borda de baixo (Z); o painel vai de 130 a 400 = 130 mm — 55 (faixa inferior) + 75 (faixa do dinheiro), ambos da proporcao da foto; a borda de baixo fica livre e o dinheiro cai por tras do painel",
+   "Cota por hipótese (da proporção da foto, não medida): painel_cena - altura da placa = 270 mm — 400 - 130; depende da borda de baixo, que e hipotese",
+   "Cota por hipótese (da proporção da foto, não medida): Canal do dinheiro atras do painel_cena (profundidade livre em Y) = 74 mm — 97 - 23; depende da posicao do painel, que e hipotese",
+   "Cota por hipótese (da proporção da foto, não medida): painel_cena - face da frente (Y) = 20 mm — posicao proposta a pedido do usuario: do acrilico (Y=5) ate o painel sobram 20 - 5 = 15 mm, para 3 camadas de decoracao (9 mm) mais 6 mm de folga. A base do mapa e as figuras encostam face a face nesta face (Y=20) e crescem para a frente",
+   "Cota por hipótese (da proporção da foto, não medida): painel_cena - face da frente (Y) = 20 mm — posicao proposta a pedido do usuario: do acrilico (Y=5) ate o painel sobram 20 - 5 = 15 mm, para 3 camadas de decoracao (9 mm) mais 6 mm de folga. A base do mapa e as figuras encostam face a face nesta face (Y=20) e crescem para a frente. Sobre os 2 conjuntos: as 8 placas destas vistas se sobrepoem as laterais (X de 0 a 3 e de 397 a 400), entao a caixa e um conjunto so; o segundo grupo so pode ser peca da cena sem apoio neste painel",
+   "A peca \"moldura_clara\" passou do limite da mesa de 600 x 400 mm.",
+   "A peca \"apoio_visor\" passou do limite da mesa de 600 x 400 mm.",
+   "A peca \"painel_cena\" passou do limite da mesa de 600 x 400 mm.",
+   "A peca \"fundo\" passou do limite da mesa de 600 x 400 mm.",
+   "A peca \"lateral_esquerda\" passou do limite da mesa de 600 x 400 mm.",
+   "A peca \"lateral_direita\" passou do limite da mesa de 600 x 400 mm.",
+   "A peca \"topo\" passou do limite da mesa de 600 x 400 mm.",
+   "A peca \"base\" passou do limite da mesa de 600 x 400 mm."
+  ],
+  "notVerified": [
+   "nenhuma peça foi cortada",
+   "as faces que a foto não mostra são hipótese",
+   "medidas críticas contra o objeto real",
+   "um corte de teste de um encaixe na mesma chapa",
+   "a compensação do corte (kerf) do material"
+  ]
+ }
+]

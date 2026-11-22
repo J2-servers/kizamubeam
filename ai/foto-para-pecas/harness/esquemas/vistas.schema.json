@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kz-vistas/1",
+  "description": "Etapa 2. A mesma placa descrita tres vezes (frente X,Z; lado Y,Z; topo X,Y) com intervalos ABSOLUTOS em mm. Conferido por conferir-vistas.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "espessura", "medidas_reais", "vistas", "cotas"],
+  "properties": {
+    "spec": { "const": "kz-vistas/1" },
+    "espessura": { "type": "number", "exclusiveMinimum": 0 },
+    "medidas_reais": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["o_que", "eixo", "mm", "alvo"],
+        "properties": {
+          "o_que": { "type": "string" },
+          "eixo": { "enum": ["x", "y", "z"] },
+          "mm": { "type": "number" },
+          "alvo": { "type": "string", "description": "\"envolvente\" (o objeto inteiro) ou o id de uma placa" }
+        }
+      }
+    },
+    "vistas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frente", "lado", "topo"],
+      "properties": {
+        "frente": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["placa", "x", "z"], "properties": { "placa": { "type": "string" }, "x": { "$ref": "#/$defs/intervalo" }, "z": { "$ref": "#/$defs/intervalo" } } } },
+        "lado": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["placa", "y", "z"], "properties": { "placa": { "type": "string" }, "y": { "$ref": "#/$defs/intervalo" }, "z": { "$ref": "#/$defs/intervalo" } } } },
+        "topo": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["placa", "x", "y"], "properties": { "placa": { "type": "string" }, "x": { "$ref": "#/$defs/intervalo" }, "y": { "$ref": "#/$defs/intervalo" } } } }
+      }
+    },
+    "cotas": {
+      "type": "array",
+      "description": "De onde veio cada dimensao que define tamanho. 'hipotese' obriga confirmacao do usuario.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["o_que", "mm", "origem", "conta"],
+        "properties": {
+          "o_que": { "type": "string" },
+          "mm": { "type": "number" },
+          "origem": { "enum": ["usuario", "derivada", "hipotese"] },
+          "conta": { "type": "string", "description": "Como se chegou ao numero (ex.: 200 - 2 x 3)" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "intervalo": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+  }
+}

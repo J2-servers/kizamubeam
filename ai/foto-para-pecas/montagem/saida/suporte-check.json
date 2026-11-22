@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "minWeb": 1,
+    "beam": 0.15,
+    "tol": 0.05,
+    "closeGap": 1,
+    "engraveLayers": [],
+    "beforeLaser": true
+  },
+  "issues": []
+}

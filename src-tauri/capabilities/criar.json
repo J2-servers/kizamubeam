@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "criar",
+  "description": "Rechte des Fensters „Produkt erstellen“: nur Ereignisse an das Hauptfenster senden und dessen Antwort hören",
+  "windows": ["criar"],
+  "permissions": ["core:event:allow-emit-to", "core:event:allow-listen", "core:event:allow-unlisten"]
+}

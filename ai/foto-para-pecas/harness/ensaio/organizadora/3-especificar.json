@@ -1,0 +1,34 @@
+{
+  "spec": "kz-montagem/1",
+  "_ensaio": "escrito a mao",
+  "nome": "Caixa organizadora com divisoria (ensaio)",
+  "espessura": 3,
+  "placas": [
+    {
+      "id": "fundo",
+      "nome": "Fundo"
+    },
+    {
+      "id": "frente",
+      "nome": "Frente"
+    },
+    {
+      "id": "tras",
+      "nome": "Tras"
+    },
+    {
+      "id": "esquerda",
+      "nome": "Lateral esquerda"
+    },
+    {
+      "id": "direita",
+      "nome": "Lateral direita"
+    },
+    {
+      "id": "divisoria",
+      "nome": "Divisoria"
+    }
+  ],
+  "ligacoes": "auto",
+  "moveis": []
+}

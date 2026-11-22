@@ -1,0 +1,15 @@
+{
+  "spec": "kz-montagem/1",
+  "nome": "Prateleira 150 x 80 x 180 com 3 tabuas",
+  "espessura": 3,
+  "medida_real": "altura 180 mm (exemplo)",
+  "placas": [
+    { "id": "lat-esq", "nome": "Lateral esquerda", "x": [0, 3], "y": [0, 80], "z": [0, 180] },
+    { "id": "lat-dir", "nome": "Lateral direita", "x": [147, 150], "y": [0, 80], "z": [0, 180] },
+    { "id": "prat-1", "nome": "Prateleira de baixo", "x": [0, 150], "y": [0, 80], "z": [20, 23] },
+    { "id": "prat-2", "nome": "Prateleira do meio", "x": [0, 150], "y": [0, 80], "z": [90, 93] },
+    { "id": "prat-3", "nome": "Prateleira de cima", "x": [0, 150], "y": [0, 80], "z": [157, 160] }
+  ],
+  "ligacoes": "auto",
+  "moveis": []
+}

@@ -1,0 +1,47 @@
+{
+ "alvos_inicio": [
+  "page http://tauri.localhost/"
+ ],
+ "webgl_principal": {
+  "webgl2": true,
+  "placa": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+ },
+ "vista3d": [],
+ "botoes_topo": [
+  "ArquivoNovoCtrl+NNovo a partir do modelo …Abrir …Ctrl+OSalvar …Ctrl+SFechar abaSalvar como modelo …Preencher modelo …Série a partir de tabela (CSV) …Importar …Ctrl+IExportar▸Exportar como SVG …Exportar como DXF …Exportar como PDF …Exportar como arquivo Illustrator (AI) …Salvar bitmap processado …Fontes …Extensões …Transferir configurações …Agentes de IA (MCP)…",
+  "EditarDesfazerCtrl+ZRefazerCtrl+YRecortarCtrl+XCopiarCtrl+CColarCtrl+VColar na posição originalDuplicarCtrl+DExcluirDelSelecionar tudoCtrl+AConverter em caminhoCtrl+Shift+CVisível se …Adicionar à biblioteca …Configurações …",
+  "FerramentasCaixa de ferramentas …SelecionarEscEditar nósCtrl+`Desenhar linhasCtrl+LMão livre / LápisShaperDesenhar caminho curvoDesenhar arcoIsolar seleçãoSair do isolamentoSimplificar / suavizar caminhos…Construtor de formas…Posicionar slots / entalhes …RetânguloCtrl+RElipseCtrl+EPolígonoTextoCtrl+TMedirOperações booleanas▸Unir (Weld)Alt++Diferença booleanaAlt+-Subtrair a da frente da de trásSubtrair a de trás da da frenteInterseção booleanaAlt+*Opções booleanas …Extrair contorno externo e ilhas …Offset de formas …Alt+OOffset local de contorno …Distorcer …Caminho▸Fechar caminhoFechar caminhos com tolerância …Unir automaticamente as formas selecionadasAlt+JSepararAlt+BEditar caminho à mão livre …Seleção por laçoSeparar ilhas de caminho …Inverter direçãoArredondar ou chanfrar cantos …Aparar formasCtrl+KDefinir ponto de inícioMarcar centrosArray▸Grade (Array) …Ctrl+Shift+AArray circular …Funções de texto▸Aplicar caminho ao textoRemover caminho do textoTexto variável …Aplicar texto variávelImagem▸Ajustar imagem …Vetorizar imagem …Alt+TRemover fundo …Recortar imagemAplicar máscara à imagem",
+  "OrganizarAgruparCtrl+GDesagruparCtrl+UEspelhar e girar▸Espelhar horizontalmenteCtrl+Shift+HEspelhar verticalmenteCtrl+Shift+VGirar 90° no sentido horário.Girar 90° no sentido anti-horário,Alinhar e distribuir▸Alinhar à esquerdaLAlinhar à direitaRAlinhar ao topoTAlinhar à baseBAlinhar centros horizontalmenteCAlinhar centros verticalmenteEDistribuir horizontalmenteDistribuir verticalmenteOrdem de empilhamento▸Trazer para a frenteAvançar uma camadaRecuar uma camadaEnviar para trásRelações▸ConcêntricoMesmo tamanhoParaleloPerpendicularHorizontalVerticalTangenteEspaçamentoAninhar …Não laserar",
+  "PáginasNova páginaDuplicar páginaExcluir páginaPágina anteriorPgUpPróxima páginaPgDnMover seleção▸Mover seleção para a página anteriorMover seleção para a próxima página",
+  "LaserVerificar designPrévia …Alt+PSalvar G-code …IniciarEnquadramentoFrame de contornoConfigurar laser …Testes e calibração▸Teste de material …Avaliar teste de material …Teste de foco …Calibrar ajuste …Controle remoto▸Modo host …Jobs remotos …Assumir do host …Dispositivo▸Dispositivos …Configurações do dispositivo …Configurar rotary …FluidNC▸Configuração …Arquivos no controlador …",
+  "ExibirMostrar todas as sobreposições de câmeraZoom na páginaCtrl+0Zoom na seleçãoAmpliar+Reduzir-Arame / PreenchidoAlt+WMostrar centros▸DesligadoSelecionados e sob o ponteiroSempreGrade▸Mostrar gradeConfigurar grade …Guias▸Mostrar guiasBloquear guiasExcluir todas as guiasTema▸SistemaClaroEscuroIdioma▸SistemaDeutschEnglishEspañolItalianoPortuguês (Brasil)",
+  "JanelaCortes / LayersObjetosHistóricoBibliotecaParâmetrosNotasVerificação do designVista 3DCaixa de ferramentasLaserMoverConsoleMaterialCâmeraBarras de ferramentas▸Barra principalBarra de ferramentasBarra de edições numéricasBarra de textoPaleta de coresBarra de statusPersonalizar barras de ferramentas…Redefinir janelas e barras de ferramentas",
+  "AjudaAtalhos de tecladoF1Procurar atualizações …Sobre o KizamuBeam …",
+  "Crie seu produto"
+ ],
+ "clique": "clicado: Crie seu produto",
+ "janela_criar": "http://tauri.localhost/criar.html",
+ "criar_titulo": "KizamuBeam — Crie seu produto",
+ "criar_texto": "Crie seu produto\nAssistente de IA · janela separada, o controle da máquina segue sem interferência\nOpenRouter · Claude Fable 5.2\n$0.0000 · 0 chamada\nEnviar para o programa\nO que você quer construir?\n\nA IA monta um produto em peças para laser a partir das fotos e da sua descrição: primeiro entende o que aparece, pergunta o que não está claro e só constrói depois da sua confirmação.\n\nFotos\nUma ou ma",
+ "criar_erros": 0,
+ "autosave_intacto": 8976,
+ "envio": {
+  "existe": true,
+  "habilitado": false
+ },
+ "rede": {
+  "openrouter": "HTTP 200",
+  "anthropic": "HTTP 401",
+  "openai": "HTTP 401",
+  "google": "HTTP 403",
+  "wikimedia": "HTTP 200",
+  "upload.wikimedia": "HTTP 200"
+ },
+ "envio_real": "emitido",
+ "abas": {
+  "antes": 1,
+  "depois": 2,
+  "ativa": "Teste do envio"
+ },
+ "limpeza": "abas agora: 1"
+}

@@ -1,0 +1,501 @@
+{
+  "ok": true,
+  "nome": "Caixa organizadora com divisoria (ensaio)",
+  "espessura": 3,
+  "pecas": [
+    {
+      "placa": "fundo",
+      "id": 1,
+      "x": 10,
+      "y": 10,
+      "largura": 200,
+      "altura": 120,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    },
+    {
+      "placa": "frente",
+      "id": 2,
+      "x": 10,
+      "y": 142,
+      "largura": 200,
+      "altura": 60,
+      "eixos": [
+        "x",
+        "z"
+      ]
+    },
+    {
+      "placa": "tras",
+      "id": 3,
+      "x": 10,
+      "y": 214,
+      "largura": 200,
+      "altura": 60,
+      "eixos": [
+        "x",
+        "z"
+      ]
+    },
+    {
+      "placa": "esquerda",
+      "id": 4,
+      "x": 222,
+      "y": 214,
+      "largura": 120,
+      "altura": 60,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "direita",
+      "id": 5,
+      "x": 10,
+      "y": 286,
+      "largura": 120,
+      "altura": 60,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "divisoria",
+      "id": 6,
+      "x": 142,
+      "y": 286,
+      "largura": 120,
+      "altura": 60,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    }
+  ],
+  "encaixes": [
+    {
+      "a": "fundo",
+      "b": "divisoria",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 120,
+      "aviso": "a espiga tem 114 mm de aresta e a borda de referencia dos furos tem 120 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          6,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 100,
+      "furo_medido": {
+        "de": 98.5,
+        "ate": 101.5,
+        "meio": 100,
+        "esperado": 100
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0
+      }
+    },
+    {
+      "a": "frente",
+      "b": "divisoria",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "z",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 60 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          6,
+          2
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 100,
+      "furo_medido": {
+        "de": 98.5,
+        "ate": 101.5,
+        "meio": 100,
+        "esperado": 100
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 1.5
+      }
+    },
+    {
+      "a": "tras",
+      "b": "divisoria",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "z",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 60 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          6,
+          3
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 100,
+      "furo_medido": {
+        "de": 98.5,
+        "ate": 101.5,
+        "meio": 100,
+        "esperado": 100
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 1.5
+      }
+    },
+    {
+      "a": "fundo",
+      "b": "frente",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 200,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          2
+        ],
+        "message": "Junta criada: 21 campos de 9,52 mm."
+      }
+    },
+    {
+      "a": "fundo",
+      "b": "tras",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 200,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          3
+        ],
+        "message": "Junta criada: 21 campos de 9,52 mm."
+      }
+    },
+    {
+      "a": "fundo",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 120,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          4
+        ],
+        "message": "Junta criada: 13 campos de 9,23 mm."
+      }
+    },
+    {
+      "a": "fundo",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 120,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          5
+        ],
+        "message": "Junta criada: 13 campos de 9,23 mm."
+      }
+    },
+    {
+      "a": "frente",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 60,
+      "aviso": "aresta de 57 / 57 mm para contato de 60 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          4
+        ],
+        "message": "Junta criada: 5 campos de 11,4 mm."
+      }
+    },
+    {
+      "a": "frente",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 60,
+      "aviso": "aresta de 57 / 57 mm para contato de 60 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          5
+        ],
+        "message": "Junta criada: 5 campos de 11,4 mm."
+      }
+    },
+    {
+      "a": "tras",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 60,
+      "aviso": "aresta de 57 / 57 mm para contato de 60 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          3,
+          4
+        ],
+        "message": "Junta criada: 5 campos de 11,4 mm."
+      }
+    },
+    {
+      "a": "tras",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 60,
+      "aviso": "aresta de 57 / 57 mm para contato de 60 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          3,
+          5
+        ],
+        "message": "Junta criada: 5 campos de 11,4 mm."
+      }
+    }
+  ],
+  "nao_feito": [],
+  "avisos": [],
+  "eixos_3d": {
+    "x": {
+      "j": 0,
+      "sg": 1,
+      "custo": 0
+    },
+    "y": {
+      "j": 1,
+      "sg": 1,
+      "custo": 0
+    },
+    "z": {
+      "j": 2,
+      "sg": 1,
+      "custo": 0
+    }
+  },
+  "medidas": [
+    {
+      "placa": "fundo",
+      "esperado": [
+        200,
+        120
+      ],
+      "medido": [
+        200,
+        120
+      ],
+      "ok": true
+    },
+    {
+      "placa": "frente",
+      "esperado": [
+        200,
+        60
+      ],
+      "medido": [
+        200,
+        60
+      ],
+      "ok": true
+    },
+    {
+      "placa": "tras",
+      "esperado": [
+        200,
+        60
+      ],
+      "medido": [
+        200,
+        60
+      ],
+      "ok": true
+    },
+    {
+      "placa": "esquerda",
+      "esperado": [
+        120,
+        60
+      ],
+      "medido": [
+        120,
+        60
+      ],
+      "ok": true
+    },
+    {
+      "placa": "direita",
+      "esperado": [
+        120,
+        60
+      ],
+      "medido": [
+        120,
+        60
+      ],
+      "ok": true
+    },
+    {
+      "placa": "divisoria",
+      "esperado": [
+        120,
+        60
+      ],
+      "medido": [
+        120,
+        60
+      ],
+      "ok": true
+    }
+  ],
+  "recortes": [],
+  "gravuras": [],
+  "cena": null,
+  "custo_ia": {
+    "chamadas": [],
+    "usd": 0
+  },
+  "vista3d_dados": {
+    "pecas": 6,
+    "conjuntos": 1,
+    "placas": [
+      {
+        "placa": "fundo",
+        "min": [
+          76,
+          -282,
+          0
+        ],
+        "max": [
+          276,
+          -162,
+          3
+        ]
+      },
+      {
+        "placa": "frente",
+        "min": [
+          76,
+          -282,
+          0
+        ],
+        "max": [
+          276,
+          -279,
+          60
+        ]
+      },
+      {
+        "placa": "tras",
+        "min": [
+          76,
+          -165,
+          0
+        ],
+        "max": [
+          276,
+          -162,
+          60
+        ]
+      },
+      {
+        "placa": "esquerda",
+        "min": [
+          76,
+          -282,
+          0
+        ],
+        "max": [
+          79,
+          -162,
+          60
+        ]
+      },
+      {
+        "placa": "direita",
+        "min": [
+          273,
+          -282,
+          0
+        ],
+        "max": [
+          276,
+          -162,
+          60
+        ]
+      },
+      {
+        "placa": "divisoria",
+        "min": [
+          174.5,
+          -282,
+          0
+        ],
+        "max": [
+          177.5,
+          -162,
+          60
+        ]
+      }
+    ],
+    "colisoes": []
+  },
+  "check_design": {
+    "total": 0,
+    "resumo": null
+  },
+  "vista3d": "Peças: 6 (Conjuntos: 1) · Sem sobreposições",
+  "erros_da_pagina": [],
+  "perguntas_do_app": [],
+  "projeto": "D:\\CLAUDE\\sistema para corte a laser\\kizamubeam\\ai\\foto-para-pecas\\montagem\\saida\\caixa-organizadora.kz-montagem.kzb"
+}

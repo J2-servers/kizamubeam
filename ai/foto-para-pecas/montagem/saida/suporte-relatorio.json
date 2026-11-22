@@ -1,0 +1,117 @@
+{
+  "ok": true,
+  "nome": "Suporte em cruz 100 x 100 x 60",
+  "espessura": 3,
+  "pecas": [
+    {
+      "placa": "nervura-x",
+      "id": 1,
+      "x": 10,
+      "y": 10,
+      "largura": 100,
+      "altura": 60,
+      "eixos": [
+        "x",
+        "z"
+      ]
+    },
+    {
+      "placa": "nervura-y",
+      "id": 2,
+      "x": 122,
+      "y": 10,
+      "largura": 100,
+      "altura": 60,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    }
+  ],
+  "encaixes": [
+    {
+      "a": "nervura-x",
+      "b": "nervura-y",
+      "contato": "X",
+      "tipo": "meia-madeira",
+      "eixo": "z",
+      "comprimento": 60,
+      "feito": true,
+      "ferramenta": "make_joint lap",
+      "resposta": {
+        "changed": [
+          1,
+          2
+        ],
+        "message": "Junta criada: 1 slot por aresta, 3 mm de largura, 30 mm / 30 mm de profundidade."
+      }
+    }
+  ],
+  "nao_feito": [],
+  "avisos": [],
+  "medidas": [
+    {
+      "placa": "nervura-x",
+      "esperado": [
+        100,
+        60
+      ],
+      "medido": [
+        100,
+        60
+      ],
+      "ok": true
+    },
+    {
+      "placa": "nervura-y",
+      "esperado": [
+        100,
+        60
+      ],
+      "medido": [
+        100,
+        60
+      ],
+      "ok": true
+    }
+  ],
+  "vista3d_dados": {
+    "pecas": 2,
+    "conjuntos": 1,
+    "placas": [
+      {
+        "placa": "nervura-x",
+        "min": [
+          66,
+          -390,
+          48.5
+        ],
+        "max": [
+          166,
+          -330,
+          51.5
+        ]
+      },
+      {
+        "placa": "nervura-y",
+        "min": [
+          114.5,
+          -390,
+          0
+        ],
+        "max": [
+          117.5,
+          -330,
+          100
+        ]
+      }
+    ],
+    "colisoes": []
+  },
+  "check_design": {
+    "total": 0,
+    "resumo": null
+  },
+  "vista3d": "Peças: 2 (Conjuntos: 1) · Sem sobreposições",
+  "erros_da_pagina": []
+}

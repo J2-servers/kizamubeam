@@ -1,0 +1,63 @@
+{
+  "spec": "kz-analise/1",
+  "_ensaio": "resposta escrita a mao para testar o encanamento; nao veio da IA",
+  "tipo_objeto": "caixa organizadora aberta com uma divisoria",
+  "rota": "placas",
+  "rota_motivo": "chapas planas em angulo reto",
+  "volumes": [
+    "uma caixa aberta em cima"
+  ],
+  "placas_visiveis": [
+    {
+      "id": "fundo",
+      "papel": "fundo",
+      "plano": "XY",
+      "evidencia": "hipotese: a foto nao mostra o fundo"
+    },
+    {
+      "id": "frente",
+      "papel": "lateral",
+      "plano": "XZ",
+      "evidencia": "face da frente"
+    },
+    {
+      "id": "tras",
+      "papel": "lateral",
+      "plano": "XZ",
+      "evidencia": "borda de cima ao fundo"
+    },
+    {
+      "id": "esquerda",
+      "papel": "lateral",
+      "plano": "YZ",
+      "evidencia": "face da esquerda"
+    },
+    {
+      "id": "direita",
+      "papel": "lateral",
+      "plano": "YZ",
+      "evidencia": "borda de cima a direita"
+    },
+    {
+      "id": "divisoria",
+      "papel": "divisoria",
+      "plano": "YZ",
+      "evidencia": "chapa no meio"
+    }
+  ],
+  "simetria": "simetrica em X",
+  "camadas": "nenhuma",
+  "partes_moveis": [],
+  "encaixes_visiveis": [
+    "dedos nos cantos"
+  ],
+  "oculto": [
+    "o fundo"
+  ],
+  "hipoteses": [
+    "profundidade 120 e altura 60 pela proporcao"
+  ],
+  "perguntas": [],
+  "confianca": "media",
+  "resumo_para_usuario": "Caixa aberta de 6 placas com uma divisoria no meio."
+}

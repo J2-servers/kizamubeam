@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kz-analise/1",
+  "description": "Etapa 1. O que a IA entendeu da foto, com o que viu separado do que supos.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "tipo_objeto", "rota", "rota_motivo", "volumes", "placas_visiveis", "simetria", "camadas", "partes_moveis", "encaixes_visiveis", "oculto", "hipoteses", "perguntas", "confianca", "resumo_para_usuario"],
+  "properties": {
+    "spec": { "const": "kz-analise/1" },
+    "tipo_objeto": { "type": "string" },
+    "rota": { "enum": ["placas", "camadas", "organico"] },
+    "rota_motivo": { "type": "string" },
+    "volumes": { "type": "array", "items": { "type": "string" }, "description": "Os blocos grandes do objeto, em palavras" },
+    "placas_visiveis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "papel", "plano", "evidencia"],
+        "properties": {
+          "id": { "type": "string" },
+          "papel": { "type": "string", "description": "fundo, lateral, divisoria, tampa, prateleira..." },
+          "plano": { "enum": ["XY", "XZ", "YZ"], "description": "Plano em que a placa se deita" },
+          "evidencia": { "type": "string", "description": "Onde na foto ela aparece; ou a palavra 'hipotese' e o motivo" }
+        }
+      }
+    },
+    "simetria": { "type": "string" },
+    "camadas": { "type": "string", "description": "Ha pecas empilhadas face a face? Quantas, em que ordem" },
+    "partes_moveis": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["o_que", "tipo", "evidencia"], "properties": { "o_que": { "type": "string" }, "tipo": { "enum": ["dobradica", "desliza", "gira"] }, "evidencia": { "type": "string" } } } },
+    "encaixes_visiveis": { "type": "array", "items": { "type": "string" } },
+    "oculto": { "type": "array", "items": { "type": "string" }, "description": "O que a foto NAO mostra (fundo, tras, interior)" },
+    "hipoteses": { "type": "array", "items": { "type": "string" } },
+    "perguntas": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["pergunta", "bloqueia"], "properties": { "pergunta": { "type": "string" }, "bloqueia": { "type": "boolean" } } } },
+    "confianca": { "enum": ["alta", "media", "baixa"] },
+    "resumo_para_usuario": { "type": "string", "description": "Ate 5 linhas, para o usuario confirmar a interpretacao" }
+  }
+}

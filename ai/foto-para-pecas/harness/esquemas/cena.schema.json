@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kz-cena/1",
+  "description": "Etapa 4. Janelas, textos gravados e pecas decorativas em camadas. Coordenadas em mm, nos dois eixos da face da placa (por exemplo x e z para uma placa que fica de pe na frente ou no fundo).",
+  "type": "object",
+  "required": ["spec", "recortes", "gravuras", "cena"],
+  "properties": {
+    "spec": { "const": "kz-cena/1" },
+    "recortes": {
+      "type": "array",
+      "items": { "type": "object", "required": ["placa", "forma"], "properties": { "placa": { "type": "string" }, "forma": { "const": "retangulo" }, "x": { "type": "array" }, "y": { "type": "array" }, "z": { "type": "array" }, "raio": { "type": "number" } } }
+    },
+    "gravuras": {
+      "type": "array",
+      "items": { "type": "object", "required": ["placa", "texto", "centro", "altura"], "properties": { "placa": { "type": "string" }, "texto": { "type": "string" }, "centro": { "type": "object" }, "altura": { "type": "number" }, "negrito": { "type": "boolean" }, "largura_max": { "type": "number" } } }
+    },
+    "cena": {
+      "type": "object",
+      "required": ["sobre", "camadas"],
+      "properties": {
+        "sobre": { "type": "string", "description": "id da placa onde a cena e colada" },
+        "camadas": {
+          "type": "array",
+          "description": "Do fundo para a frente",
+          "items": {
+            "type": "object",
+            "required": ["nome", "pecas"],
+            "properties": {
+              "nome": { "type": "string" },
+              "cor": { "type": "string", "description": "#rrggbb" },
+              "pecas": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "nome", "o_que", "caixa", "fonte"],
+                  "properties": {
+                    "id": { "type": "string" }, "nome": { "type": "string" }, "o_que": { "type": "string" },
+                    "caixa": { "type": "object", "description": "[inicio, fim] nos dois eixos da face da placa" },
+                    "fonte": { "type": "object", "description": "{tipo: forma|biblioteca|web|desenho, ...}" },
+                    "busca": { "type": "string" },
+                    "gravuras": { "type": "array" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,571 @@
+{
+  "spec": "kz-montagem/1",
+  "nome": "Cofrinho Nossa Aventura (ensaio a mao)",
+  "espessura": 3,
+  "placas": [
+    {
+      "id": "base",
+      "nome": "Base",
+      "x": [
+        0,
+        400
+      ],
+      "y": [
+        0,
+        100
+      ],
+      "z": [
+        0,
+        3
+      ]
+    },
+    {
+      "id": "topo",
+      "nome": "Topo",
+      "x": [
+        0,
+        400
+      ],
+      "y": [
+        0,
+        100
+      ],
+      "z": [
+        397,
+        400
+      ]
+    },
+    {
+      "id": "esquerda",
+      "nome": "Lateral esquerda",
+      "x": [
+        0,
+        3
+      ],
+      "y": [
+        0,
+        100
+      ],
+      "z": [
+        0,
+        400
+      ]
+    },
+    {
+      "id": "direita",
+      "nome": "Lateral direita",
+      "x": [
+        397,
+        400
+      ],
+      "y": [
+        0,
+        100
+      ],
+      "z": [
+        0,
+        400
+      ]
+    },
+    {
+      "id": "tras",
+      "nome": "Fundo (ceu)",
+      "x": [
+        0,
+        400
+      ],
+      "y": [
+        97,
+        100
+      ],
+      "z": [
+        0,
+        400
+      ]
+    },
+    {
+      "id": "frente",
+      "nome": "Moldura da frente",
+      "x": [
+        0,
+        400
+      ],
+      "y": [
+        0,
+        3
+      ],
+      "z": [
+        0,
+        400
+      ],
+      "recortes": [
+        {
+          "forma": "retangulo",
+          "x": [
+            22,
+            378
+          ],
+          "z": [
+            85,
+            378
+          ],
+          "raio": 10
+        }
+      ],
+      "gravuras": [
+        {
+          "texto": "PLANEJE, ECONOMIZE, VIAJE!",
+          "centro": {
+            "x": 200,
+            "z": 66
+          },
+          "altura": 8,
+          "negrito": true
+        },
+        {
+          "texto": "R$20    R$50    R$100    R$200    R$500    R$1.000",
+          "centro": {
+            "x": 200,
+            "z": 38
+          },
+          "altura": 7
+        }
+      ]
+    },
+    {
+      "id": "prateleira",
+      "nome": "Prateleira do cofre",
+      "x": [
+        0,
+        400
+      ],
+      "y": [
+        0,
+        60
+      ],
+      "z": [
+        147,
+        150
+      ]
+    },
+    {
+      "id": "divisoria1",
+      "nome": "Divisoria 1",
+      "x": [
+        56,
+        59
+      ],
+      "y": [
+        0,
+        60
+      ],
+      "z": [
+        0,
+        150
+      ]
+    },
+    {
+      "id": "divisoria2",
+      "nome": "Divisoria 2",
+      "x": [
+        146,
+        149
+      ],
+      "y": [
+        0,
+        60
+      ],
+      "z": [
+        0,
+        150
+      ]
+    },
+    {
+      "id": "divisoria3",
+      "nome": "Divisoria 3",
+      "x": [
+        244,
+        247
+      ],
+      "y": [
+        0,
+        60
+      ],
+      "z": [
+        0,
+        150
+      ]
+    },
+    {
+      "id": "divisoria4",
+      "nome": "Divisoria 4",
+      "x": [
+        337,
+        340
+      ],
+      "y": [
+        0,
+        60
+      ],
+      "z": [
+        0,
+        150
+      ]
+    }
+  ],
+  "ligacoes": "auto",
+  "moveis": [],
+  "cena": {
+    "sobre": "tras",
+    "camadas": [
+      {
+        "nome": "Base do mapa e nuvem",
+        "cor": "#3f8f96",
+        "pecas": [
+          {
+            "id": "mapa_base",
+            "nome": "contorno do mapa do Brasil",
+            "o_que": "contorno do mapa do Brasil",
+            "fonte": {
+              "tipo": "web",
+              "busca": "Brazil blank map"
+            },
+            "caixa": {
+              "x": [
+                80,
+                298
+              ],
+              "z": [
+                163,
+                337
+              ]
+            }
+          },
+          {
+            "id": "nuvem",
+            "nome": "nuvem",
+            "o_que": "nuvem",
+            "fonte": {
+              "tipo": "biblioteca",
+              "id": "cloud"
+            },
+            "caixa": {
+              "x": [
+                44,
+                76
+              ],
+              "z": [
+                285,
+                300
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "nome": "Estados e figuras",
+        "cor": "#e9cf9e",
+        "pecas": [
+          {
+            "id": "mapa_estados",
+            "nome": "mapa do Brasil com os estados",
+            "o_que": "mapa do Brasil com os estados",
+            "fonte": {
+              "tipo": "web",
+              "busca": "File:Map of the Brazilian states by literacy rate (2019).svg"
+            },
+            "caixa": {
+              "x": [
+                84,
+                294
+              ],
+              "z": [
+                167,
+                333
+              ]
+            },
+            "julgado": {
+              "por": "juiz.mjs (julgamento manual, modo ensaio)",
+              "nota": 9,
+              "motivo": "o anterior trazia a legenda de 6 quadradinhos"
+            }
+          },
+          {
+            "id": "aviao",
+            "nome": "aviao",
+            "o_que": "aviao",
+            "fonte": {
+              "tipo": "biblioteca",
+              "id": "airplane"
+            },
+            "caixa": {
+              "x": [
+                305,
+                358
+              ],
+              "z": [
+                294,
+                326
+              ]
+            }
+          },
+          {
+            "id": "mala",
+            "nome": "mala de viagem com alca",
+            "o_que": "mala de viagem com alca",
+            "fonte": {
+              "tipo": "web",
+              "busca": "File:Suitcase icon.svg"
+            },
+            "caixa": {
+              "x": [
+                46,
+                106
+              ],
+              "z": [
+                176,
+                245
+              ]
+            },
+            "julgado": {
+              "por": "juiz.mjs (julgamento manual, modo ensaio)",
+              "nota": 8
+            }
+          },
+          {
+            "id": "barco",
+            "nome": "veleiro",
+            "o_que": "veleiro",
+            "fonte": {
+              "tipo": "biblioteca",
+              "id": "sailboat"
+            },
+            "caixa": {
+              "x": [
+                115,
+                166
+              ],
+              "z": [
+                179,
+                221
+              ]
+            }
+          },
+          {
+            "id": "cristo",
+            "nome": "Cristo Redentor",
+            "o_que": "Cristo Redentor",
+            "fonte": {
+              "tipo": "web",
+              "busca": "File:Wikimedia Brasil 2025 Strategic Process - cristo.svg"
+            },
+            "caixa": {
+              "x": [
+                283,
+                330
+              ],
+              "z": [
+                185,
+                253
+              ]
+            },
+            "julgado": {
+              "por": "juiz.mjs (julgamento manual, modo ensaio)",
+              "nota": 9
+            }
+          },
+          {
+            "id": "palmeira",
+            "nome": "palmeira",
+            "o_que": "palmeira",
+            "fonte": {
+              "tipo": "biblioteca",
+              "id": "palm"
+            },
+            "caixa": {
+              "x": [
+                322,
+                363
+              ],
+              "z": [
+                185,
+                257
+              ]
+            }
+          },
+          {
+            "id": "montanhas",
+            "nome": "montanhas",
+            "o_que": "montanhas",
+            "fonte": {
+              "tipo": "web",
+              "busca": "File:Mountain icon (Noun Project).svg"
+            },
+            "caixa": {
+              "x": [
+                252,
+                312
+              ],
+              "z": [
+                166,
+                188
+              ]
+            },
+            "julgado": {
+              "por": "juiz.mjs (julgamento manual, modo ensaio)",
+              "nota": 8
+            }
+          }
+        ]
+      },
+      {
+        "nome": "Placas e titulo",
+        "cor": "#f3e4c8",
+        "pecas": [
+          {
+            "id": "titulo",
+            "nome": "placa do titulo",
+            "o_que": "placa do titulo",
+            "fonte": {
+              "tipo": "forma",
+              "forma": "retangulo",
+              "raio": 4
+            },
+            "caixa": {
+              "x": [
+                98,
+                317
+              ],
+              "z": [
+                338,
+                381
+              ]
+            },
+            "gravuras": [
+              {
+                "texto": "Nossa Aventura",
+                "centro": {
+                  "x": 207,
+                  "z": 364
+                },
+                "altura": 12
+              },
+              {
+                "texto": "Para a próxima viagem juntos",
+                "centro": {
+                  "x": 207,
+                  "z": 347
+                },
+                "altura": 6
+              }
+            ]
+          },
+          {
+            "id": "placa_rio",
+            "nome": "placa Rio de Janeiro",
+            "o_que": "placa Rio de Janeiro",
+            "fonte": {
+              "tipo": "forma",
+              "forma": "placa_seta"
+            },
+            "caixa": {
+              "x": [
+                22,
+                102
+              ],
+              "z": [
+                152,
+                175
+              ]
+            },
+            "gravuras": [
+              {
+                "texto": "RIO DE JANEIRO",
+                "altura": 6,
+                "largura_max": 62
+              }
+            ]
+          },
+          {
+            "id": "placa_salvador",
+            "nome": "placa Salvador",
+            "o_que": "placa Salvador",
+            "fonte": {
+              "tipo": "forma",
+              "forma": "placa_seta"
+            },
+            "caixa": {
+              "x": [
+                110,
+                190
+              ],
+              "z": [
+                152,
+                175
+              ]
+            },
+            "gravuras": [
+              {
+                "texto": "SALVADOR",
+                "altura": 7,
+                "largura_max": 62
+              }
+            ]
+          },
+          {
+            "id": "placa_foz",
+            "nome": "placa Foz do Iguaçu",
+            "o_que": "placa Foz do Iguaçu",
+            "fonte": {
+              "tipo": "forma",
+              "forma": "placa_seta"
+            },
+            "caixa": {
+              "x": [
+                202,
+                288
+              ],
+              "z": [
+                152,
+                175
+              ]
+            },
+            "gravuras": [
+              {
+                "texto": "FOZ DO IGUAÇU",
+                "altura": 6,
+                "largura_max": 66
+              }
+            ]
+          },
+          {
+            "id": "placa_manaus",
+            "nome": "placa Manaus",
+            "o_que": "placa Manaus",
+            "fonte": {
+              "tipo": "forma",
+              "forma": "placa_seta"
+            },
+            "caixa": {
+              "x": [
+                298,
+                378
+              ],
+              "z": [
+                152,
+                175
+              ]
+            },
+            "gravuras": [
+              {
+                "texto": "MANAUS",
+                "altura": 7,
+                "largura_max": 62
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

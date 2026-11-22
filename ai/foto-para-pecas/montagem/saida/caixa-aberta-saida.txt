@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "pecas": 5,
+  "encaixes": [
+    "fundo+frente: L -> make_joint finger",
+    "fundo+tras: L -> make_joint finger",
+    "fundo+esquerda: L -> make_joint finger",
+    "fundo+direita: L -> make_joint finger",
+    "frente+esquerda: L -> make_joint finger",
+    "frente+direita: L -> make_joint finger",
+    "tras+esquerda: L -> make_joint finger",
+    "tras+direita: L -> make_joint finger"
+  ],
+  "saida": "D:\\CLAUDE\\sistema para corte a laser\\kizamubeam\\ai\\foto-para-pecas\\montagem\\saida"
+}

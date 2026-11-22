@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kz-diferencas/1",
+  "description": "Etapa 5. Comparacao entre a foto do usuario e as fotos do 3D montado.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "observacoes_por_vista", "diferencas", "veredito"],
+  "properties": {
+    "spec": { "const": "kz-diferencas/1" },
+    "observacoes_por_vista": {
+      "type": "array",
+      "description": "Uma linha por foto do 3D recebida: o que se ve nela. Prova de que cada vista foi olhada.",
+      "items": { "type": "object", "additionalProperties": false, "required": ["vista", "o_que_vejo"], "properties": { "vista": { "type": "string" }, "o_que_vejo": { "type": "string" } } }
+    },
+    "diferencas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["onde", "esperado", "observado", "gravidade", "placas", "correcao"],
+        "properties": {
+          "onde": { "type": "string" },
+          "esperado": { "type": "string", "description": "O que a foto do usuario mostra" },
+          "observado": { "type": "string", "description": "O que o 3D mostra, e em qual vista" },
+          "gravidade": { "enum": ["grave", "media", "leve"] },
+          "placas": { "type": "array", "items": { "type": "string" }, "description": "Ids das placas envolvidas" },
+          "correcao": { "type": "string", "description": "Mudanca proposta NAS VISTAS (etapa 2), nunca na peca ja gerada" }
+        }
+      }
+    },
+    "veredito": { "enum": ["igual", "corrigir", "perguntar"] }
+  }
+}

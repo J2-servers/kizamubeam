@@ -1,0 +1,24 @@
+{
+  "provedor": "openrouter",
+  "padrao": "anthropic/claude-fable-5.2",
+  "por_etapa": {
+    "1-compreender": "anthropic/claude-fable-5.2",
+    "2-vistas": "anthropic/claude-fable-5.2",
+    "3-especificar": "anthropic/claude-fable-5.2",
+    "4-cena": "anthropic/claude-fable-5.2",
+    "peca-desenho": "anthropic/claude-fable-5.2",
+    "peca-conferir": "anthropic/claude-sonnet-5.5",
+    "5-conferir": "anthropic/claude-fable-5.2"
+  },
+  "por_que": "Fable 5.2 decide a geometria (entender a foto, vistas, especificacao, cena, desenhar silhuetas) e confere o resultado final. Sonnet 5.5 so da nota a cada peca recortada (muitas chamadas pequenas, 4x mais barato). Precos no OpenRouter em 18/11/2026: Fable 5.2 US$ 8/40, Sonnet 5.5 US$ 2/10 por milhao de tokens.",
+  "effort": "high",
+  "voltas_maximas": 3,
+  "nota_minima_peca": 7,
+  "candidatos_web": 4,
+  "max_tokens": {
+    "padrao": 32000,
+    "4-cena": 64000,
+    "3-especificar": 48000
+  },
+  "max_tokens_por_que": "A cena e a maior resposta (dezenas de pecas com caixa, fonte e gravuras) e o raciocinio em esforco alto conta no mesmo limite: com 32000 ela foi cortada no cofrinho (18/11/2026)."
+}

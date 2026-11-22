@@ -1,0 +1,4769 @@
+{
+  "settings": {
+    "minWeb": 1,
+    "beam": 0.15,
+    "tol": 0.05,
+    "closeGap": 1,
+    "engraveLayers": [],
+    "beforeLaser": true
+  },
+  "issues": [
+    {
+      "index": 0,
+      "kind": "bed",
+      "level": "error",
+      "message": "Ultrapassa a área de trabalho.",
+      "ids": [
+        1
+      ],
+      "area": {
+        "x": 9,
+        "y": 9,
+        "w": 402,
+        "h": 102
+      },
+      "fix": "Mover para a mesa"
+    },
+    {
+      "index": 1,
+      "kind": "bed",
+      "level": "error",
+      "message": "Ultrapassa a área de trabalho.",
+      "ids": [
+        2
+      ],
+      "area": {
+        "x": 9,
+        "y": 121,
+        "w": 402,
+        "h": 102
+      },
+      "fix": "Mover para a mesa"
+    },
+    {
+      "index": 2,
+      "kind": "bed",
+      "level": "error",
+      "message": "Ultrapassa a área de trabalho.",
+      "ids": [
+        3
+      ],
+      "area": {
+        "x": 9,
+        "y": 233,
+        "w": 102,
+        "h": 402
+      },
+      "fix": "Mover para a mesa"
+    },
+    {
+      "index": 3,
+      "kind": "bed",
+      "level": "error",
+      "message": "Ultrapassa a área de trabalho.",
+      "ids": [
+        4
+      ],
+      "area": {
+        "x": 121,
+        "y": 233,
+        "w": 102,
+        "h": 402
+      },
+      "fix": "Mover para a mesa"
+    },
+    {
+      "index": 4,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 237.559,
+        "y": 944.913,
+        "w": 16.972,
+        "h": 9.263
+      }
+    },
+    {
+      "index": 5,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 235.816,
+        "y": 912.715,
+        "w": 19.361,
+        "h": 34.104
+      }
+    },
+    {
+      "index": 6,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 226.456,
+        "y": 919.162,
+        "w": 25.962,
+        "h": 31.157
+      }
+    },
+    {
+      "index": 7,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 232.6,
+        "y": 921.656,
+        "w": 0.39,
+        "h": 0.48
+      }
+    },
+    {
+      "index": 8,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 224.331,
+        "y": 923.592,
+        "w": 7.996,
+        "h": 13.327
+      }
+    },
+    {
+      "index": 9,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 224.11,
+        "y": 934.838,
+        "w": 5.357,
+        "h": 4.626
+      }
+    },
+    {
+      "index": 10,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 234.623,
+        "y": 950.914,
+        "w": 0.866,
+        "h": 0.74
+      }
+    },
+    {
+      "index": 11,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 283.178,
+        "y": 918.819,
+        "w": 1.588,
+        "h": 1.273
+      }
+    },
+    {
+      "index": 12,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 257.07,
+        "y": 917.354,
+        "w": 24.733,
+        "h": 8.34
+      }
+    },
+    {
+      "index": 13,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 259.404,
+        "y": 918.064,
+        "w": 5.064,
+        "h": 2.204
+      }
+    },
+    {
+      "index": 14,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 265.208,
+        "y": 925.338,
+        "w": 1.279,
+        "h": 1.695
+      }
+    },
+    {
+      "index": 15,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 275.143,
+        "y": 922.602,
+        "w": 1.299,
+        "h": 1.785
+      }
+    },
+    {
+      "index": 16,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 254.782,
+        "y": 864.343,
+        "w": 1.441,
+        "h": 2.492
+      }
+    },
+    {
+      "index": 17,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 257.682,
+        "y": 874.486,
+        "w": 1.254,
+        "h": 1.746
+      }
+    },
+    {
+      "index": 18,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 261.577,
+        "y": 877.787,
+        "w": 3.101,
+        "h": 2.887
+      }
+    },
+    {
+      "index": 19,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 197.373,
+        "y": 954.645,
+        "w": 10.798,
+        "h": 13.824
+      }
+    },
+    {
+      "index": 20,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 201.045,
+        "y": 962.086,
+        "w": 17.245,
+        "h": 11.393
+      }
+    },
+    {
+      "index": 21,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 197.45,
+        "y": 964.007,
+        "w": 21.559,
+        "h": 15.063
+      }
+    },
+    {
+      "index": 22,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 239.728,
+        "y": 855.276,
+        "w": 5.612,
+        "h": 4.268
+      }
+    },
+    {
+      "index": 23,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 241.649,
+        "y": 859.026,
+        "w": 0.928,
+        "h": 1.396
+      }
+    },
+    {
+      "index": 24,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 249.283,
+        "y": 861.117,
+        "w": 5.763,
+        "h": 6.489
+      }
+    },
+    {
+      "index": 25,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 242.374,
+        "y": 855.909,
+        "w": 10.702,
+        "h": 7.032
+      }
+    },
+    {
+      "index": 26,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 253.732,
+        "y": 865.274,
+        "w": 2.508,
+        "h": 1.326
+      }
+    },
+    {
+      "index": 27,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 224.446,
+        "y": 847.519,
+        "w": 11.523,
+        "h": 5.452
+      }
+    },
+    {
+      "index": 28,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 207.561,
+        "y": 851.374,
+        "w": 30.377,
+        "h": 14.508
+      }
+    },
+    {
+      "index": 29,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 204.599,
+        "y": 853.983,
+        "w": 15.787,
+        "h": 6.404
+      }
+    },
+    {
+      "index": 30,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 204.863,
+        "y": 847.741,
+        "w": 21.782,
+        "h": 10.969
+      }
+    },
+    {
+      "index": 31,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 209.226,
+        "y": 864.566,
+        "w": 3.484,
+        "h": 4.038
+      }
+    },
+    {
+      "index": 32,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 214.228,
+        "y": 868.851,
+        "w": 12.223,
+        "h": 3.177
+      }
+    },
+    {
+      "index": 33,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 220.812,
+        "y": 863.814,
+        "w": 13.238,
+        "h": 6.867
+      }
+    },
+    {
+      "index": 34,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 271.033,
+        "y": 915.719,
+        "w": 1.641,
+        "h": 2.73
+      }
+    },
+    {
+      "index": 35,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 275.402,
+        "y": 917.553,
+        "w": 4.637,
+        "h": 1.394
+      }
+    },
+    {
+      "index": 36,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 186.544,
+        "y": 812.245,
+        "w": 29.13,
+        "h": 16.383
+      }
+    },
+    {
+      "index": 37,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 192.667,
+        "y": 816.141,
+        "w": 26.176,
+        "h": 17.355
+      }
+    },
+    {
+      "index": 38,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 217.365,
+        "y": 832.568,
+        "w": 0.692,
+        "h": 0.631
+      }
+    },
+    {
+      "index": 39,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        244
+      ],
+      "area": {
+        "x": 211.15,
+        "y": 816.937,
+        "w": 5.4,
+        "h": 5.192
+      }
+    },
+    {
+      "index": 40,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 268.318,
+        "y": 928.279,
+        "w": 12.661,
+        "h": 3.187
+      }
+    },
+    {
+      "index": 41,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 269.463,
+        "y": 929.329,
+        "w": 16.188,
+        "h": 2.162
+      }
+    },
+    {
+      "index": 42,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 274.329,
+        "y": 925.825,
+        "w": 11.901,
+        "h": 4.586
+      }
+    },
+    {
+      "index": 43,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 281.627,
+        "y": 924.346,
+        "w": 0.749,
+        "h": 0.638
+      }
+    },
+    {
+      "index": 44,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 269.344,
+        "y": 923.158,
+        "w": 10.004,
+        "h": 7.775
+      }
+    },
+    {
+      "index": 45,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 271.517,
+        "y": 929.091,
+        "w": 6.087,
+        "h": 1.626
+      }
+    },
+    {
+      "index": 46,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 217.002,
+        "y": 828.866,
+        "w": 2.908,
+        "h": 3.78
+      }
+    },
+    {
+      "index": 47,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 201.702,
+        "y": 831.594,
+        "w": 22.081,
+        "h": 12.674
+      }
+    },
+    {
+      "index": 48,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 212.089,
+        "y": 840.37,
+        "w": 13.165,
+        "h": 4.242
+      }
+    },
+    {
+      "index": 49,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 223.697,
+        "y": 832.315,
+        "w": 0.734,
+        "h": 10.89
+      }
+    },
+    {
+      "index": 50,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 234.905,
+        "y": 895.762,
+        "w": 1.03,
+        "h": 0.643
+      }
+    },
+    {
+      "index": 51,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 235.207,
+        "y": 894.985,
+        "w": 1.626,
+        "h": 7.365
+      }
+    },
+    {
+      "index": 52,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 234.017,
+        "y": 903.641,
+        "w": 3.518,
+        "h": 10.207
+      }
+    },
+    {
+      "index": 53,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 232.872,
+        "y": 888.469,
+        "w": 30.779,
+        "h": 31.329
+      }
+    },
+    {
+      "index": 54,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 240.588,
+        "y": 911.01,
+        "w": 14.856,
+        "h": 8.423
+      }
+    },
+    {
+      "index": 55,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 245.343,
+        "y": 915.838,
+        "w": 13.192,
+        "h": 5.255
+      }
+    },
+    {
+      "index": 56,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 255.227,
+        "y": 917.238,
+        "w": 8.564,
+        "h": 4.289
+      }
+    },
+    {
+      "index": 57,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 260.748,
+        "y": 881.835,
+        "w": 9.168,
+        "h": 38.096
+      }
+    },
+    {
+      "index": 58,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 270.861,
+        "y": 912.465,
+        "w": 3.227,
+        "h": 6.06
+      }
+    },
+    {
+      "index": 59,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 271.053,
+        "y": 907.868,
+        "w": 3.244,
+        "h": 9.02
+      }
+    },
+    {
+      "index": 60,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 271.697,
+        "y": 909.535,
+        "w": 2.075,
+        "h": 2.445
+      }
+    },
+    {
+      "index": 61,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 244.875,
+        "y": 879.642,
+        "w": 18.173,
+        "h": 16.255
+      }
+    },
+    {
+      "index": 62,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 235.973,
+        "y": 891.537,
+        "w": 11.673,
+        "h": 4.465
+      }
+    },
+    {
+      "index": 63,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 154.867,
+        "y": 962.548,
+        "w": 24.03,
+        "h": 17.022
+      }
+    },
+    {
+      "index": 64,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 159.005,
+        "y": 953.104,
+        "w": 19.653,
+        "h": 16.387
+      }
+    },
+    {
+      "index": 65,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 152.661,
+        "y": 967.479,
+        "w": 22.921,
+        "h": 15.266
+      }
+    },
+    {
+      "index": 66,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 269.009,
+        "y": 924.887,
+        "w": 0.687,
+        "h": 0.686
+      }
+    },
+    {
+      "index": 67,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 273.099,
+        "y": 913.252,
+        "w": 0.51,
+        "h": 0.497
+      }
+    },
+    {
+      "index": 68,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 274.873,
+        "y": 908.557,
+        "w": 2.519,
+        "h": 3.115
+      }
+    },
+    {
+      "index": 69,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 212.083,
+        "y": 840.443,
+        "w": 15.097,
+        "h": 8.109
+      }
+    },
+    {
+      "index": 70,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 201.026,
+        "y": 842.035,
+        "w": 22.779,
+        "h": 4.202
+      }
+    },
+    {
+      "index": 71,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 198.275,
+        "y": 845.376,
+        "w": 26.742,
+        "h": 12.747
+      }
+    },
+    {
+      "index": 72,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 167.133,
+        "y": 920.117,
+        "w": 14.942,
+        "h": 5.995
+      }
+    },
+    {
+      "index": 73,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 128.941,
+        "y": 915.673,
+        "w": 61.457,
+        "h": 49.787
+      }
+    },
+    {
+      "index": 74,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 147.842,
+        "y": 917.143,
+        "w": 13.692,
+        "h": 6.618
+      }
+    },
+    {
+      "index": 75,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 121.283,
+        "y": 924.231,
+        "w": 1.958,
+        "h": 0.508
+      }
+    },
+    {
+      "index": 76,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 115.84,
+        "y": 915.456,
+        "w": 29.2,
+        "h": 10.86
+      }
+    },
+    {
+      "index": 77,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 130.211,
+        "y": 964.271,
+        "w": 29.907,
+        "h": 5.049
+      }
+    },
+    {
+      "index": 78,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 157.452,
+        "y": 957.522,
+        "w": 22.566,
+        "h": 11.273
+      }
+    },
+    {
+      "index": 79,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 178.705,
+        "y": 924.23,
+        "w": 11.589,
+        "h": 36.282
+      }
+    },
+    {
+      "index": 80,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 260.492,
+        "y": 878.669,
+        "w": 1.717,
+        "h": 0.975
+      }
+    },
+    {
+      "index": 81,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 236.195,
+        "y": 858.518,
+        "w": 24.75,
+        "h": 34.563
+      }
+    },
+    {
+      "index": 82,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 238.976,
+        "y": 857.299,
+        "w": 16.24,
+        "h": 9.45
+      }
+    },
+    {
+      "index": 83,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 213.922,
+        "y": 859.13,
+        "w": 34.111,
+        "h": 36.793
+      }
+    },
+    {
+      "index": 84,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 229.317,
+        "y": 859.083,
+        "w": 6.498,
+        "h": 11.324
+      }
+    },
+    {
+      "index": 85,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 213.201,
+        "y": 870.227,
+        "w": 22.823,
+        "h": 23.598
+      }
+    },
+    {
+      "index": 86,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 234.51,
+        "y": 879.33,
+        "w": 30.171,
+        "h": 16.624
+      }
+    },
+    {
+      "index": 87,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 148.117,
+        "y": 898.074,
+        "w": 27.15,
+        "h": 18.317
+      }
+    },
+    {
+      "index": 88,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 143.638,
+        "y": 914.699,
+        "w": 23.991,
+        "h": 8.966
+      }
+    },
+    {
+      "index": 89,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 167.274,
+        "y": 897.939,
+        "w": 8.551,
+        "h": 19.253
+      }
+    },
+    {
+      "index": 90,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 255.964,
+        "y": 919.085,
+        "w": 5.414,
+        "h": 6.288
+      }
+    },
+    {
+      "index": 91,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 239.243,
+        "y": 910.4,
+        "w": 17.016,
+        "h": 8.978
+      }
+    },
+    {
+      "index": 92,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 242.305,
+        "y": 926.711,
+        "w": 10.122,
+        "h": 17.241
+      }
+    },
+    {
+      "index": 93,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 251.404,
+        "y": 943.969,
+        "w": 2.078,
+        "h": 0.925
+      }
+    },
+    {
+      "index": 94,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 256.972,
+        "y": 944.472,
+        "w": 1.104,
+        "h": 1.171
+      }
+    },
+    {
+      "index": 95,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 170.908,
+        "y": 891.156,
+        "w": 2.248,
+        "h": 8.489
+      }
+    },
+    {
+      "index": 96,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 167,
+        "y": 879.905,
+        "w": 50.51,
+        "h": 40.556
+      }
+    },
+    {
+      "index": 97,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 167.135,
+        "y": 908.8,
+        "w": 8.14,
+        "h": 10.744
+      }
+    },
+    {
+      "index": 98,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 181.902,
+        "y": 922.542,
+        "w": 2.618,
+        "h": 4.18
+      }
+    },
+    {
+      "index": 99,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 214.763,
+        "y": 906.37,
+        "w": 1.003,
+        "h": 1.586
+      }
+    },
+    {
+      "index": 100,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 203.766,
+        "y": 879.943,
+        "w": 0.991,
+        "h": 1.894
+      }
+    },
+    {
+      "index": 101,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 184.643,
+        "y": 879.024,
+        "w": 20.407,
+        "h": 4.23
+      }
+    },
+    {
+      "index": 102,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 116.453,
+        "y": 909.641,
+        "w": 20.964,
+        "h": 16.684
+      }
+    },
+    {
+      "index": 103,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 129.1,
+        "y": 915.336,
+        "w": 15.28,
+        "h": 7.17
+      }
+    },
+    {
+      "index": 104,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 233.406,
+        "y": 900.822,
+        "w": 1.891,
+        "h": 1.568
+      }
+    },
+    {
+      "index": 105,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 216.667,
+        "y": 899.991,
+        "w": 16.064,
+        "h": 35.105
+      }
+    },
+    {
+      "index": 106,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 220.71,
+        "y": 899.992,
+        "w": 13.755,
+        "h": 3.37
+      }
+    },
+    {
+      "index": 107,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 187.726,
+        "y": 882.098,
+        "w": 31.397,
+        "h": 36.709
+      }
+    },
+    {
+      "index": 108,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 216.19,
+        "y": 913.751,
+        "w": 10.249,
+        "h": 20.271
+      }
+    },
+    {
+      "index": 109,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 225.216,
+        "y": 913.573,
+        "w": 10.202,
+        "h": 22.053
+      }
+    },
+    {
+      "index": 110,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 204.294,
+        "y": 874.872,
+        "w": 29.985,
+        "h": 28.486
+      }
+    },
+    {
+      "index": 111,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 214.495,
+        "y": 873.862,
+        "w": 19.522,
+        "h": 19.653
+      }
+    },
+    {
+      "index": 112,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 205.802,
+        "y": 872.559,
+        "w": 9.206,
+        "h": 4.329
+      }
+    },
+    {
+      "index": 113,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 206.698,
+        "y": 885.359,
+        "w": 5.196,
+        "h": 6.947
+      }
+    },
+    {
+      "index": 114,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 216.54,
+        "y": 899.986,
+        "w": 12.757,
+        "h": 3.815
+      }
+    },
+    {
+      "index": 115,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 226.139,
+        "y": 900.117,
+        "w": 3.354,
+        "h": 1.195
+      }
+    },
+    {
+      "index": 116,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 228.981,
+        "y": 887.371,
+        "w": 2.345,
+        "h": 3.271
+      }
+    },
+    {
+      "index": 117,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 226.328,
+        "y": 888.363,
+        "w": 2.561,
+        "h": 2.344
+      }
+    },
+    {
+      "index": 118,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 198.918,
+        "y": 852.187,
+        "w": 8.347,
+        "h": 8.229
+      }
+    },
+    {
+      "index": 119,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 183.065,
+        "y": 853.978,
+        "w": 31.367,
+        "h": 29.401
+      }
+    },
+    {
+      "index": 120,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 187.818,
+        "y": 881.012,
+        "w": 0.792,
+        "h": 1.175
+      }
+    },
+    {
+      "index": 121,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 205.58,
+        "y": 876.922,
+        "w": 0.699,
+        "h": 0.684
+      }
+    },
+    {
+      "index": 122,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 185.391,
+        "y": 914.864,
+        "w": 32.145,
+        "h": 5.128
+      }
+    },
+    {
+      "index": 123,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 180.079,
+        "y": 918.851,
+        "w": 48.991,
+        "h": 37.172
+      }
+    },
+    {
+      "index": 124,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 179.857,
+        "y": 928.226,
+        "w": 2.495,
+        "h": 27.933
+      }
+    },
+    {
+      "index": 125,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 177.686,
+        "y": 957.45,
+        "w": 1.98,
+        "h": 6.048
+      }
+    },
+    {
+      "index": 126,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 208.389,
+        "y": 952.229,
+        "w": 5.377,
+        "h": 3.299
+      }
+    },
+    {
+      "index": 127,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 206.666,
+        "y": 949.613,
+        "w": 30.205,
+        "h": 6.925
+      }
+    },
+    {
+      "index": 128,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 214.962,
+        "y": 950.724,
+        "w": 6.906,
+        "h": 4.135
+      }
+    },
+    {
+      "index": 129,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 214.29,
+        "y": 948.037,
+        "w": 10.138,
+        "h": 7.433
+      }
+    },
+    {
+      "index": 130,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 229.626,
+        "y": 939.301,
+        "w": 6.371,
+        "h": 12.444
+      }
+    },
+    {
+      "index": 131,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 215.091,
+        "y": 951.451,
+        "w": 9.64,
+        "h": 4.662
+      }
+    },
+    {
+      "index": 132,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 210.118,
+        "y": 952.881,
+        "w": 2.659,
+        "h": 2.666
+      }
+    },
+    {
+      "index": 133,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 234.622,
+        "y": 944.263,
+        "w": 11.554,
+        "h": 7.436
+      }
+    },
+    {
+      "index": 134,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 235.028,
+        "y": 919.119,
+        "w": 16.314,
+        "h": 23.334
+      }
+    },
+    {
+      "index": 135,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 223.08,
+        "y": 911.982,
+        "w": 12.522,
+        "h": 23.14
+      }
+    },
+    {
+      "index": 136,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 279.975,
+        "y": 918.756,
+        "w": 1.392,
+        "h": 1.06
+      }
+    },
+    {
+      "index": 137,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 267.62,
+        "y": 916.76,
+        "w": 13.231,
+        "h": 2.694
+      }
+    },
+    {
+      "index": 138,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 257.405,
+        "y": 916.162,
+        "w": 9.129,
+        "h": 4.292
+      }
+    },
+    {
+      "index": 139,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 254.863,
+        "y": 919.139,
+        "w": 2.162,
+        "h": 1.806
+      }
+    },
+    {
+      "index": 140,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 258.409,
+        "y": 923.223,
+        "w": 8.679,
+        "h": 2.112
+      }
+    },
+    {
+      "index": 141,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 265.972,
+        "y": 921.731,
+        "w": 16.266,
+        "h": 4.113
+      }
+    },
+    {
+      "index": 142,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 252.236,
+        "y": 868.239,
+        "w": 6.837,
+        "h": 13.183
+      }
+    },
+    {
+      "index": 143,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 197.4,
+        "y": 951.604,
+        "w": 13.014,
+        "h": 15.755
+      }
+    },
+    {
+      "index": 144,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 197.505,
+        "y": 961.132,
+        "w": 20.638,
+        "h": 14.134
+      }
+    },
+    {
+      "index": 145,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 241.888,
+        "y": 858.6,
+        "w": 8.515,
+        "h": 6.248
+      }
+    },
+    {
+      "index": 146,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 239.338,
+        "y": 857.409,
+        "w": 3.11,
+        "h": 3.331
+      }
+    },
+    {
+      "index": 147,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 239.911,
+        "y": 861.172,
+        "w": 11.697,
+        "h": 6.555
+      }
+    },
+    {
+      "index": 148,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 252.3,
+        "y": 865.396,
+        "w": 3.791,
+        "h": 2.949
+      }
+    },
+    {
+      "index": 149,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 225.474,
+        "y": 849.227,
+        "w": 8.684,
+        "h": 6.01
+      }
+    },
+    {
+      "index": 150,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 204.446,
+        "y": 849.828,
+        "w": 21.858,
+        "h": 11.788
+      }
+    },
+    {
+      "index": 151,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 213.375,
+        "y": 859.103,
+        "w": 28.933,
+        "h": 14.321
+      }
+    },
+    {
+      "index": 152,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 268.528,
+        "y": 911.641,
+        "w": 6.904,
+        "h": 4.429
+      }
+    },
+    {
+      "index": 153,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 267.986,
+        "y": 914.93,
+        "w": 1.173,
+        "h": 1.628
+      }
+    },
+    {
+      "index": 154,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 185.479,
+        "y": 819.44,
+        "w": 30.925,
+        "h": 17.504
+      }
+    },
+    {
+      "index": 155,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 201.643,
+        "y": 831.378,
+        "w": 17.329,
+        "h": 11.002
+      }
+    },
+    {
+      "index": 156,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 265.775,
+        "y": 923.756,
+        "w": 16.404,
+        "h": 3.166
+      }
+    },
+    {
+      "index": 157,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 266.164,
+        "y": 926.716,
+        "w": 15.397,
+        "h": 4.209
+      }
+    },
+    {
+      "index": 158,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 266.186,
+        "y": 929.368,
+        "w": 5.331,
+        "h": 6.641
+      }
+    },
+    {
+      "index": 159,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 209.82,
+        "y": 831.794,
+        "w": 14.276,
+        "h": 9.621
+      }
+    },
+    {
+      "index": 160,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 202.35,
+        "y": 842.906,
+        "w": 21.517,
+        "h": 3.426
+      }
+    },
+    {
+      "index": 161,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 234.022,
+        "y": 895.132,
+        "w": 1.072,
+        "h": 6.294
+      }
+    },
+    {
+      "index": 162,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 233.546,
+        "y": 906.354,
+        "w": 0.763,
+        "h": 3.925
+      }
+    },
+    {
+      "index": 163,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 235.804,
+        "y": 910.245,
+        "w": 19.458,
+        "h": 9.443
+      }
+    },
+    {
+      "index": 164,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 269.61,
+        "y": 907.257,
+        "w": 1.33,
+        "h": 0.484
+      }
+    },
+    {
+      "index": 165,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 234.482,
+        "y": 882.534,
+        "w": 32.766,
+        "h": 20.223
+      }
+    },
+    {
+      "index": 166,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 259.228,
+        "y": 878.678,
+        "w": 2.469,
+        "h": 1.53
+      }
+    },
+    {
+      "index": 167,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 257.845,
+        "y": 884.226,
+        "w": 2.647,
+        "h": 2.942
+      }
+    },
+    {
+      "index": 168,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 160.986,
+        "y": 950.565,
+        "w": 18.632,
+        "h": 15.301
+      }
+    },
+    {
+      "index": 169,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 164.617,
+        "y": 952.652,
+        "w": 8.64,
+        "h": 26.081
+      }
+    },
+    {
+      "index": 170,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 254.194,
+        "y": 925.449,
+        "w": 4.095,
+        "h": 18.607
+      }
+    },
+    {
+      "index": 171,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 266.441,
+        "y": 929.35,
+        "w": 0.232,
+        "h": 0.591
+      }
+    },
+    {
+      "index": 172,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 267.852,
+        "y": 908.159,
+        "w": 5.81,
+        "h": 2.924
+      }
+    },
+    {
+      "index": 173,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 223.63,
+        "y": 846.697,
+        "w": 2.328,
+        "h": 2.921
+      }
+    },
+    {
+      "index": 174,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 166.236,
+        "y": 918.911,
+        "w": 16.696,
+        "h": 6.185
+      }
+    },
+    {
+      "index": 175,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 150.033,
+        "y": 914.778,
+        "w": 18.5,
+        "h": 7.621
+      }
+    },
+    {
+      "index": 176,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 116.447,
+        "y": 914.621,
+        "w": 31.441,
+        "h": 11.687
+      }
+    },
+    {
+      "index": 177,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 180.323,
+        "y": 927.032,
+        "w": 10.291,
+        "h": 27.658
+      }
+    },
+    {
+      "index": 178,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 230.671,
+        "y": 880.126,
+        "w": 28.545,
+        "h": 11.654
+      }
+    },
+    {
+      "index": 179,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 214.258,
+        "y": 874.548,
+        "w": 20.872,
+        "h": 19.481
+      }
+    },
+    {
+      "index": 180,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 146.351,
+        "y": 906.574,
+        "w": 27.135,
+        "h": 8.896
+      }
+    },
+    {
+      "index": 181,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 168.368,
+        "y": 898.434,
+        "w": 7.607,
+        "h": 20.657
+      }
+    },
+    {
+      "index": 182,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 252.339,
+        "y": 944.005,
+        "w": 1.094,
+        "h": 0.876
+      }
+    },
+    {
+      "index": 183,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 168.498,
+        "y": 919.233,
+        "w": 12.363,
+        "h": 1.397
+      }
+    },
+    {
+      "index": 184,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 185.138,
+        "y": 879.833,
+        "w": 19.851,
+        "h": 3.858
+      }
+    },
+    {
+      "index": 185,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 144.977,
+        "y": 914.331,
+        "w": 2.121,
+        "h": 1.442
+      }
+    },
+    {
+      "index": 186,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 129.024,
+        "y": 915.209,
+        "w": 1.455,
+        "h": 1.381
+      }
+    },
+    {
+      "index": 187,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 215.715,
+        "y": 899.824,
+        "w": 11.983,
+        "h": 3.63
+      }
+    },
+    {
+      "index": 188,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 214.51,
+        "y": 901.915,
+        "w": 4.608,
+        "h": 16.892
+      }
+    },
+    {
+      "index": 189,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 220.89,
+        "y": 923.444,
+        "w": 2.533,
+        "h": 5.528
+      }
+    },
+    {
+      "index": 190,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 232.413,
+        "y": 905.532,
+        "w": 1.886,
+        "h": 15.59
+      }
+    },
+    {
+      "index": 191,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 203.442,
+        "y": 872.721,
+        "w": 11.134,
+        "h": 7.575
+      }
+    },
+    {
+      "index": 192,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 204.35,
+        "y": 883.386,
+        "w": 8.67,
+        "h": 9.739
+      }
+    },
+    {
+      "index": 193,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 205.514,
+        "y": 861.15,
+        "w": 0.382,
+        "h": 0.251
+      }
+    },
+    {
+      "index": 194,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 185.082,
+        "y": 879.788,
+        "w": 2.417,
+        "h": 1.3
+      }
+    },
+    {
+      "index": 195,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 206.011,
+        "y": 871.052,
+        "w": 7.933,
+        "h": 5.897
+      }
+    },
+    {
+      "index": 196,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 182.024,
+        "y": 920.433,
+        "w": 3.196,
+        "h": 6.21
+      }
+    },
+    {
+      "index": 197,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 179.015,
+        "y": 955.085,
+        "w": 1.171,
+        "h": 6.989
+      }
+    },
+    {
+      "index": 198,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 206.262,
+        "y": 946.761,
+        "w": 27.846,
+        "h": 7.342
+      }
+    },
+    {
+      "index": 199,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 208.734,
+        "y": 949.924,
+        "w": 4.443,
+        "h": 3.264
+      }
+    },
+    {
+      "index": 200,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 214.158,
+        "y": 945.955,
+        "w": 6.864,
+        "h": 7.464
+      }
+    },
+    {
+      "index": 201,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 223.071,
+        "y": 933.487,
+        "w": 11.625,
+        "h": 18.206
+      }
+    },
+    {
+      "index": 202,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 209.518,
+        "y": 950.347,
+        "w": 1.872,
+        "h": 1.867
+      }
+    },
+    {
+      "index": 203,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 211.358,
+        "y": 952.923,
+        "w": 1.428,
+        "h": 0.951
+      }
+    },
+    {
+      "index": 204,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 330.89,
+        "y": 874.001,
+        "w": 6.675,
+        "h": 6.783
+      }
+    },
+    {
+      "index": 205,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 332.635,
+        "y": 878.101,
+        "w": 7.269,
+        "h": 2.491
+      }
+    },
+    {
+      "index": 206,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 316.96,
+        "y": 880.434,
+        "w": 3.038,
+        "h": 7.047
+      }
+    },
+    {
+      "index": 207,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 308.517,
+        "y": 880.166,
+        "w": 3.05,
+        "h": 0.259
+      }
+    },
+    {
+      "index": 208,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 305.952,
+        "y": 856.391,
+        "w": 16.886,
+        "h": 24.153
+      }
+    },
+    {
+      "index": 209,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 298.868,
+        "y": 873.186,
+        "w": 8.663,
+        "h": 6.236
+      }
+    },
+    {
+      "index": 210,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 293.065,
+        "y": 877.887,
+        "w": 4.602,
+        "h": 1.525
+      }
+    },
+    {
+      "index": 211,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 309.711,
+        "y": 852.505,
+        "w": 12.391,
+        "h": 8.813
+      }
+    },
+    {
+      "index": 212,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 309.555,
+        "y": 842.472,
+        "w": 12.021,
+        "h": 9.007
+      }
+    },
+    {
+      "index": 213,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 327.329,
+        "y": 873.76,
+        "w": 1.001,
+        "h": 0.171
+      }
+    },
+    {
+      "index": 214,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 310.102,
+        "y": 856.067,
+        "w": 7.886,
+        "h": 3.866
+      }
+    },
+    {
+      "index": 215,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 309.743,
+        "y": 855.818,
+        "w": 12.514,
+        "h": 17.987
+      }
+    },
+    {
+      "index": 216,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 309.742,
+        "y": 852.535,
+        "w": 12.403,
+        "h": 12.125
+      }
+    },
+    {
+      "index": 217,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 312.495,
+        "y": 855.908,
+        "w": 5.787,
+        "h": 13.406
+      }
+    },
+    {
+      "index": 218,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 316.354,
+        "y": 855.802,
+        "w": 2.802,
+        "h": 1.663
+      }
+    },
+    {
+      "index": 219,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 322.046,
+        "y": 875.854,
+        "w": 0.07,
+        "h": 0.601
+      }
+    },
+    {
+      "index": 220,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 330.961,
+        "y": 874.004,
+        "w": 2.581,
+        "h": 5.131
+      }
+    },
+    {
+      "index": 221,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 306.12,
+        "y": 873.473,
+        "w": 13.425,
+        "h": 6.321
+      }
+    },
+    {
+      "index": 222,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 298.934,
+        "y": 872.221,
+        "w": 10.85,
+        "h": 7.193
+      }
+    },
+    {
+      "index": 223,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 314.35,
+        "y": 882.589,
+        "w": 2.523,
+        "h": 4.911
+      }
+    },
+    {
+      "index": 224,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 315.541,
+        "y": 881.562,
+        "w": 0.554,
+        "h": 0.522
+      }
+    },
+    {
+      "index": 225,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 317.288,
+        "y": 882.038,
+        "w": 0.519,
+        "h": 0.413
+      }
+    },
+    {
+      "index": 226,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 293.523,
+        "y": 877.801,
+        "w": 6.318,
+        "h": 1.567
+      }
+    },
+    {
+      "index": 227,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 330.855,
+        "y": 873.997,
+        "w": 2.612,
+        "h": 4.611
+      }
+    },
+    {
+      "index": 228,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 336.759,
+        "y": 880.271,
+        "w": 0.803,
+        "h": 0.507
+      }
+    },
+    {
+      "index": 229,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 314.053,
+        "y": 878.631,
+        "w": 0.825,
+        "h": 1.687
+      }
+    },
+    {
+      "index": 230,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 316.334,
+        "y": 855.803,
+        "w": 2.824,
+        "h": 1.68
+      }
+    },
+    {
+      "index": 231,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 314.819,
+        "y": 877.19,
+        "w": 3.69,
+        "h": 2.033
+      }
+    },
+    {
+      "index": 232,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 305.866,
+        "y": 860.22,
+        "w": 13.663,
+        "h": 20.394
+      }
+    },
+    {
+      "index": 233,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 299.212,
+        "y": 874.079,
+        "w": 2.355,
+        "h": 3.791
+      }
+    },
+    {
+      "index": 234,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 317.215,
+        "y": 881.084,
+        "w": 0.61,
+        "h": 1.502
+      }
+    },
+    {
+      "index": 235,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 340.194,
+        "y": 869.821,
+        "w": 23.064,
+        "h": 10.113
+      }
+    },
+    {
+      "index": 236,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 332.632,
+        "y": 876.171,
+        "w": 0.748,
+        "h": 0.88
+      }
+    },
+    {
+      "index": 237,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 283.781,
+        "y": 819.295,
+        "w": 13.679,
+        "h": 5.479
+      }
+    },
+    {
+      "index": 238,
+      "kind": "web",
+      "level": "error",
+      "message": "Os cortes se tocam aqui: o material será cortado.",
+      "ids": [
+        232,
+        244
+      ],
+      "area": {
+        "x": 282.866,
+        "y": 810.97,
+        "w": 14.093,
+        "h": 11.078
+      }
+    },
+    {
+      "index": 239,
+      "kind": "double",
+      "level": "warn",
+      "message": "631,3 mm seriam cortados duas vezes (linhas sobrepostas).",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 112.568,
+        "y": 828.576,
+        "w": 173.117,
+        "h": 140.596
+      },
+      "fix": "Remover linhas duplicadas"
+    },
+    {
+      "index": 240,
+      "kind": "double",
+      "level": "warn",
+      "message": "15,3 mm seriam cortados duas vezes (linhas sobrepostas).",
+      "ids": [
+        232,
+        104
+      ],
+      "area": {
+        "x": 117.895,
+        "y": 841.541,
+        "w": 126.544,
+        "h": 127.94
+      },
+      "fix": "Remover linhas duplicadas"
+    },
+    {
+      "index": 241,
+      "kind": "double",
+      "level": "warn",
+      "message": "478,8 mm seriam cortados duas vezes (linhas sobrepostas).",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 148.131,
+        "y": 831.773,
+        "w": 191.859,
+        "h": 132.368
+      },
+      "fix": "Remover linhas duplicadas"
+    },
+    {
+      "index": 242,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,00 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 234.907,
+        "y": 913.212,
+        "w": 19.466,
+        "h": 31.501
+      }
+    },
+    {
+      "index": 243,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,03 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 275.331,
+        "y": 917.306,
+        "w": 1.062,
+        "h": 0.912
+      }
+    },
+    {
+      "index": 244,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,02 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 269.228,
+        "y": 917.401,
+        "w": 2.901,
+        "h": 2.667
+      }
+    },
+    {
+      "index": 245,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,11 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 269.512,
+        "y": 919.582,
+        "w": 6.276,
+        "h": 4.725
+      }
+    },
+    {
+      "index": 246,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,00 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 274.228,
+        "y": 926.564,
+        "w": 0.868,
+        "h": 0.8
+      }
+    },
+    {
+      "index": 247,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,73 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 282.219,
+        "y": 925.433,
+        "w": 0.925,
+        "h": 0.604
+      }
+    },
+    {
+      "index": 248,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,06 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 258.883,
+        "y": 868.798,
+        "w": 3.18,
+        "h": 10.492
+      }
+    },
+    {
+      "index": 249,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,06 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 259.408,
+        "y": 879.359,
+        "w": 0.791,
+        "h": 0.571
+      }
+    },
+    {
+      "index": 250,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,14 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 241.017,
+        "y": 856.889,
+        "w": 15.351,
+        "h": 9.463
+      }
+    },
+    {
+      "index": 251,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,07 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 278.353,
+        "y": 912.311,
+        "w": 0.904,
+        "h": 1.145
+      }
+    },
+    {
+      "index": 252,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,18 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 272.12,
+        "y": 935.507,
+        "w": 0.79,
+        "h": 0.745
+      }
+    },
+    {
+      "index": 253,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,39 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 274.526,
+        "y": 937.704,
+        "w": 0.88,
+        "h": 0.956
+      }
+    },
+    {
+      "index": 254,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,22 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 275.059,
+        "y": 929.108,
+        "w": 6.327,
+        "h": 1.537
+      }
+    },
+    {
+      "index": 255,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,43 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 274.608,
+        "y": 931.254,
+        "w": 1.182,
+        "h": 1.352
+      }
+    },
+    {
+      "index": 256,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,64 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 218.464,
+        "y": 827.719,
+        "w": 0.716,
+        "h": 1.483
+      }
+    },
+    {
+      "index": 257,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,05 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 234.337,
+        "y": 910.716,
+        "w": 1.032,
+        "h": 0.863
+      }
+    },
+    {
+      "index": 258,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,02 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 267.343,
+        "y": 923.38,
+        "w": 2.748,
+        "h": 7.871
+      }
+    },
+    {
+      "index": 259,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,46 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 261.327,
+        "y": 923.551,
+        "w": 7.054,
+        "h": 2.908
+      }
+    },
+    {
+      "index": 260,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,10 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 220.759,
+        "y": 851.378,
+        "w": 0.892,
+        "h": 0.972
+      }
+    },
+    {
+      "index": 261,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,10 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 229.372,
+        "y": 881.452,
+        "w": 1.201,
+        "h": 4.351
+      }
+    },
+    {
+      "index": 262,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,15 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 149.499,
+        "y": 907.031,
+        "w": 1.96,
+        "h": 9.216
+      }
+    },
+    {
+      "index": 263,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,72 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 167.263,
+        "y": 910.397,
+        "w": 0.869,
+        "h": 0.968
+      }
+    },
+    {
+      "index": 264,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,31 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 180.831,
+        "y": 920.368,
+        "w": 2.08,
+        "h": 5.533
+      }
+    },
+    {
+      "index": 265,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,02 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 125.687,
+        "y": 916.075,
+        "w": 1.455,
+        "h": 1.341
+      }
+    },
+    {
+      "index": 266,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,14 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 216.559,
+        "y": 902.284,
+        "w": 12.77,
+        "h": 25.373
+      }
+    },
+    {
+      "index": 267,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,26 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 228.901,
+        "y": 887.107,
+        "w": 0.203,
+        "h": 0.791
+      }
+    },
+    {
+      "index": 268,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,51 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 208.783,
+        "y": 863.232,
+        "w": 3.364,
+        "h": 5.148
+      }
+    },
+    {
+      "index": 269,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,02 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 184.226,
+        "y": 878.836,
+        "w": 1.573,
+        "h": 1.471
+      }
+    },
+    {
+      "index": 270,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,30 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 201.085,
+        "y": 965.554,
+        "w": 2.164,
+        "h": 1.136
+      }
+    },
+    {
+      "index": 271,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,42 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 226.277,
+        "y": 933.072,
+        "w": 1.244,
+        "h": 0.696
+      }
+    },
+    {
+      "index": 272,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,24 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 216.4,
+        "y": 958.494,
+        "w": 3.302,
+        "h": 1.096
+      }
+    },
+    {
+      "index": 273,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,05 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 216.461,
+        "y": 959.886,
+        "w": 1.966,
+        "h": 1.57
+      }
+    },
+    {
+      "index": 274,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,82 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104
+      ],
+      "area": {
+        "x": 218.723,
+        "y": 951.607,
+        "w": 1.008,
+        "h": 0.378
+      }
+    },
+    {
+      "index": 275,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,14 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 215.346,
+        "y": 955.857,
+        "w": 4.143,
+        "h": 3.081
+      }
+    },
+    {
+      "index": 276,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,08 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 209.959,
+        "y": 952.924,
+        "w": 3.516,
+        "h": 4.19
+      }
+    },
+    {
+      "index": 277,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,10 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 259.047,
+        "y": 870.13,
+        "w": 0.299,
+        "h": 0.439
+      }
+    },
+    {
+      "index": 278,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,08 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 233.829,
+        "y": 892.204,
+        "w": 2.287,
+        "h": 10.601
+      }
+    },
+    {
+      "index": 279,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,03 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 233.918,
+        "y": 901.738,
+        "w": 1.523,
+        "h": 6.733
+      }
+    },
+    {
+      "index": 280,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,87 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 272.764,
+        "y": 910.926,
+        "w": 1.044,
+        "h": 1.112
+      }
+    },
+    {
+      "index": 281,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,08 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 140.027,
+        "y": 963.768,
+        "w": 20.852,
+        "h": 2.297
+      }
+    },
+    {
+      "index": 282,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,53 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 164.577,
+        "y": 953.593,
+        "w": 0.388,
+        "h": 0.887
+      }
+    },
+    {
+      "index": 283,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,51 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 259.151,
+        "y": 879.371,
+        "w": 1.163,
+        "h": 0.68
+      }
+    },
+    {
+      "index": 284,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,11 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 181.944,
+        "y": 886.42,
+        "w": 0.545,
+        "h": 1.185
+      }
+    },
+    {
+      "index": 285,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,04 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 228.692,
+        "y": 887.896,
+        "w": 0.418,
+        "h": 0.61
+      }
+    },
+    {
+      "index": 286,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,52 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        232
+      ],
+      "area": {
+        "x": 196.687,
+        "y": 967.035,
+        "w": 0.772,
+        "h": 0.887
+      }
+    },
+    {
+      "index": 287,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,40 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 216.157,
+        "y": 956.593,
+        "w": 2.956,
+        "h": 1.343
+      }
+    },
+    {
+      "index": 288,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,35 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 77.1,
+        "y": 872.5,
+        "w": 17.8,
+        "h": 0.5
+      }
+    },
+    {
+      "index": 289,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,60 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 151.141,
+        "y": 839.685,
+        "w": 0.752,
+        "h": 21.411
+      }
+    },
+    {
+      "index": 290,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,79 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 148.601,
+        "y": 839.829,
+        "w": 0.937,
+        "h": 24.054
+      }
+    },
+    {
+      "index": 291,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,44 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 338.863,
+        "y": 879.01,
+        "w": 0.987,
+        "h": 1.13
+      }
+    },
+    {
+      "index": 292,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,11 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 314.352,
+        "y": 882.538,
+        "w": 2.378,
+        "h": 4.953
+      }
+    },
+    {
+      "index": 293,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,04 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 312.117,
+        "y": 879.2,
+        "w": 0.944,
+        "h": 1.067
+      }
+    },
+    {
+      "index": 294,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,07 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 310.105,
+        "y": 859.008,
+        "w": 0.469,
+        "h": 0.976
+      }
+    },
+    {
+      "index": 295,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,39 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 312.529,
+        "y": 864.28,
+        "w": 2.475,
+        "h": 5.014
+      }
+    },
+    {
+      "index": 296,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,06 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 332.508,
+        "y": 878.192,
+        "w": 1.034,
+        "h": 1.337
+      }
+    },
+    {
+      "index": 297,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,14 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 318.011,
+        "y": 876.563,
+        "w": 0.952,
+        "h": 0.96
+      }
+    },
+    {
+      "index": 298,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,96 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 314.273,
+        "y": 880.755,
+        "w": 1.153,
+        "h": 0.279
+      }
+    },
+    {
+      "index": 299,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,35 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 317.18,
+        "y": 880.739,
+        "w": 1.735,
+        "h": 6.734
+      }
+    },
+    {
+      "index": 300,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,12 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 315.363,
+        "y": 880.6,
+        "w": 0.364,
+        "h": 0.272
+      }
+    },
+    {
+      "index": 301,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,08 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 332.918,
+        "y": 878.172,
+        "w": 6.99,
+        "h": 1.968
+      }
+    },
+    {
+      "index": 302,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,08 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 312.495,
+        "y": 863.473,
+        "w": 2.561,
+        "h": 5.332
+      }
+    },
+    {
+      "index": 303,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,39 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 312.529,
+        "y": 864.28,
+        "w": 2.475,
+        "h": 5.014
+      }
+    },
+    {
+      "index": 304,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,46 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 343.543,
+        "y": 848.964,
+        "w": 4.071,
+        "h": 1.094
+      }
+    },
+    {
+      "index": 305,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,46 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 344.14,
+        "y": 854.614,
+        "w": 3.69,
+        "h": 1.084
+      }
+    },
+    {
+      "index": 306,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,47 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 345.154,
+        "y": 860.32,
+        "w": 3.447,
+        "h": 1.097
+      }
+    },
+    {
+      "index": 307,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,47 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        232
+      ],
+      "area": {
+        "x": 346.683,
+        "y": 866.119,
+        "w": 3.259,
+        "h": 1.12
+      }
+    },
+    {
+      "index": 308,
+      "kind": "web",
+      "level": "warn",
+      "message": "Ponte com só 0,88 mm de largura: pode quebrar durante o corte.",
+      "ids": [
+        104,
+        244
+      ],
+      "area": {
+        "x": 172.92,
+        "y": 982.878,
+        "w": 0.6,
+        "h": 1.122
+      }
+    }
+  ]
+}

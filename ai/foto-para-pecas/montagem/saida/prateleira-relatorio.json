@@ -1,0 +1,405 @@
+{
+  "ok": true,
+  "nome": "Prateleira 150 x 80 x 180 com 3 tabuas",
+  "espessura": 3,
+  "pecas": [
+    {
+      "placa": "lat-esq",
+      "id": 1,
+      "x": 10,
+      "y": 10,
+      "largura": 80,
+      "altura": 180,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "lat-dir",
+      "id": 2,
+      "x": 102,
+      "y": 10,
+      "largura": 80,
+      "altura": 180,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "prat-1",
+      "id": 3,
+      "x": 194,
+      "y": 10,
+      "largura": 150,
+      "altura": 80,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    },
+    {
+      "placa": "prat-2",
+      "id": 4,
+      "x": 10,
+      "y": 202,
+      "largura": 150,
+      "altura": 80,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    },
+    {
+      "placa": "prat-3",
+      "id": 5,
+      "x": 172,
+      "y": 202,
+      "largura": 150,
+      "altura": 80,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    }
+  ],
+  "encaixes": [
+    {
+      "a": "lat-esq",
+      "b": "prat-1",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          3,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 21.5,
+      "furo_medido": {
+        "de": 20,
+        "ate": 23,
+        "meio": 21.5,
+        "esperado": 21.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0
+      }
+    },
+    {
+      "a": "lat-esq",
+      "b": "prat-2",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          4,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 88.5,
+      "furo_medido": {
+        "de": 87,
+        "ate": 90,
+        "meio": 88.5,
+        "esperado": 88.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0
+      }
+    },
+    {
+      "a": "lat-esq",
+      "b": "prat-3",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          5,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 21.5,
+      "furo_medido": {
+        "de": 20,
+        "ate": 23,
+        "meio": 21.5,
+        "esperado": 21.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0
+      }
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-1",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          3,
+          2
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 21.5,
+      "furo_medido": {
+        "de": 20,
+        "ate": 23,
+        "meio": 21.5,
+        "esperado": 21.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0
+      }
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-2",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          4,
+          2
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 88.5,
+      "furo_medido": {
+        "de": 87,
+        "ate": 90,
+        "meio": 88.5,
+        "esperado": 88.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0
+      }
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-3",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 80,
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          5,
+          2
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 21.5,
+      "furo_medido": {
+        "de": 20,
+        "ate": 23,
+        "meio": 21.5,
+        "esperado": 21.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0
+      }
+    }
+  ],
+  "nao_feito": [],
+  "avisos": [],
+  "eixos_3d": {
+    "x": {
+      "j": 2,
+      "sg": 1,
+      "custo": 0
+    },
+    "y": {
+      "j": 0,
+      "sg": 1,
+      "custo": 0
+    },
+    "z": {
+      "j": 1,
+      "sg": 1,
+      "custo": 0
+    }
+  },
+  "medidas": [
+    {
+      "placa": "lat-esq",
+      "esperado": [
+        80,
+        180
+      ],
+      "medido": [
+        80,
+        180
+      ],
+      "ok": true
+    },
+    {
+      "placa": "lat-dir",
+      "esperado": [
+        80,
+        180
+      ],
+      "medido": [
+        80,
+        180
+      ],
+      "ok": true
+    },
+    {
+      "placa": "prat-1",
+      "esperado": [
+        150,
+        80
+      ],
+      "medido": [
+        150,
+        80
+      ],
+      "ok": true
+    },
+    {
+      "placa": "prat-2",
+      "esperado": [
+        150,
+        80
+      ],
+      "medido": [
+        150,
+        80
+      ],
+      "ok": true
+    },
+    {
+      "placa": "prat-3",
+      "esperado": [
+        150,
+        80
+      ],
+      "medido": [
+        150,
+        80
+      ],
+      "ok": true
+    }
+  ],
+  "recortes": [],
+  "gravuras": [],
+  "cena": null,
+  "custo_ia": {
+    "chamadas": [],
+    "usd": 0
+  },
+  "vista3d_dados": {
+    "pecas": 5,
+    "conjuntos": 1,
+    "placas": [
+      {
+        "placa": "lat-esq",
+        "min": [
+          137,
+          -344,
+          0
+        ],
+        "max": [
+          217,
+          -164,
+          3
+        ]
+      },
+      {
+        "placa": "prat-1",
+        "min": [
+          137,
+          -324,
+          0
+        ],
+        "max": [
+          217,
+          -321,
+          150
+        ]
+      },
+      {
+        "placa": "prat-2",
+        "min": [
+          137,
+          -254,
+          0
+        ],
+        "max": [
+          217,
+          -251,
+          150
+        ]
+      },
+      {
+        "placa": "prat-3",
+        "min": [
+          137,
+          -187,
+          0
+        ],
+        "max": [
+          217,
+          -184,
+          150
+        ]
+      },
+      {
+        "placa": "lat-dir",
+        "min": [
+          137,
+          -344,
+          147
+        ],
+        "max": [
+          217,
+          -164,
+          150
+        ]
+      }
+    ],
+    "colisoes": []
+  },
+  "check_design": {
+    "total": 0,
+    "resumo": null
+  },
+  "vista3d": "Peças: 5 (Conjuntos: 1) · Sem sobreposições",
+  "erros_da_pagina": [],
+  "perguntas_do_app": [],
+  "projeto": "D:\\CLAUDE\\sistema para corte a laser\\kizamubeam\\ai\\foto-para-pecas\\montagem\\saida\\prateleira.kzb"
+}

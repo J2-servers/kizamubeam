@@ -1,0 +1,357 @@
+{
+  "ok": true,
+  "erros": [],
+  "avisos": [],
+  "nome": "Prateleira 150 x 80 x 180 com 3 tabuas",
+  "espessura": 3,
+  "tamanho": {
+    "x": 150,
+    "y": 80,
+    "z": 180
+  },
+  "placas": [
+    {
+      "id": "lat-esq",
+      "nome": "Lateral esquerda",
+      "x": [
+        0,
+        3
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        0,
+        180
+      ],
+      "fino": 0,
+      "eixo_espessura": "x",
+      "eixos_peca": [
+        "y",
+        "z"
+      ],
+      "peca": [
+        80,
+        180
+      ],
+      "recortes": []
+    },
+    {
+      "id": "lat-dir",
+      "nome": "Lateral direita",
+      "x": [
+        147,
+        150
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        0,
+        180
+      ],
+      "fino": 0,
+      "eixo_espessura": "x",
+      "eixos_peca": [
+        "y",
+        "z"
+      ],
+      "peca": [
+        80,
+        180
+      ],
+      "recortes": []
+    },
+    {
+      "id": "prat-1",
+      "nome": "Prateleira de baixo",
+      "x": [
+        0,
+        150
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        20,
+        23
+      ],
+      "fino": 2,
+      "eixo_espessura": "z",
+      "eixos_peca": [
+        "x",
+        "y"
+      ],
+      "peca": [
+        150,
+        80
+      ],
+      "recortes": []
+    },
+    {
+      "id": "prat-2",
+      "nome": "Prateleira do meio",
+      "x": [
+        0,
+        150
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        90,
+        93
+      ],
+      "fino": 2,
+      "eixo_espessura": "z",
+      "eixos_peca": [
+        "x",
+        "y"
+      ],
+      "peca": [
+        150,
+        80
+      ],
+      "recortes": []
+    },
+    {
+      "id": "prat-3",
+      "nome": "Prateleira de cima",
+      "x": [
+        0,
+        150
+      ],
+      "y": [
+        0,
+        80
+      ],
+      "z": [
+        157,
+        160
+      ],
+      "fino": 2,
+      "eixo_espessura": "z",
+      "eixos_peca": [
+        "x",
+        "y"
+      ],
+      "peca": [
+        150,
+        80
+      ],
+      "recortes": []
+    }
+  ],
+  "pares": [
+    {
+      "a": "lat-esq",
+      "b": "prat-1",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          0,
+          3
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          20,
+          23
+        ]
+      },
+      "borda_a": null,
+      "borda_b": {
+        "eixo": "x",
+        "lado": "inicio"
+      },
+      "tipo": "T",
+      "espiga": "prat-1",
+      "furo": "lat-esq"
+    },
+    {
+      "a": "lat-esq",
+      "b": "prat-2",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          0,
+          3
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          90,
+          93
+        ]
+      },
+      "borda_a": null,
+      "borda_b": {
+        "eixo": "x",
+        "lado": "inicio"
+      },
+      "tipo": "T",
+      "espiga": "prat-2",
+      "furo": "lat-esq"
+    },
+    {
+      "a": "lat-esq",
+      "b": "prat-3",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          0,
+          3
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          157,
+          160
+        ]
+      },
+      "borda_a": null,
+      "borda_b": {
+        "eixo": "x",
+        "lado": "inicio"
+      },
+      "tipo": "T",
+      "espiga": "prat-3",
+      "furo": "lat-esq"
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-1",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          147,
+          150
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          20,
+          23
+        ]
+      },
+      "borda_a": null,
+      "borda_b": {
+        "eixo": "x",
+        "lado": "fim"
+      },
+      "tipo": "T",
+      "espiga": "prat-1",
+      "furo": "lat-dir"
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-2",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          147,
+          150
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          90,
+          93
+        ]
+      },
+      "borda_a": null,
+      "borda_b": {
+        "eixo": "x",
+        "lado": "fim"
+      },
+      "tipo": "T",
+      "espiga": "prat-2",
+      "furo": "lat-dir"
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-3",
+      "eixo": "y",
+      "comprimento": 80,
+      "contato": {
+        "x": [
+          147,
+          150
+        ],
+        "y": [
+          0,
+          80
+        ],
+        "z": [
+          157,
+          160
+        ]
+      },
+      "borda_a": null,
+      "borda_b": {
+        "eixo": "x",
+        "lado": "fim"
+      },
+      "tipo": "T",
+      "espiga": "prat-3",
+      "furo": "lat-dir"
+    }
+  ],
+  "ligacoes": [
+    {
+      "a": "lat-esq",
+      "b": "prat-1",
+      "tipo": "espiga",
+      "contato": "T"
+    },
+    {
+      "a": "lat-esq",
+      "b": "prat-2",
+      "tipo": "espiga",
+      "contato": "T"
+    },
+    {
+      "a": "lat-esq",
+      "b": "prat-3",
+      "tipo": "espiga",
+      "contato": "T"
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-1",
+      "tipo": "espiga",
+      "contato": "T"
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-2",
+      "tipo": "espiga",
+      "contato": "T"
+    },
+    {
+      "a": "lat-dir",
+      "b": "prat-3",
+      "tipo": "espiga",
+      "contato": "T"
+    }
+  ]
+}

@@ -1,0 +1,2368 @@
+{
+  "ok": true,
+  "nome": "Cofrinho Nossa Aventura (ensaio a mao)",
+  "espessura": 3,
+  "pecas": [
+    {
+      "placa": "base",
+      "id": 1,
+      "x": 10,
+      "y": 10,
+      "largura": 400,
+      "altura": 100,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    },
+    {
+      "placa": "topo",
+      "id": 2,
+      "x": 10,
+      "y": 122,
+      "largura": 400,
+      "altura": 100,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    },
+    {
+      "placa": "esquerda",
+      "id": 3,
+      "x": 10,
+      "y": 234,
+      "largura": 100,
+      "altura": 400,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "direita",
+      "id": 4,
+      "x": 122,
+      "y": 234,
+      "largura": 100,
+      "altura": 400,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "tras",
+      "id": 5,
+      "x": 10,
+      "y": 646,
+      "largura": 400,
+      "altura": 400,
+      "eixos": [
+        "x",
+        "z"
+      ]
+    },
+    {
+      "placa": "frente",
+      "id": 6,
+      "x": 10,
+      "y": 1058,
+      "largura": 400,
+      "altura": 400,
+      "eixos": [
+        "x",
+        "z"
+      ]
+    },
+    {
+      "placa": "prateleira",
+      "id": 7,
+      "x": 10,
+      "y": 1470,
+      "largura": 400,
+      "altura": 60,
+      "eixos": [
+        "x",
+        "y"
+      ]
+    },
+    {
+      "placa": "divisoria1",
+      "id": 8,
+      "x": 10,
+      "y": 1542,
+      "largura": 60,
+      "altura": 150,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "divisoria2",
+      "id": 9,
+      "x": 82,
+      "y": 1542,
+      "largura": 60,
+      "altura": 150,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "divisoria3",
+      "id": 10,
+      "x": 154,
+      "y": 1542,
+      "largura": 60,
+      "altura": 150,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    },
+    {
+      "placa": "divisoria4",
+      "id": 11,
+      "x": 226,
+      "y": 1542,
+      "largura": 60,
+      "altura": 150,
+      "eixos": [
+        "y",
+        "z"
+      ]
+    }
+  ],
+  "encaixes": [
+    {
+      "a": "base",
+      "b": "divisoria1",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 100 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          8,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 57.5,
+      "furo_medido": {
+        "de": 56,
+        "ate": 59,
+        "meio": 57.5,
+        "esperado": 57.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": -18.5,
+        "espessura_mm": 0
+      }
+    },
+    {
+      "a": "base",
+      "b": "divisoria2",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 100 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          9,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 147.5,
+      "furo_medido": {
+        "de": 146,
+        "ate": 149,
+        "meio": 147.5,
+        "esperado": 147.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": -18.5,
+        "espessura_mm": 0
+      }
+    },
+    {
+      "a": "base",
+      "b": "divisoria3",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 100 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          10,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 154.5,
+      "furo_medido": {
+        "de": 153,
+        "ate": 156,
+        "meio": 154.5,
+        "esperado": 154.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": -18.5,
+        "espessura_mm": 0
+      }
+    },
+    {
+      "a": "base",
+      "b": "divisoria4",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 100 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          11,
+          1
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 61.5,
+      "furo_medido": {
+        "de": 60,
+        "ate": 63,
+        "meio": 61.5,
+        "esperado": 61.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": -18.5,
+        "espessura_mm": 0
+      }
+    },
+    {
+      "a": "esquerda",
+      "b": "prateleira",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 100 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          7,
+          3
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 148.5,
+      "furo_medido": {
+        "de": 147,
+        "ate": 150,
+        "meio": 148.5,
+        "esperado": 148.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": -18.5,
+        "espessura_mm": 0
+      }
+    },
+    {
+      "a": "direita",
+      "b": "prateleira",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 100 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          7,
+          4
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots."
+      },
+      "slotOffset": 148.5,
+      "furo_medido": {
+        "de": 147,
+        "ate": 150,
+        "meio": 148.5,
+        "esperado": 148.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 18.5,
+        "espessura_mm": 0
+      }
+    },
+    {
+      "a": "frente",
+      "b": "prateleira",
+      "contato": "T",
+      "tipo": "colado",
+      "eixo": "x",
+      "comprimento": 400,
+      "feito": false,
+      "motivo": "contato T fica colado, sem encaixe"
+    },
+    {
+      "a": "frente",
+      "b": "divisoria1",
+      "contato": "T",
+      "tipo": "colado",
+      "eixo": "z",
+      "comprimento": 150,
+      "feito": false,
+      "motivo": "contato T fica colado, sem encaixe"
+    },
+    {
+      "a": "frente",
+      "b": "divisoria2",
+      "contato": "T",
+      "tipo": "colado",
+      "eixo": "z",
+      "comprimento": 150,
+      "feito": false,
+      "motivo": "contato T fica colado, sem encaixe"
+    },
+    {
+      "a": "frente",
+      "b": "divisoria3",
+      "contato": "T",
+      "tipo": "colado",
+      "eixo": "z",
+      "comprimento": 150,
+      "feito": false,
+      "motivo": "contato T fica colado, sem encaixe"
+    },
+    {
+      "a": "frente",
+      "b": "divisoria4",
+      "contato": "T",
+      "tipo": "colado",
+      "eixo": "z",
+      "comprimento": 150,
+      "feito": false,
+      "motivo": "contato T fica colado, sem encaixe"
+    },
+    {
+      "a": "prateleira",
+      "b": "divisoria1",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 13.5 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          8,
+          7
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots. Atenção: linha do slot (13,5 mm) mais curta que a aresta da espiga (57 mm)."
+      },
+      "slotOffset": 57.5,
+      "furo_medido": {
+        "de": 56,
+        "ate": 59,
+        "meio": 57.5,
+        "esperado": 57.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0,
+        "espessura_mm": -3
+      }
+    },
+    {
+      "a": "prateleira",
+      "b": "divisoria2",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 13.5 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          9,
+          7
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots. Atenção: linha do slot (13,5 mm) mais curta que a aresta da espiga (57 mm)."
+      },
+      "slotOffset": 147.5,
+      "furo_medido": {
+        "de": 146,
+        "ate": 149,
+        "meio": 147.5,
+        "esperado": 147.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0,
+        "espessura_mm": -3
+      }
+    },
+    {
+      "a": "prateleira",
+      "b": "divisoria3",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 13.5 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          10,
+          7
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots. Atenção: linha do slot (13,5 mm) mais curta que a aresta da espiga (57 mm)."
+      },
+      "slotOffset": 154.5,
+      "furo_medido": {
+        "de": 153,
+        "ate": 156,
+        "meio": 154.5,
+        "esperado": 154.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0,
+        "espessura_mm": 3
+      }
+    },
+    {
+      "a": "prateleira",
+      "b": "divisoria4",
+      "contato": "T",
+      "tipo": "espiga",
+      "eixo": "y",
+      "comprimento": 60,
+      "aviso": "a espiga tem 57 mm de aresta e a borda de referencia dos furos tem 13.5 mm: os furos podem nao casar",
+      "feito": true,
+      "ferramenta": "make_joint tenon (slotOffset)",
+      "resposta": {
+        "changed": [
+          11,
+          7
+        ],
+        "message": "Junta criada: 2 espigas de 15 × 3 mm, 2 slots. Atenção: linha do slot (13,5 mm) mais curta que a aresta da espiga (57 mm)."
+      },
+      "slotOffset": 61.5,
+      "furo_medido": {
+        "de": 60,
+        "ate": 63,
+        "meio": 61.5,
+        "esperado": 61.5
+      },
+      "furos_deslocados": {
+        "furos": 2,
+        "mm": 0,
+        "espessura_mm": 3
+      }
+    },
+    {
+      "a": "base",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 100,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          3
+        ],
+        "message": "Junta criada: 11 campos de 9,09 mm."
+      }
+    },
+    {
+      "a": "base",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 100,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          4
+        ],
+        "message": "Junta criada: 11 campos de 9,09 mm."
+      }
+    },
+    {
+      "a": "base",
+      "b": "tras",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 400,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          5
+        ],
+        "message": "Junta criada: 41 campos de 9,76 mm."
+      }
+    },
+    {
+      "a": "base",
+      "b": "frente",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 400,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          1,
+          6
+        ],
+        "message": "Junta criada: 41 campos de 9,76 mm."
+      }
+    },
+    {
+      "a": "topo",
+      "b": "esquerda",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 100,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          3
+        ],
+        "message": "Junta criada: 11 campos de 9,09 mm."
+      }
+    },
+    {
+      "a": "topo",
+      "b": "direita",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "y",
+      "comprimento": 100,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          4
+        ],
+        "message": "Junta criada: 11 campos de 9,09 mm."
+      }
+    },
+    {
+      "a": "topo",
+      "b": "tras",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 400,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          5
+        ],
+        "message": "Junta criada: 41 campos de 9,76 mm."
+      }
+    },
+    {
+      "a": "topo",
+      "b": "frente",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "x",
+      "comprimento": 400,
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          2,
+          6
+        ],
+        "message": "Junta criada: 41 campos de 9,76 mm."
+      }
+    },
+    {
+      "a": "esquerda",
+      "b": "tras",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 400,
+      "aviso": "aresta de 394 / 394 mm para contato de 400 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          3,
+          5
+        ],
+        "message": "Junta criada: 39 campos de 10,1 mm."
+      }
+    },
+    {
+      "a": "esquerda",
+      "b": "frente",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 400,
+      "aviso": "aresta de 394 / 394 mm para contato de 400 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          3,
+          6
+        ],
+        "message": "Junta criada: 39 campos de 10,1 mm."
+      }
+    },
+    {
+      "a": "direita",
+      "b": "tras",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 400,
+      "aviso": "aresta de 394 / 394 mm para contato de 400 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          4,
+          5
+        ],
+        "message": "Junta criada: 39 campos de 10,1 mm."
+      }
+    },
+    {
+      "a": "direita",
+      "b": "frente",
+      "contato": "L",
+      "tipo": "dedos",
+      "eixo": "z",
+      "comprimento": 400,
+      "aviso": "aresta de 394 / 394 mm para contato de 400 mm",
+      "feito": true,
+      "ferramenta": "make_joint finger",
+      "resposta": {
+        "changed": [
+          4,
+          6
+        ],
+        "message": "Junta criada: 39 campos de 10,1 mm."
+      }
+    }
+  ],
+  "nao_feito": [],
+  "avisos": [
+    {
+      "codigo": "espiga-na-janela",
+      "placas": [
+        "prateleira",
+        "frente"
+      ],
+      "msg": "\"prateleira\" encosta em \"frente\" onde ha um recorte (x 22..378, z 85..378): fica colado, sem espiga."
+    },
+    {
+      "codigo": "espiga-na-janela",
+      "placas": [
+        "divisoria1",
+        "frente"
+      ],
+      "msg": "\"divisoria1\" encosta em \"frente\" onde ha um recorte (x 22..378, z 85..378): fica colado, sem espiga."
+    },
+    {
+      "codigo": "espiga-na-janela",
+      "placas": [
+        "divisoria2",
+        "frente"
+      ],
+      "msg": "\"divisoria2\" encosta em \"frente\" onde ha um recorte (x 22..378, z 85..378): fica colado, sem espiga."
+    },
+    {
+      "codigo": "espiga-na-janela",
+      "placas": [
+        "divisoria3",
+        "frente"
+      ],
+      "msg": "\"divisoria3\" encosta em \"frente\" onde ha um recorte (x 22..378, z 85..378): fica colado, sem espiga."
+    },
+    {
+      "codigo": "espiga-na-janela",
+      "placas": [
+        "divisoria4",
+        "frente"
+      ],
+      "msg": "\"divisoria4\" encosta em \"frente\" onde ha um recorte (x 22..378, z 85..378): fica colado, sem espiga."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "esquerda"
+      ],
+      "msg": "A peca \"esquerda\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "direita"
+      ],
+      "msg": "A peca \"direita\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "tras"
+      ],
+      "msg": "A peca \"tras\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "frente"
+      ],
+      "msg": "A peca \"frente\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "prateleira"
+      ],
+      "msg": "A peca \"prateleira\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "divisoria1"
+      ],
+      "msg": "A peca \"divisoria1\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "divisoria2"
+      ],
+      "msg": "A peca \"divisoria2\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "divisoria3"
+      ],
+      "msg": "A peca \"divisoria3\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "mesa-cheia",
+      "placas": [
+        "divisoria4"
+      ],
+      "msg": "A peca \"divisoria4\" passou do limite da mesa de 400 mm."
+    },
+    {
+      "codigo": "medida-mudou",
+      "placas": [
+        "prateleira"
+      ],
+      "msg": "A peca \"prateleira\" devia ter 400 x 60 mm e ficou com 400 x 57 mm depois dos encaixes."
+    },
+    {
+      "codigo": "medida-mudou",
+      "placas": [
+        "divisoria1"
+      ],
+      "msg": "A peca \"divisoria1\" devia ter 60 x 150 mm e ficou com 57 x 150 mm depois dos encaixes."
+    },
+    {
+      "codigo": "medida-mudou",
+      "placas": [
+        "divisoria2"
+      ],
+      "msg": "A peca \"divisoria2\" devia ter 60 x 150 mm e ficou com 57 x 150 mm depois dos encaixes."
+    },
+    {
+      "codigo": "medida-mudou",
+      "placas": [
+        "divisoria3"
+      ],
+      "msg": "A peca \"divisoria3\" devia ter 60 x 150 mm e ficou com 57 x 150 mm depois dos encaixes."
+    },
+    {
+      "codigo": "medida-mudou",
+      "placas": [
+        "divisoria4"
+      ],
+      "msg": "A peca \"divisoria4\" devia ter 60 x 150 mm e ficou com 57 x 150 mm depois dos encaixes."
+    }
+  ],
+  "eixos_3d": {
+    "x": {
+      "j": 0,
+      "sg": 1,
+      "custo": 5.45454545454546
+    },
+    "y": {
+      "j": 1,
+      "sg": 1,
+      "custo": 132.27272727272725
+    },
+    "z": {
+      "j": 2,
+      "sg": 1,
+      "custo": 0
+    }
+  },
+  "medidas": [
+    {
+      "placa": "base",
+      "esperado": [
+        400,
+        100
+      ],
+      "medido": [
+        400,
+        100
+      ],
+      "ok": true
+    },
+    {
+      "placa": "topo",
+      "esperado": [
+        400,
+        100
+      ],
+      "medido": [
+        400,
+        100
+      ],
+      "ok": true
+    },
+    {
+      "placa": "esquerda",
+      "esperado": [
+        100,
+        400
+      ],
+      "medido": [
+        100,
+        400
+      ],
+      "ok": true
+    },
+    {
+      "placa": "direita",
+      "esperado": [
+        100,
+        400
+      ],
+      "medido": [
+        100,
+        400
+      ],
+      "ok": true
+    },
+    {
+      "placa": "tras",
+      "esperado": [
+        400,
+        400
+      ],
+      "medido": [
+        400,
+        400
+      ],
+      "ok": true
+    },
+    {
+      "placa": "frente",
+      "esperado": [
+        400,
+        400
+      ],
+      "medido": [
+        400,
+        400
+      ],
+      "ok": true
+    },
+    {
+      "placa": "prateleira",
+      "esperado": [
+        400,
+        60
+      ],
+      "medido": [
+        400,
+        57
+      ],
+      "ok": false
+    },
+    {
+      "placa": "divisoria1",
+      "esperado": [
+        60,
+        150
+      ],
+      "medido": [
+        57,
+        150
+      ],
+      "ok": false
+    },
+    {
+      "placa": "divisoria2",
+      "esperado": [
+        60,
+        150
+      ],
+      "medido": [
+        57,
+        150
+      ],
+      "ok": false
+    },
+    {
+      "placa": "divisoria3",
+      "esperado": [
+        60,
+        150
+      ],
+      "medido": [
+        57,
+        150
+      ],
+      "ok": false
+    },
+    {
+      "placa": "divisoria4",
+      "esperado": [
+        60,
+        150
+      ],
+      "medido": [
+        57,
+        150
+      ],
+      "ok": false
+    }
+  ],
+  "recortes": [
+    {
+      "placa": "frente",
+      "mm": [
+        356,
+        293
+      ],
+      "id": 12
+    }
+  ],
+  "gravuras": [
+    {
+      "placa": "frente",
+      "texto": "PLANEJE, ECONOMIZE, VIAJE!",
+      "id": 13
+    },
+    {
+      "placa": "frente",
+      "texto": "R$20    R$50    R$100    R$200    R$500    R$1.000",
+      "id": 14
+    },
+    {
+      "peca": "titulo",
+      "texto": "Nossa Aventura",
+      "id": 234
+    },
+    {
+      "peca": "titulo",
+      "texto": "Para a próxima viagem juntos",
+      "id": 235
+    },
+    {
+      "peca": "placa_rio",
+      "texto": "RIO DE JANEIRO",
+      "id": 237
+    },
+    {
+      "peca": "placa_salvador",
+      "texto": "SALVADOR",
+      "id": 239
+    },
+    {
+      "peca": "placa_foz",
+      "texto": "FOZ DO IGUAÇU",
+      "id": 241
+    },
+    {
+      "peca": "placa_manaus",
+      "texto": "MANAUS",
+      "id": 243
+    }
+  ],
+  "faces_gravadas": [
+    {
+      "placa": "frente",
+      "antes": "dentro",
+      "espelhada": true,
+      "levados": 3,
+      "depois": "fora"
+    }
+  ],
+  "cena": {
+    "camadas": 3,
+    "sobre": "tras",
+    "pecas": [
+      {
+        "peca": "mapa_base",
+        "nome": "contorno do mapa do Brasil",
+        "ok": true,
+        "escolhida": {
+          "origem": "web: File:Blank Map of Brazil.svg (https://commons.wikimedia.org/wiki/File:Blank_Map_of_Brazil.svg)",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "web: File:Blank Map of Brazil.svg (https://commons.wikimedia.org/wiki/File:Blank_Map_of_Brazil.svg)",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "nuvem",
+        "nome": "nuvem",
+        "ok": true,
+        "escolhida": {
+          "origem": "biblioteca builtin:cloud",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "biblioteca builtin:cloud",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "mapa_estados",
+        "nome": "mapa do Brasil com os estados",
+        "ok": true,
+        "escolhida": {
+          "origem": "web: File:Map of the Brazilian states by literacy rate (2019).svg (https://commons.wikimedia.org/wiki/File:Map_of_the_Brazilian_states_by_literacy_rate_(2019).svg)",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "web: File:Map of the Brazilian states by literacy rate (2019).svg (https://commons.wikimedia.org/wiki/File:Map_of_the_Brazilian_states_by_literacy_rate_(2019).svg)",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "aviao",
+        "nome": "aviao",
+        "ok": true,
+        "escolhida": {
+          "origem": "biblioteca builtin:airplane",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "biblioteca builtin:airplane",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "mala",
+        "nome": "mala de viagem com alca",
+        "ok": true,
+        "escolhida": {
+          "origem": "web: File:Suitcase icon.svg (https://commons.wikimedia.org/wiki/File:Suitcase_icon.svg)",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "web: File:Suitcase icon.svg (https://commons.wikimedia.org/wiki/File:Suitcase_icon.svg)",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "barco",
+        "nome": "veleiro",
+        "ok": true,
+        "escolhida": {
+          "origem": "biblioteca builtin:sailboat",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "biblioteca builtin:sailboat",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "cristo",
+        "nome": "Cristo Redentor",
+        "ok": true,
+        "escolhida": {
+          "origem": "web: File:Wikimedia Brasil 2025 Strategic Process - cristo.svg (https://commons.wikimedia.org/wiki/File:Wikimedia_Brasil_2025_Strategic_Process_-_cristo.svg)",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "web: File:Wikimedia Brasil 2025 Strategic Process - cristo.svg (https://commons.wikimedia.org/wiki/File:Wikimedia_Brasil_2025_Strategic_Process_-_cristo.svg)",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "palmeira",
+        "nome": "palmeira",
+        "ok": true,
+        "escolhida": {
+          "origem": "biblioteca builtin:palm",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "biblioteca builtin:palm",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "montanhas",
+        "nome": "montanhas",
+        "ok": true,
+        "escolhida": {
+          "origem": "web: File:Mountain icon (Noun Project).svg (https://commons.wikimedia.org/wiki/File:Mountain_icon_(Noun_Project).svg)",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "web: File:Mountain icon (Noun Project).svg (https://commons.wikimedia.org/wiki/File:Mountain_icon_(Noun_Project).svg)",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "titulo",
+        "nome": "placa do titulo",
+        "ok": true,
+        "escolhida": {
+          "origem": "forma retangulo",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "forma retangulo",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "placa_rio",
+        "nome": "placa Rio de Janeiro",
+        "ok": true,
+        "escolhida": {
+          "origem": "forma placa_seta",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "forma placa_seta",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "placa_salvador",
+        "nome": "placa Salvador",
+        "ok": true,
+        "escolhida": {
+          "origem": "forma placa_seta",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "forma placa_seta",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "placa_foz",
+        "nome": "placa Foz do Iguaçu",
+        "ok": true,
+        "escolhida": {
+          "origem": "forma placa_seta",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "forma placa_seta",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      },
+      {
+        "peca": "placa_manaus",
+        "nome": "placa Manaus",
+        "ok": true,
+        "escolhida": {
+          "origem": "forma placa_seta",
+          "nota": 10
+        },
+        "tentativas": [
+          {
+            "origem": "forma placa_seta",
+            "nota": 10,
+            "parece": "forma exata do sistema",
+            "problemas": []
+          }
+        ]
+      }
+    ]
+  },
+  "custo_ia": {
+    "chamadas": [],
+    "usd": 0
+  },
+  "vista3d_dados": {
+    "pecas": 81,
+    "conjuntos": 2,
+    "placas": [
+      {
+        "placa": "base",
+        "min": [
+          10,
+          401,
+          0
+        ],
+        "max": [
+          410,
+          501,
+          3
+        ]
+      },
+      {
+        "placa": "esquerda",
+        "min": [
+          10,
+          401,
+          0
+        ],
+        "max": [
+          13,
+          501,
+          400
+        ]
+      },
+      {
+        "placa": "direita",
+        "min": [
+          407,
+          401,
+          0
+        ],
+        "max": [
+          410,
+          501,
+          400
+        ]
+      },
+      {
+        "placa": "tras",
+        "min": [
+          10,
+          498,
+          0
+        ],
+        "max": [
+          410,
+          501,
+          400
+        ]
+      },
+      {
+        "placa": "frente",
+        "min": [
+          10,
+          401,
+          0
+        ],
+        "max": [
+          410,
+          404,
+          400
+        ]
+      },
+      {
+        "placa": "divisoria1",
+        "min": [
+          66,
+          404,
+          0
+        ],
+        "max": [
+          69,
+          461,
+          150
+        ]
+      },
+      {
+        "placa": "divisoria2",
+        "min": [
+          156,
+          404,
+          0
+        ],
+        "max": [
+          159,
+          461,
+          150
+        ]
+      },
+      {
+        "placa": "divisoria3",
+        "min": [
+          254,
+          404,
+          0
+        ],
+        "max": [
+          257,
+          461,
+          150
+        ]
+      },
+      {
+        "placa": "divisoria4",
+        "min": [
+          347,
+          404,
+          0
+        ],
+        "max": [
+          350,
+          461,
+          150
+        ]
+      },
+      {
+        "placa": "topo",
+        "min": [
+          10,
+          401,
+          397
+        ],
+        "max": [
+          410,
+          501,
+          400
+        ]
+      },
+      {
+        "placa": "prateleira",
+        "min": [
+          10,
+          404,
+          147
+        ],
+        "max": [
+          410,
+          461,
+          150
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:0:0",
+        "min": [
+          184.72,
+          495,
+          163
+        ],
+        "max": [
+          244.67,
+          498,
+          225.22
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:0:1",
+        "min": [
+          111.59,
+          495,
+          206.2
+        ],
+        "max": [
+          286.43,
+          498,
+          336.98
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:0:2",
+        "min": [
+          59.83,
+          495,
+          285
+        ],
+        "max": [
+          80.18,
+          498,
+          299.97
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:0:3",
+        "min": [
+          214.99,
+          495,
+          305.27
+        ],
+        "max": [
+          225.92,
+          498,
+          313.02
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:0:4",
+        "min": [
+          209.95,
+          495,
+          306.86
+        ],
+        "max": [
+          213.53,
+          498,
+          311.12
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:0:5",
+        "min": [
+          216.86,
+          495,
+          313.12
+        ],
+        "max": [
+          220.27,
+          498,
+          314.95
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:0",
+        "min": [
+          276.98,
+          492,
+          166
+        ],
+        "max": [
+          307.02,
+          495,
+          188
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:1",
+        "min": [
+          115.6,
+          492,
+          167
+        ],
+        "max": [
+          282.42,
+          495,
+          333
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:2",
+        "min": [
+          129.25,
+          492,
+          179.01
+        ],
+        "max": [
+          171.76,
+          495,
+          182.03
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:3",
+        "min": [
+          131.57,
+          492,
+          183.32
+        ],
+        "max": [
+          169.4,
+          495,
+          221
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:4",
+        "min": [
+          106,
+          492,
+          186.5
+        ],
+        "max": [
+          116,
+          495,
+          226.5
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:5",
+        "min": [
+          68,
+          492,
+          186.5
+        ],
+        "max": [
+          104,
+          495,
+          226.5
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:6",
+        "min": [
+          56,
+          492,
+          186.5
+        ],
+        "max": [
+          66,
+          495,
+          226.5
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:7",
+        "min": [
+          151.89,
+          492,
+          193.68
+        ],
+        "max": [
+          167.44,
+          495,
+          215.17
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:8",
+        "min": [
+          133.52,
+          492,
+          193.68
+        ],
+        "max": [
+          148.6,
+          495,
+          217.95
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:9",
+        "min": [
+          343.02,
+          492,
+          195.25
+        ],
+        "max": [
+          347.74,
+          495,
+          203.47
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:10",
+        "min": [
+          223.72,
+          492,
+          199.87
+        ],
+        "max": [
+          223.82,
+          495,
+          200.22
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:11",
+        "min": [
+          223.04,
+          492,
+          200.18
+        ],
+        "max": [
+          223.79,
+          495,
+          200.33
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:12",
+        "min": [
+          343.5,
+          492,
+          203.57
+        ],
+        "max": [
+          347.98,
+          495,
+          209.11
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:13",
+        "min": [
+          321.62,
+          492,
+          206.5
+        ],
+        "max": [
+          322.26,
+          495,
+          210.66
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:14",
+        "min": [
+          344.06,
+          492,
+          209.21
+        ],
+        "max": [
+          348.69,
+          495,
+          214.82
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:15",
+        "min": [
+          312.73,
+          492,
+          210.23
+        ],
+        "max": [
+          318.55,
+          495,
+          222.75
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:16",
+        "min": [
+          312.73,
+          492,
+          209.9
+        ],
+        "max": [
+          318.38,
+          495,
+          222.75
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:17",
+        "min": [
+          320.33,
+          492,
+          210.36
+        ],
+        "max": [
+          323.21,
+          495,
+          234.57
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:18",
+        "min": [
+          239.62,
+          492,
+          211.25
+        ],
+        "max": [
+          241.98,
+          495,
+          213.42
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:19",
+        "min": [
+          240.13,
+          492,
+          212.57
+        ],
+        "max": [
+          256.15,
+          495,
+          222.35
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:20",
+        "min": [
+          310.68,
+          492,
+          214.09
+        ],
+        "max": [
+          312.91,
+          495,
+          227.83
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:21",
+        "min": [
+          345.07,
+          492,
+          214.92
+        ],
+        "max": [
+          349.98,
+          495,
+          220.64
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:22",
+        "min": [
+          322.24,
+          492,
+          226.54
+        ],
+        "max": [
+          330.05,
+          495,
+          227.96
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:23",
+        "min": [
+          77,
+          492,
+          227
+        ],
+        "max": [
+          95,
+          495,
+          234.5
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:24",
+        "min": [
+          296.05,
+          492,
+          227.61
+        ],
+        "max": [
+          304.86,
+          495,
+          231.99
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:25",
+        "min": [
+          314,
+          492,
+          228.03
+        ],
+        "max": [
+          319.16,
+          495,
+          228.55
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:26",
+        "min": [
+          306.02,
+          492,
+          228.11
+        ],
+        "max": [
+          314,
+          495,
+          233.28
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:27",
+        "min": [
+          299.91,
+          492,
+          228.66
+        ],
+        "max": [
+          301.8,
+          495,
+          231.78
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:28",
+        "min": [
+          316.51,
+          492,
+          231.17
+        ],
+        "max": [
+          318.4,
+          495,
+          232.06
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:29",
+        "min": [
+          310.54,
+          492,
+          231.18
+        ],
+        "max": [
+          316.51,
+          495,
+          234.43
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:30",
+        "min": [
+          314.94,
+          492,
+          231.45
+        ],
+        "max": [
+          318.58,
+          495,
+          234.06
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:31",
+        "min": [
+          298.86,
+          492,
+          231.78
+        ],
+        "max": [
+          299.93,
+          495,
+          233.43
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:32",
+        "min": [
+          294.02,
+          492,
+          231.93
+        ],
+        "max": [
+          296.05,
+          495,
+          232.35
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:33",
+        "min": [
+          314.05,
+          492,
+          232.51
+        ],
+        "max": [
+          314.94,
+          495,
+          234.44
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:34",
+        "min": [
+          327.41,
+          492,
+          232.98
+        ],
+        "max": [
+          329.23,
+          495,
+          233.16
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:35",
+        "min": [
+          323.02,
+          492,
+          232.98
+        ],
+        "max": [
+          327.41,
+          495,
+          233.71
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:36",
+        "min": [
+          294.17,
+          492,
+          233.28
+        ],
+        "max": [
+          298.89,
+          495,
+          234.05
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:37",
+        "min": [
+          315.95,
+          492,
+          234.54
+        ],
+        "max": [
+          317.06,
+          495,
+          234.6
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:38",
+        "min": [
+          315.61,
+          492,
+          234.54
+        ],
+        "max": [
+          318.21,
+          495,
+          240.96
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:39",
+        "min": [
+          315.34,
+          492,
+          234.59
+        ],
+        "max": [
+          315.95,
+          495,
+          234.61
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:40",
+        "min": [
+          324.89,
+          492,
+          294
+        ],
+        "max": [
+          358.11,
+          495,
+          325.96
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:41",
+        "min": [
+          214.29,
+          492,
+          302.77
+        ],
+        "max": [
+          224.69,
+          495,
+          310.15
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:42",
+        "min": [
+          209.45,
+          492,
+          304.31
+        ],
+        "max": [
+          212.81,
+          495,
+          308.49
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:43",
+        "min": [
+          216.06,
+          492,
+          310.18
+        ],
+        "max": [
+          219.28,
+          495,
+          311.95
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:44",
+        "min": [
+          308.99,
+          492,
+          197.03
+        ],
+        "max": [
+          310.11,
+          495,
+          215.61
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:45",
+        "min": [
+          310.1,
+          492,
+          206.5
+        ],
+        "max": [
+          321.62,
+          495,
+          214.12
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:46",
+        "min": [
+          322.26,
+          492,
+          210.66
+        ],
+        "max": [
+          322.54,
+          495,
+          210.78
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:47",
+        "min": [
+          310.56,
+          492,
+          217.2
+        ],
+        "max": [
+          312.2,
+          495,
+          218.12
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:48",
+        "min": [
+          304.86,
+          492,
+          220.49
+        ],
+        "max": [
+          309.96,
+          495,
+          229.66
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:49",
+        "min": [
+          317.29,
+          492,
+          230.51
+        ],
+        "max": [
+          318.86,
+          495,
+          231.65
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:50",
+        "min": [
+          311.6,
+          492,
+          230.21
+        ],
+        "max": [
+          318.82,
+          495,
+          232.62
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:51",
+        "min": [
+          293.01,
+          492,
+          232.47
+        ],
+        "max": [
+          294.17,
+          495,
+          233.42
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:52",
+        "min": [
+          298.86,
+          492,
+          233.02
+        ],
+        "max": [
+          310.54,
+          495,
+          234.43
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:53",
+        "min": [
+          329.23,
+          492,
+          233.08
+        ],
+        "max": [
+          333.39,
+          495,
+          233.61
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:54",
+        "min": [
+          330.83,
+          492,
+          217.02
+        ],
+        "max": [
+          373,
+          495,
+          246.75
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:55",
+        "min": [
+          314.24,
+          492,
+          234.4
+        ],
+        "max": [
+          316.62,
+          495,
+          241.53
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:56",
+        "min": [
+          318.57,
+          492,
+          231.69
+        ],
+        "max": [
+          320.33,
+          495,
+          240.21
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:57",
+        "min": [
+          315.04,
+          492,
+          236.17
+        ],
+        "max": [
+          316.66,
+          495,
+          240.96
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:1:58",
+        "min": [
+          316.62,
+          492,
+          241.2
+        ],
+        "max": [
+          316.9,
+          495,
+          241.51
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:2:0",
+        "min": [
+          308,
+          489,
+          152
+        ],
+        "max": [
+          388,
+          492,
+          175
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:2:1",
+        "min": [
+          212,
+          489,
+          152
+        ],
+        "max": [
+          298,
+          492,
+          175
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:2:2",
+        "min": [
+          120,
+          489,
+          152
+        ],
+        "max": [
+          200,
+          492,
+          175
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:2:3",
+        "min": [
+          32,
+          489,
+          152
+        ],
+        "max": [
+          112,
+          492,
+          175
+        ]
+      },
+      {
+        "placa": "ml:5xcfpmiq:2:4",
+        "min": [
+          108,
+          489,
+          338
+        ],
+        "max": [
+          327,
+          492,
+          381
+        ]
+      }
+    ],
+    "colisoes": []
+  },
+  "check_design": {
+    "total": 309,
+    "resumo": null
+  },
+  "vista3d": "Peças: 81 (Conjuntos: 2) · Sem sobreposições",
+  "erros_da_pagina": [],
+  "perguntas_do_app": [],
+  "projeto": "D:\\CLAUDE\\sistema para corte a laser\\kizamubeam\\ai\\foto-para-pecas\\montagem\\saida\\cofrinho-ensaio.kzb"
+}
