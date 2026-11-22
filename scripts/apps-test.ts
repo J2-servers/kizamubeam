@@ -79,7 +79,7 @@ test('Jede Option der Dialoge mit Beispielbildern hat eines, und die Bilder best
   const offsetSrc = dialog('openOffsetDialog');
   const want: Record<string, string[]> = {
     fill: [...layerSrc.matchAll(/h\('option', \{ value: '(\w+)', selected: c\.fillStyle/g)].map((m) => m[1]),
-    lead: [...layerSrc.matchAll(/name: `lead-\$\{i\}`, value: '(\w+)'/g)].map((m) => m[1]),
+    lead: [...layerSrc.matchAll(/name: `lead-[^`]*`, value: '(\w+)'/g)].map((m) => m[1]),
     joint: [...jointLine.matchAll(/\['(\w+)', t\(/g)].map((m) => m[1]),
     hinge: HINGE_KINDS.map(([k]) => k as string),
     warp: [...WARP_KINDS],

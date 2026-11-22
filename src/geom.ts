@@ -1,10 +1,14 @@
 // Geometrie: Formen in Pfade umwandeln, Begrenzungsrahmen, Text-Layout, Treffertest.
 import { apply, IDENT, inv, mul, Mat, Node, Obj, Pt, Shape, SubPath, TextShape } from './model';
+import { clampRectCorners, rectCorners } from './model';
 import { fitText, loadedFont, onFontLoaded, textLines, textToSubs, wrapParagraph, wrapWidth } from './fonts';
 import { bezierPt, segments } from './curves';
 import { shownText } from './vartext';
 import { barcodeExtent, barcodeOutline } from './barcode';
 import { forgetCenters } from './arcs';
+import { resolveImageEdits } from './imageEdits';
+import { resolveImageContour, type ImageContour, type ImageCorner } from './imageContour';
+import { t } from './i18n';
 
 export { bezierPt, segments };
 
@@ -17,6 +21,43 @@ export interface Box {
 
 const K = 0.5522847498; // Bézier-Näherung für Viertelkreise
 
+/** Kurvenqualität (Tempo vs. Genauigkeit) für die Kurven-Abtastung bei Rahmen und Treffertest. */
+export type CurveQuality = 'coarse' | 'balanced' | 'fine';
+const CURVE_QUALITY_KEY = 'kizamubeam.curveQuality';
+export const DEFAULT_CURVE_QUALITY: CurveQuality = 'balanced';
+
+export function loadCurveQuality(): CurveQuality {
+  try {
+    const v = JSON.parse(localStorage.getItem(CURVE_QUALITY_KEY) ?? JSON.stringify(DEFAULT_CURVE_QUALITY));
+    if (v === 'coarse' || v === 'balanced' || v === 'fine') return v;
+  } catch {
+    /* Speicher nicht verfügbar oder beschädigt */
+  }
+  return DEFAULT_CURVE_QUALITY;
+}
+
+export function saveCurveQuality(q: CurveQuality) {
+  if (q !== 'coarse' && q !== 'balanced' && q !== 'fine') throw new Error(t('Ungültige Kurvenqualität.'));
+  try {
+    localStorage.setItem(CURVE_QUALITY_KEY, JSON.stringify(q));
+  } catch {
+    /* Speicher nicht verfügbar */
+  }
+  curveQualityCache = q;
+}
+
+/** Zwischenspeicher: Rahmen/Treffertest sind heiß, kein Speicherzugriff pro Kurve. */
+let curveQualityCache: CurveQuality | null = null;
+function currentCurveQuality(): CurveQuality {
+  if (!curveQualityCache) curveQualityCache = loadCurveQuality();
+  return curveQualityCache;
+}
+
+/** Abtastschritt je Qualität: grob 1/8, ausgewogen 1/16 (heutiges Verhalten), fein 1/32. */
+function curveStep(q: CurveQuality): number {
+  return q === 'coarse' ? 1 / 8 : q === 'fine' ? 1 / 32 : 1 / 16;
+}
+
 /** Grundformen als Knotenpfade (lokale Koordinaten). */
 export function shapeSubs(s: Shape): SubPath[] {
   switch (s.kind) {
@@ -26,29 +67,59 @@ export function shapeSubs(s: Shape): SubPath[] {
     case 'barcode':
       return barcodeOutline(s).subs;
     case 'image':
+      if (s.edit !== undefined) {
+        const resolved = resolveImageEdits(s);
+        // Invalid edits have no valid contour; render/check expose the error.
+        return resolved.ok ? [{ closed: true, nodes: resolved.quad.map(p => ({ ...p })) }] : [];
+      }
       // Umriss des Bildes (für Begrenzung, Auswahl und Rahmen)
       return [{ closed: true, nodes: [{ x: 0, y: 0 }, { x: s.w, y: 0 }, { x: s.w, y: s.h }, { x: 0, y: s.h }] }];
     case 'rect': {
       const { w, h } = s;
-      const r = Math.max(0, Math.min(s.r, Math.abs(w) / 2, Math.abs(h) / 2));
-      if (r <= 0)
+      const [tl, tr, br, bl] = clampRectCorners(rectCorners(s), w, h);
+      if (tl <= 0 && tr <= 0 && br <= 0 && bl <= 0)
         return [{ closed: true, nodes: [{ x: 0, y: 0 }, { x: w, y: 0 }, { x: w, y: h }, { x: 0, y: h }] }];
-      const k = r * K;
-      return [
-        {
-          closed: true,
-          nodes: [
-            { x: r, y: 0, cin: { x: r - k, y: 0 } },
-            { x: w - r, y: 0, cout: { x: w - r + k, y: 0 } },
-            { x: w, y: r, cin: { x: w, y: r - k } },
-            { x: w, y: h - r, cout: { x: w, y: h - r + k } },
-            { x: w - r, y: h, cin: { x: w - r + k, y: h } },
-            { x: r, y: h, cout: { x: r - k, y: h } },
-            { x: 0, y: h - r, cin: { x: 0, y: h - r + k } },
-            { x: 0, y: r, cout: { x: 0, y: r - k } },
-          ],
-        },
-      ];
+      // Kantenpunkte je Ecke (Umlauf oben-links → oben-rechts → unten-rechts → unten-links, y nach unten).
+      const S0 = { x: tl, y: 0 }, E0 = { x: w - tr, y: 0 };
+      const S1 = { x: w, y: tr }, E1 = { x: w, y: h - br };
+      const S2 = { x: w - br, y: h }, E2 = { x: bl, y: h };
+      const S3 = { x: 0, y: h - bl }, E3 = { x: 0, y: tl };
+      const kTL = tl * K, kTR = tr * K, kBR = br * K, kBL = bl * K;
+      const at = (p: Pt, extra?: Partial<Node>): Node => ({ ...p, ...extra });
+      // Je Ecke: Austritt der Vorgängerkante (cout) und Eintritt der Folgekante (cin) für den Viertelkreis.
+      const nodes: Node[] = [];
+      const push = (p: Node) => {
+        const last = nodes[nodes.length - 1];
+        if (last && Math.abs(last.x - p.x) < 1e-12 && Math.abs(last.y - p.y) < 1e-12
+          && !last.cin && !last.cout && !p.cin && !p.cout) return;
+        nodes.push(p);
+      };
+      push(at({ ...S0 }, tl > 0 ? { cin: { x: S0.x - kTL, y: 0 } } : {}));
+      push(at({ ...E0 }, tr > 0 ? { cout: { x: E0.x + kTR, y: 0 } } : {}));
+      push(at({ ...S1 }, tr > 0 ? { cin: { x: w, y: S1.y - kTR } } : {}));
+      push(at({ ...E1 }, br > 0 ? { cout: { x: w, y: E1.y + kBR } } : {}));
+      push(at({ ...S2 }, br > 0 ? { cin: { x: S2.x + kBR, y: h } } : {}));
+      push(at({ ...E2 }, bl > 0 ? { cout: { x: E2.x - kBL, y: h } } : {}));
+      push(at({ ...S3 }, bl > 0 ? { cin: { x: 0, y: S3.y + kBL } } : {}));
+      push(at({ ...E3 }, tl > 0 ? { cout: { x: 0, y: E3.y - kTL } } : {}));
+      // Zusammenfallende Eckpunkte (Radius 0) zu einem scharfen Knoten vereinen.
+      const merged: Node[] = [];
+      for (const n of nodes) {
+        const last = merged[merged.length - 1];
+        if (last && Math.abs(last.x - n.x) < 1e-12 && Math.abs(last.y - n.y) < 1e-12) {
+          last.cin = n.cin ?? last.cin;
+          last.cout = n.cout ?? last.cout;
+          if (!last.cin && !last.cout) { last.cin = undefined; last.cout = undefined; }
+        } else merged.push({ ...n });
+      }
+      if (merged.length > 1) {
+        const first = merged[0], last = merged[merged.length - 1];
+        if (Math.abs(first.x - last.x) < 1e-12 && Math.abs(first.y - last.y) < 1e-12) {
+          first.cin = last.cin ?? first.cin;
+          merged.pop();
+        }
+      }
+      return [{ closed: true, nodes: merged }];
     }
     case 'ellipse': {
       const { rx, ry } = s;
@@ -105,9 +176,22 @@ export function subsToPath2D(subs: SubPath[], p = new Path2D()): Path2D {
 
 const localCache = new WeakMap<Shape, Path2D>();
 /** Lokaler Pfad, zwischengespeichert pro Form-Objekt. Nach Änderung invalidate() aufrufen. */
-export function localPath(s: Shape): Path2D {
+export function localPath(s: Shape, world: Mat = IDENT): Path2D {
   // QR-Codes mit variablem Inhalt ändern sich ohne touch(); barcode.ts prüft selbst, ob der Inhalt noch passt
   if (s.kind === 'barcode') return barcodeOutline(s).path;
+  // Edits may change in place without touch(), including crop/perspective reset.
+  if (s.kind === 'image' && s.edit !== undefined) {
+    const resolved = resolveImageContour(s, world), p = new Path2D();
+    if (resolved.ok) {
+      // Preserve exact legacy local coordinates without a world/inverse round trip.
+      if (resolved.contour.corners.every(c => c.radius === 0)) {
+        const local = resolveImageContour(s);
+        return local.ok ? subsToPath2D([{ closed: true, nodes: local.contour.polygon }]) : p;
+      }
+      p.addPath(imageContourPath(resolved.contour), new DOMMatrix(inv(world)));
+    }
+    return p;
+  }
   let p = localCache.get(s);
   if (!p) {
     p = subsToPath2D(shapeSubs(s));
@@ -122,17 +206,98 @@ export function invalidate(s: Shape) {
 
 export function worldPath(s: Shape, m: Mat): Path2D {
   const p = new Path2D();
-  p.addPath(localPath(s), new DOMMatrix(m));
+  p.addPath(localPath(s, m), new DOMMatrix(m));
   return p;
+}
+
+/** Construct circles in final world mm before inverse-transforming for local display. */
+function imageContourPath(contour: ImageContour): Path2D {
+  const p = new Path2D();
+  const first = contour.corners[0].start;
+  p.moveTo(first.x, first.y);
+  for (let i = 0; i < contour.corners.length; i++) {
+    const c = contour.corners[i];
+    if (i) p.lineTo(c.start.x, c.start.y);
+    if (c.radius) p.arc(c.center.x, c.center.y, c.radius,
+      Math.atan2(c.start.y - c.center.y, c.start.x - c.center.x),
+      Math.atan2(c.end.y - c.center.y, c.end.x - c.center.x), !contour.clockwise);
+  }
+  p.closePath();
+  return p;
+}
+
+function onImageArc(c: ImageCorner, p: Pt): boolean {
+  // The fillet is the minor arc between tangent points, on the vertex side.
+  return (p.x - c.start.x) * (c.start.x - c.vertex.x) + (p.y - c.start.y) * (c.start.y - c.vertex.y) <= 1e-10
+    && (p.x - c.end.x) * (c.end.x - c.vertex.x) + (p.y - c.end.y) * (c.end.y - c.vertex.y) <= 1e-10;
+}
+
+function imageContourExtrema(contour: ImageContour): Pt[] {
+  return contour.corners.flatMap(c => {
+    const points = [c.start, c.end];
+    if (c.radius) for (const p of [
+      { x: c.center.x - c.radius, y: c.center.y }, { x: c.center.x + c.radius, y: c.center.y },
+      { x: c.center.x, y: c.center.y - c.radius }, { x: c.center.x, y: c.center.y + c.radius },
+    ]) if (onImageArc(c, p)) points.push(p);
+    return points;
+  });
+}
+
+/** Segment parameters at exact line/arc boundary intersections (including overlap endpoints). */
+export function imageContourSegmentCuts(contour: ImageContour, a: Pt, b: Pt): number[] {
+  const dx = b.x - a.x, dy = b.y - a.y, length2 = dx * dx + dy * dy;
+  const cuts: number[] = [];
+  for (let i = 0; i < contour.corners.length; i++) {
+    const c = contour.corners[i], end = contour.corners[(i + 1) % contour.corners.length].start;
+    const ex = end.x - c.end.x, ey = end.y - c.end.y;
+    const qx = c.end.x - a.x, qy = c.end.y - a.y, den = dx * ey - dy * ex;
+    if (den) {
+      const t = (qx * ey - qy * ex) / den, u = (qx * dy - qy * dx) / den;
+      if (t >= 0 && t <= 1 && u >= 0 && u <= 1) cuts.push(t);
+    } else if (qx * dy - qy * dx === 0 && segHitsBox(c.end, end,
+      { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(dx), h: Math.abs(dy) })) {
+      if (!length2) cuts.push(0);
+      else {
+        const t = (qx * dx + qy * dy) / length2, u = ((end.x - a.x) * dx + (end.y - a.y) * dy) / length2;
+        cuts.push(Math.max(0, Math.min(t, u)), Math.min(1, Math.max(t, u)));
+      }
+    }
+    if (!length2) {
+      const edge2 = ex * ex + ey * ey;
+      const u = edge2 ? Math.max(0, Math.min(1, ((a.x - c.end.x) * ex + (a.y - c.end.y) * ey) / edge2)) : 0;
+      if (Math.hypot(a.x - c.end.x - u * ex, a.y - c.end.y - u * ey) < 1e-10) cuts.push(0);
+    }
+    if (!c.radius) continue;
+    if (!length2) {
+      if (Math.abs(Math.hypot(a.x - c.center.x, a.y - c.center.y) - c.radius) < 1e-10 && onImageArc(c, a)) cuts.push(0);
+      continue;
+    }
+    const t = ((c.center.x - a.x) * dx + (c.center.y - a.y) * dy) / length2;
+    const nx = a.x + t * dx - c.center.x, ny = a.y + t * dy - c.center.y;
+    const gap = c.radius * c.radius - nx * nx - ny * ny;
+    const tolerance = Math.max(c.radius * c.radius, nx * nx + ny * ny) * Number.EPSILON * 128;
+    if (gap < -tolerance) continue;
+    const half = Math.sqrt(Math.max(0, gap) / length2);
+    for (const u of [t - half, t + half]) {
+      if (u >= 0 && u <= 1 && onImageArc(c, { x: a.x + u * dx, y: a.y + u * dy })) cuts.push(u);
+    }
+  }
+  return cuts;
+}
+
+/** Exact line/arc boundary crossing, shared by image marquee and freehand lasso. */
+export function imageContourHitsSegment(contour: ImageContour, a: Pt, b: Pt): boolean {
+  return imageContourSegmentCuts(contour, a, b).length > 0;
 }
 
 function samplePoints(subs: SubPath[]): Pt[] {
   const pts: Pt[] = [];
+  const step = curveStep(currentCurveQuality());
   for (const sp of subs) {
     if (sp.nodes.length === 1) pts.push(sp.nodes[0]);
     for (const s of segments(sp)) {
       if (!s.curve) pts.push(s.a, s.b);
-      else for (let t = 0; t <= 1.0001; t += 1 / 16) pts.push(bezierPt(s.a, s.c1, s.c2, s.b, t));
+      else for (let t = 0; t <= 1.0001; t += step) pts.push(bezierPt(s.a, s.c1, s.c2, s.b, t));
     }
   }
   return pts;
@@ -267,23 +432,30 @@ export function drawText(ctx: CanvasRenderingContext2D, t: TextShape, m: Mat, mo
   ctx.scale(lay.k, lay.k);
   ctx.font = lay.font;
   ctx.textBaseline = 'alphabetic';
+  // Schrift noch nicht geladen: Browser formt mit (arabische Verbindung inklusive);
+  // Zeile rechtsbündig an ihrer rechten Kante ausrichten
+  if (t.rtl) ctx.direction = 'rtl';
+  ctx.textAlign = t.rtl ? 'right' : 'left';
   if (mode === 'stroke') {
     const s = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])) * lay.k;
     ctx.lineWidth = px / s;
   }
   for (const ln of lay.lines) {
+    const lx = t.rtl ? ln.x + ln.w : ln.x;
     if (!lay.spacing) {
-      if (mode === 'fill') ctx.fillText(ln.text, ln.x, ln.y);
-      else ctx.strokeText(ln.text, ln.x, ln.y);
+      if (mode === 'fill') ctx.fillText(ln.text, lx, ln.y);
+      else ctx.strokeText(ln.text, lx, ln.y);
       continue;
     }
-    let x = ln.x;
+    let x = lx;
     for (const ch of ln.text) {
       if (mode === 'fill') ctx.fillText(ch, x, ln.y);
       else ctx.strokeText(ch, x, ln.y);
-      x += ctx.measureText(ch).width + lay.spacing;
+      x += (t.rtl ? -1 : 1) * (ctx.measureText(ch).width + lay.spacing);
     }
   }
+  ctx.direction = 'ltr';
+  ctx.textAlign = 'start';
   ctx.restore();
 }
 
@@ -315,6 +487,9 @@ function objExtents(o: Obj, parent: Mat, b: { x0: number; y0: number; x1: number
       { x: bx.x + bx.w, y: bx.y + bx.h },
       { x: bx.x, y: bx.y + bx.h },
     ]);
+  } else if (s.kind === 'image' && s.edit !== undefined) {
+    const resolved = resolveImageContour(s, m);
+    if (resolved.ok) addPts(b, IDENT, imageContourExtrema(resolved.contour));
   } else addPts(b, m, samplePoints(shapeSubs(s)));
 }
 
@@ -351,7 +526,7 @@ export function hitLeaf(o: Obj, m: Mat, p: Pt, tol: number, inside: boolean): bo
     const t = tol / Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2]) || 1);
     return q.x >= b.x - t && q.x <= b.x + b.w + t && q.y >= b.y - t && q.y <= b.y + b.h + t;
   }
-  if (s.kind === 'image' || s.kind === 'barcode') {
+  if ((s.kind === 'image' && s.edit === undefined) || s.kind === 'barcode') {
     // Bilder und QR-Codes: die ganze Fläche trifft (einzelne Module wären zu kleine Ziele)
     const q = apply(inv(m), p.x, p.y);
     const t = tol / Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2]) || 1);
@@ -362,7 +537,7 @@ export function hitLeaf(o: Obj, m: Mat, p: Pt, tol: number, inside: boolean): bo
   const wp = worldPath(s, m);
   ctx.lineWidth = tol * 2;
   if (ctx.isPointInStroke(wp, p.x, p.y)) return true;
-  return inside && ctx.isPointInPath(wp, p.x, p.y, 'evenodd');
+  return (inside || s.kind === 'image') && ctx.isPointInPath(wp, p.x, p.y, 'evenodd');
 }
 
 /** Schnell: Überschneidet die Kontur das Rechteck? (Für Kreuzungsauswahl) */
@@ -373,6 +548,16 @@ export function leafIntersectsBox(o: Obj, m: Mat, r: Box): boolean {
     const b = boundsOf([o], mul(m, inv(o.m)));
     if (!b) return false;
     return !(b.x > r.x + r.w || b.x + b.w < r.x || b.y > r.y + r.h || b.y + b.h < r.y);
+  }
+  if (s.kind === 'image' && s.edit !== undefined) {
+    const resolved = resolveImageContour(s, m);
+    if (!resolved.ok) return false;
+    const { contour } = resolved;
+    const boxCorners = [{ x: r.x, y: r.y }, { x: r.x + r.w, y: r.y },
+      { x: r.x + r.w, y: r.y + r.h }, { x: r.x, y: r.y + r.h }];
+    if (boxCorners.some(contour.contains)) return true;
+    return contour.corners.some(c => inBox(c.start) || inBox(c.end))
+      || boxCorners.some((a, i) => imageContourHitsSegment(contour, a, boxCorners[(i + 1) % boxCorners.length]));
   }
   for (const sp of shapeSubs(s)) {
     const pts = samplePoints([sp]).map((p) => apply(m, p.x, p.y));

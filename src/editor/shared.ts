@@ -39,6 +39,10 @@ export type Drag =
       anchor: Pt | null; box: Box; snapSet: SnapSet;
     }
   | { type: 'scale'; handle: number; box: Box; orig: Mat[] }
+  | { type: 'image-crop'; mode: 'crop'; handle: import('./imageHandles').ImageCropHandle }
+  | { type: 'image-crop'; mode: 'perspective'; handle: number }
+  | { type: 'image-crop'; mode: 'rounding'; handle: number }
+  | { type: 'rect-radius'; obj: Obj; radius: number; corners: [number, number, number, number] | null; moved: boolean; redo: import('../history').HistoryEntry[] }
   | { type: 'rotate'; center: Pt; a0: number; orig: Mat[]; angle: number }
   | { type: 'pivot' }
   | { type: 'marquee'; start: Pt; end: Pt; base: Obj[]; mode: 'set' | 'add' | 'toggle' | 'remove' }
@@ -66,7 +70,9 @@ export type Drag =
       redo: import('../history').HistoryEntry[];
       handles: {obj:Obj;sub:number;idx:number;which:'cin'|'cout';orig:Node}[];
     }
-  | { type: 'nodebox'; start: Pt; end: Pt; obj: Obj; base: Map<Obj, Set<string>>; mode: 'set' | 'add' | 'toggle'; onTarget: boolean };
+  | { type: 'nodebox'; start: Pt; end: Pt; obj: Obj; base: Map<Obj, Set<string>>; mode: 'set' | 'add' | 'toggle'; onTarget: boolean }
+  /** Shaper-Nachbearbeitung: Bézieranker/Tangente samt zugrunde liegender Mausspur. */
+  | { type: 'shaper-point'; index: number; which: 'p' | 'cin' | 'cout'; pointerId: number; moved: boolean; original: import('./shaper').ShaperSession; shape: Shape; mat: Mat; snapSet: SnapSet };
 
 export interface NodeHover {
   obj?: Obj;
@@ -91,6 +97,7 @@ export function bumpShapeVersion(s: Shape) {
   shapeVersions.set(s, (shapeVersions.get(s) ?? 0) + 1);
 }
 export function cachedWorldPath(o: Obj, m: Mat): Path2D {
+  if (o.shape.kind === 'image' && o.shape.edit !== undefined) return worldPath(o.shape, m);
   const c = worldCache.get(o);
   if (c && c.shape === o.shape && c.ver === (shapeVersions.get(o.shape) ?? 0) && c.m.every((v, i) => v === m[i])) return c.path;
   const path = worldPath(o.shape, m);

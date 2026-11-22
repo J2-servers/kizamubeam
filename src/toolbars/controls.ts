@@ -1,8 +1,9 @@
 import type { Editor } from '../editor';
 import { ICONS } from '../icons';
-import type { BarcodeShape, GenShape, ImageShape, Obj, ObjBindKey, TextShape } from '../model';
+import type { BarcodeShape, GenShape, ImageShape, Obj, ObjBindKey, RectCorners, TextShape } from '../model';
+import { rectCorners } from '../model';
 import { evaluate, formatNumber, namesIn } from '../params';
-import { onFontListChanged, refreshFonts, requestLocalFonts, systemFonts } from '../fonts';
+import { isFallbackFont, onFontListChanged, refreshFonts, requestLocalFonts, systemFonts } from '../fonts';
 import { openFontManager } from '../fontManager';
 import { createFontPicker } from '../fontPicker';
 import { f2, h, iconBtn, numInput, sep, setIcon, setVal } from '../dom';
@@ -15,6 +16,7 @@ import { outputGrid } from '../images';
 import { shaperName } from '../editor/shaper';
 import type { ShaperKind } from '../shaper';
 import { t, tn } from '../i18n';
+import { withShortcut } from '../commandKeys';
 import type { Definitions } from './model';
 import type { ControlContext, ControlDefinition, ToolbarControl } from './registry';
 
@@ -178,12 +180,165 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
     } };
   });
   register('rectangle', t('Radius'), () => ed.tool === 'rect' || ed.sel.some((o) => o.shape.kind === 'rect'), () => {
-    const fRad = numInput('small', plain(['r'], (v) => ed.updateShapes('rect', { r: Math.max(0, v) })), t('Eckenradius (mm)'), formula('r'));
-    const el = h('label', {}, t('Radius'), fRad);
-    return { el, update() {
-      const rect = ed.sel.find((o) => o.shape.kind === 'rect');
-      el.hidden = !(rect || ed.tool === 'rect');
-      bindField(fRad, 'r', f2(rect && rect.shape.kind === 'rect' ? rect.shape.r : ed.rectRadius), (o) => o.shape.kind === 'rect');
+    // Gemeinsamer Radius + Dropdown mit Synchron-Checkbox und vier Einzelradien (wie die Bild-Abrundung).
+    let unlocked = false;
+    let open = false;
+    const rects = () => ed.sel.filter((o) => o.shape.kind === 'rect');
+    const tuples = (): RectCorners[] => rects()
+      .map((o) => (o.shape.kind === 'rect' ? rectCorners(o.shape) : [0, 0, 0, 0] as RectCorners));
+    const sameTuple = (): RectCorners | null => {
+      const ts = tuples();
+      if (!ts.length) return null;
+      const [a, b, c, d] = ts[0];
+      return ts.every((x) => x[0] === a && x[1] === b && x[2] === c && x[3] === d) ? ts[0] : null;
+    };
+    const sameBind = (): string | null | undefined => {
+      const list = rects();
+      if (!list.length) return undefined;
+      const src = list[0].bind?.['r'];
+      return list.every((o) => o.bind?.['r'] === src) ? src ?? null : undefined;
+    };
+    const commitCommon = (v: number) => {
+      unlocked = false;
+      ed.updateShapes('rect', { r: Math.max(0, v) });
+    };
+    const fRad = numInput('small', plain(['r'], commitCommon), t('Eckenradius (mm)'), formula('r'));
+    const syncBox = h('input', { type: 'checkbox' }) as HTMLInputElement;
+    const fCorners = [1, 2, 3, 4].map((n, i) => {
+      const label = t('Ecke {number} (mm)', { number: String(n) });
+      const inp = numInput('small', (v) => {
+        unlocked = true;
+        const patch: (number | undefined)[] = [undefined, undefined, undefined, undefined];
+        patch[i] = Math.max(0, v);
+        ed.dropObjBind(ed.sel, ['r']);
+        ed.updateShapes('rect', { corners: patch });
+        refresh();
+      }, label) as HTMLInputElement;
+      inp.placeholder = t('Individuell');
+      return inp;
+    });
+    const syncLabel = h('label', { class: 'check' }, syncBox, t('Alle Ecken synchron'));
+    const toggle = h('button', {
+      class: 'toggle', title: t('Einzelne Eckenradien'), 'aria-label': t('Einzelne Eckenradien'), 'aria-haspopup': 'dialog', 'aria-expanded': 'false',
+      onclick: (e: Event) => {
+        e.stopPropagation();
+        open = !open;
+        refresh();
+        if (!open) toggle.focus();
+      },
+    }, '▾') as HTMLButtonElement;
+    fCorners.forEach((inp, i) => {
+      inp.id = `rect-corner-${i}`;
+    });
+    const rows = fCorners.map((inp, i) => h('div', { class: 'form' }, h('label', { for: `rect-corner-${i}` }, t('Ecke {number} (mm)', { number: String(i + 1) })), inp));
+    const pop = h('div', { class: 'toolbar-popup rect-corners-pop', role: 'dialog', 'aria-label': t('Einzelne Eckenradien') }, syncLabel, ...rows);
+    const el = h('span', { class: 'field rect-radius-wrap' }, h('label', {}, t('Radius'), fRad), toggle);
+    const positionPop = () => {
+      const anchor = toggle.getBoundingClientRect();
+      const { width, height } = pop.getBoundingClientRect();
+      const clamp = (v: number, max: number) => Math.max(4, Math.min(v, max - 4));
+      const below = anchor.bottom + 4;
+      const top = below + height > window.innerHeight - 4 && anchor.top - height - 4 >= 4
+        ? anchor.top - height - 4 : below;
+      pop.style.left = `${clamp(anchor.left, window.innerWidth - width)}px`;
+      pop.style.top = `${clamp(top, window.innerHeight - height)}px`;
+    };
+    function refresh() {
+      const list = rects();
+      el.hidden = !(list.length || ed.tool === 'rect');
+      if (el.hidden) open = false;
+      const same = sameTuple();
+      const uniform = same !== null && same[0] === same[1] && same[0] === same[2] && same[0] === same[3];
+      const synced = uniform && !unlocked;
+      syncBox.checked = synced;
+      syncBox.disabled = !list.length;
+      toggle.classList.toggle('on', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) {
+        // The scrollable toolbar would clip a child popup below the row.
+        if (!pop.isConnected) document.body.append(pop);
+        positionPop();
+      } else pop.remove();
+      const bs = sameBind();
+      fCorners.forEach((inp, i) => {
+        inp.disabled = synced || !list.length;
+        if (document.activeElement === inp) return;
+        if (same) setVal(inp, f2(same[i]));
+        else if (!list.length) setVal(inp, f2(ed.rectRadius));
+        else setVal(inp, '');
+      });
+      if (document.activeElement === fRad) return;
+      if (!list.length) {
+        bindField(fRad, 'r', f2(ed.rectRadius), (o) => o.shape.kind === 'rect');
+        fRad.placeholder = '';
+        return;
+      }
+      fRad.placeholder = uniform ? '' : t('Individuell');
+      if (bs === undefined) {
+        // Unterschiedliche Formeln/Bindungen: gemischt anzeigen.
+        fRad.classList.remove('bound');
+        setVal(fRad, '');
+      } else if (uniform && same) {
+        bindField(fRad, 'r', f2(same[0]), (o) => o.shape.kind === 'rect');
+      } else if (bs) {
+        bindField(fRad, 'r', '', (o) => o.shape.kind === 'rect');
+      } else {
+        fRad.classList.remove('bound');
+        setVal(fRad, '');
+      }
+    }
+    syncBox.addEventListener('change', () => {
+      if (syncBox.checked) {
+        // Synchronisieren: gemeinsamer Wert aus dem Radius-Feld, sonst erste Ecke.
+        const raw = fRad.value.trim() !== '' ? fRad.value.replace(',', '.') : NaN;
+        const parsed = Number(raw);
+        const same = sameTuple();
+        const target = Number.isFinite(parsed) && parsed >= 0 ? parsed : same ? same[0] : 0;
+        commitCommon(target);
+      } else {
+        unlocked = true;
+        refresh();
+      }
+    });
+    const onDoc = (e: Event) => {
+      if (!open) return;
+      if (e.target instanceof Node && pop.contains(e.target)) return;
+      if (e.target === toggle) return;
+      open = false;
+      refresh();
+    };
+    document.addEventListener('pointerdown', onDoc, true);
+    const onKey = (e: KeyboardEvent) => {
+      if (open && e.key === 'Escape') {
+        open = false;
+        refresh();
+        toggle.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey, true);
+    const onLayout = (e: Event) => {
+      if (!open || (e.target instanceof Node && pop.contains(e.target))) return;
+      if (toggle.getClientRects().length) positionPop();
+      else { open = false; refresh(); }
+    };
+    window.addEventListener('resize', onLayout);
+    window.addEventListener('scroll', onLayout, true);
+    let lastKey = '';
+    const trackedUpdate = () => {
+      const key = rects().map((o) => o.id).join(',') + `|${ed.tool}`;
+      if (key !== lastKey) {
+        lastKey = key;
+        unlocked = false;
+        open = false;
+      }
+      refresh();
+    };
+    return { el, update: trackedUpdate, dispose() {
+      pop.remove();
+      document.removeEventListener('pointerdown', onDoc, true);
+      document.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('resize', onLayout);
+      window.removeEventListener('scroll', onLayout, true);
     } };
   });
   register('polygon', t('Ecken'), () => ed.tool === 'polygon' || ed.sel.some((o) => o.shape.kind === 'polygon'), () => {
@@ -208,17 +363,24 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
       },
       openManager: () => { if (available()) void openFontManager(ed); },
     });
+    // Fehlende Schrift (#233): Roboto springt still ein — Warnung mit Weg zum Font-Manager
+    const fbWarn = h('button', {
+      type: 'button', class: 'fontpick-fallback', hidden: true,
+      title: '',
+      onclick: () => { if (available()) void openFontManager(ed); },
+    }) as HTMLButtonElement;
     pickers.add(fontPicker);
     const fSize = numInput('small', plain(['size'], (v) => v > 0 && ed.updateTexts({ size: v })), t('Schriftgröße (mm)'), formula('size'));
     const fHs = numInput('small', (v) => ed.updateTexts({ hSpace: v }), t('Zeichenabstand (mm)'));
     const fVs = numInput('small', (v) => ed.updateTexts({ vSpace: v }), t('Zeilenabstand (mm)'));
-    const tog = (label: string, key: 'bold' | 'italic' | 'upper', title: string) => {
+    const tog = (label: string, key: 'bold' | 'italic' | 'upper' | 'rtl', title: string) => {
       const b = h('button', { class: 'toggle', title }, label);
       b.addEventListener('click', () => ed.updateTexts({ [key]: !b.classList.contains('on') } as Partial<TextShape>)); return b;
     };
     const bBold = tog(t('F'), 'bold', t('Fett')); bBold.style.fontWeight = '700';
     const bItal = tog(t('K'), 'italic', t('Kursiv')); bItal.style.fontStyle = 'italic';
     const bUp = tog('AB', 'upper', t('Großbuchstaben'));
+    const bRtl = tog(t('RTL'), 'rtl', t('Schreibrichtung rechts-nach-links (Hebräisch/Arabisch, Best-Effort)'));
     const alignBtns = (['left', 'center', 'right'] as const).map((a) => {
       const b = iconBtn(a === 'left' ? 'alignTextL' : a === 'center' ? 'alignTextC' : 'alignTextR', a === 'left' ? t('Ausrichtung links') : a === 'center' ? t('Ausrichtung mittig') : t('Ausrichtung rechts'), () => ed.updateTexts({ align: a }));
       b.classList.add('toolbar-text-align'); b.dataset.align = a; return b;
@@ -248,7 +410,7 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
     const pathProps = h('span', { class: 'field' }, h('label', {}, t('Versatz'), fPOff), h('label', {}, t('Abstand|Text auf Pfad'), fPDist), bPFlip, bPOff);
     const el = h('div', { class: 'field' },
       h('span', { icon: 'text', class: 'icon-inline', style: 'color: var(--muted)', title: t('Textleiste') }),
-      h('label', {}, t('Schrift'), fontPicker.el), h('label', {}, t('Höhe'), fSize), bBold, bItal, bUp, ...alignBtns, sep(),
+      h('label', {}, t('Schrift'), fontPicker.el), fbWarn, h('label', {}, t('Höhe'), fSize), bBold, bItal, bUp, bRtl, ...alignBtns, sep(),
       h('label', {}, t('Abst. H'), fHs), h('label', {}, 'V', fVs), sep(),
       h('label', {}, t('Max. Breite'), fMaxW), h('label', {}, t('Max. Höhe'), fMaxH), bShrink, bWrap, sep(),
       bWeld, bOnPath, pathProps, bVar, vtProps);
@@ -256,9 +418,16 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
       const ts = ed.selTexts(), tx = ts.length ? ts[0].shape as TextShape : ed.textDefaults;
       el.classList.toggle('group-disabled', !ts.length && ed.tool !== 'text');
       if (!available()) fontPicker.close();
+      // Ersatzschrift-Hinweis (#233): nur bei Auswahl; null = Schrift lädt noch (refresh kommt via onFontLoaded → emit('sel'))
+      const fb = ts.length ? isFallbackFont(tx.font, tx.bold, tx.italic) : null;
+      fbWarn.hidden = fb !== true;
+      if (fb === true) {
+        fbWarn.title = t('Schrift „{font}“ ist nicht installiert — Text wird mit Roboto gezeichnet (Klick: Schriften öffnen)', { font: tx.font });
+        fbWarn.textContent = t('Roboto statt „{font}“', { font: tx.font });
+      }
       fontPicker.sync(tx.font); bindField(fSize, 'size', f2(tx.size), (o) => o.shape.kind === 'text');
       setVal(fHs, f2(tx.hSpace)); setVal(fVs, f2(tx.vSpace));
-      bBold.classList.toggle('on', tx.bold); bItal.classList.toggle('on', tx.italic); bUp.classList.toggle('on', tx.upper);
+      bBold.classList.toggle('on', tx.bold); bItal.classList.toggle('on', tx.italic); bUp.classList.toggle('on', tx.upper); bRtl.classList.toggle('on', !!tx.rtl);
       alignBtns.forEach((b) => b.classList.toggle('on', b.dataset.align === tx.align)); bWeld.classList.toggle('on', !!tx.weld);
       const tvt = ts.length ? (ts[0].shape as TextShape).vt : undefined;
       bVar.classList.toggle('on', !!tvt); bVar.hidden = !ts.length; vtProps.hidden = !tvt;
@@ -295,11 +464,11 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
     const tolerance = h('input', { type: 'number', min: 0.001, max: 100, step: 0.01, 'aria-label': t('Freihandtoleranz in Millimetern'), style: 'width: 7ch' });
     tolerance.addEventListener('change', () => {
       const v = tolerance.valueAsNumber;
-      if (Number.isFinite(v) && v >= 0.001 && v <= 100) { ed.pencilTolerance = v; refresh(); }
+      if (Number.isFinite(v) && v >= 0.001 && v <= 100) { ed.pencilTolerance = v; ed.saveToolOptions(); refresh(); }
       else tolerance.value = String(ed.pencilTolerance);
     });
     const closed = h('input', { type: 'checkbox' });
-    closed.addEventListener('change', () => { ed.pencilClosed = closed.checked; refresh(); });
+    closed.addEventListener('change', () => { ed.pencilClosed = closed.checked; ed.saveToolOptions(); refresh(); });
     const el = h('span', { class: 'field' }, h('label', {}, t('Anpassungstoleranz (mm)'), tolerance), h('label', { class: 'check' }, closed, t('Geschlossener Pfad')));
     return { el, update() { el.hidden = ed.tool !== 'pencil'; setVal(tolerance, String(ed.pencilTolerance)); closed.checked = ed.pencilClosed; } };
   });
@@ -317,7 +486,7 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
   });
   register('shaper', t('Form erkennen'), () => ed.tool === 'shaper', () => {
     const recognize = h('input', { type: 'checkbox' });
-    recognize.addEventListener('change', () => { ed.shaperRecognize = recognize.checked; ed.shaperRebuild(); refresh(); });
+    recognize.addEventListener('change', () => { ed.shaperRecognize = recognize.checked; ed.saveToolOptions(); ed.shaperRebuild(); refresh(); });
     const shaperNum = (get: () => number, min: number, max: number, aria: string, set: (v: number) => void) => {
       const input = h('input', { type: 'number', min, max, step: 0.1, 'aria-label': aria, style: 'width: 7ch' });
       input.addEventListener('change', () => {
@@ -326,9 +495,9 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
         else input.value = String(get());
       }); return input;
     };
-    const close = shaperNum(() => ed.shaperCloseGap, 0.2, 20, t('Schließabstand in Millimetern'), (v) => (ed.shaperCloseGap = v));
-    const smooth = shaperNum(() => ed.shaperSmoothing, 0, 20, t('Glättung in Millimetern'), (v) => (ed.shaperSmoothing = v));
-    const tolerance = shaperNum(() => ed.shaperTolerance, 0.2, 20, t('Schnittbreite in Millimetern'), (v) => (ed.shaperTolerance = v));
+    const close = shaperNum(() => ed.shaperCloseGap, 0.2, 20, t('Schließabstand in Millimetern'), (v) => { ed.shaperCloseGap = v; ed.saveToolOptions(); });
+    const smooth = shaperNum(() => ed.shaperSmoothing, 0, 20, t('Glättung in Millimetern'), (v) => { ed.shaperSmoothing = v; ed.saveToolOptions(); });
+    const tolerance = shaperNum(() => ed.shaperTolerance, 0.2, 20, t('Schnittbreite in Millimetern'), (v) => { ed.shaperTolerance = v; ed.saveToolOptions(); });
     const pick = h('select', { 'aria-label': t('Formvorschlag der letzten Geste') });
     pick.addEventListener('change', () => { const s = ed.shaperEdit; if (!s || !ed.shaperEditValid()) return; s.pick = pick.value as ShaperKind | 'freehand'; ed.shaperRebuild(); });
     const el = h('span', { class: 'field' }, h('label', { class: 'check' }, recognize, t('Form erkennen')), h('label', {}, t('Schließen (mm)'), close), h('label', {}, t('Glättung (mm)'), smooth), h('label', {}, t('Schnittbreite (mm)'), tolerance), pick);
@@ -352,7 +521,7 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
     ];
     const el = h('div', { class: 'field' }, h('span', { icon: 'image', class: 'muted icon-inline' }), info,
       h('button', { class: 'toggle', title: t('Helligkeit, Kontrast, Gamma, Schärfen, Bildmodus'), onclick: () => editorDialogs?.adjust() }, t('Anpassen …')),
-      h('button', { class: 'toggle', title: t('Bild in Vektoren umwandeln (Alt+T)'), onclick: () => editorDialogs?.trace() }, t('Nachzeichnen …')),
+      h('button', { class: 'toggle', title: withShortcut(t('Bild in Vektoren umwandeln'), 'trace'), onclick: () => editorDialogs?.trace() }, t('Nachzeichnen …')),
       h('button', { class: 'toggle', title: t('Hintergrund freistellen: ähnliche Farben werden transparent und nicht gelasert'), onclick: () => openBackgroundDialog(ed) }, t('Freistellen …')), ...cropBtns);
     return { el, update() {
       const imgs = ed.selImages(); el.hidden = !imgs.length;
@@ -379,7 +548,7 @@ export function createEditorToolbarControls(ed: Editor, refresh: () => void): {
     const info = h('span', { class: 'muted' }), icon = h('span', { icon: 'gear', class: 'muted icon-inline' });
     const el = h('div', { class: 'field' }, icon, info,
       h('button', { class: 'toggle', title: t('Parameter ändern, die Kontur wird neu berechnet (Doppelklick)'), onclick: () => ed.selGens()[0] && ed.onGenEdit?.(ed.selGens()[0]) }, t('Parameter …')),
-      h('button', { class: 'toggle', title: t('In gewöhnliche Pfade umwandeln; die Parameter gehen verloren (Ctrl+Shift+C)'), onclick: () => ed.convertSelToPath() }, t('In Pfade umwandeln')));
+      h('button', { class: 'toggle', title: withShortcut(t('In gewöhnliche Pfade umwandeln; die Parameter gehen verloren'), 'tolines'), onclick: () => ed.convertSelToPath() }, t('In Pfade umwandeln')));
     return { el, update() {
       const gens = ed.selGens(); el.hidden = !gens.length;
       if (gens.length) { const gs = gens[0].shape as GenShape; info.textContent = gens.length > 1 ? t('{n} Bauteile', { n: gens.length }) : genLabel(gs); const gi = getGenerator(gs.gen)?.icon ?? ''; setIcon(icon, ICONS[gi] ? gi : 'gear'); }

@@ -10,15 +10,30 @@ import { lassoTouchMode } from '../lasso';
 import { MAX_VECTOR_SAMPLES } from '../vectorFit';
 import { closureOf } from '../shaper';
 import { genLeaves, isMarkGroup } from './generators';
-import { HINGE_HINT_FIRST, HINGE_HINT_SECOND, LASSO_TOUCH_HINT, RULER, SNAP_PX, TOOL_HINTS } from './shared';
+import { HINGE_HINT_FIRST, HINGE_HINT_SECOND, LASSO_TOUCH_HINT, RULER, TOOL_HINTS } from './shared';
+import { DEFAULT_HANDLE_SIZE } from './render';
+import { deformGesture, gestureSpline, hitSpline } from '../shaperSpline';
 import { ARC_MIN_RADIUS, arcPoint, arcSpec, arcSubPath, newArcDraft, snapAngle, type ArcDraft, type ArcMode } from './arc';
 import { OVERLAP_MOVE_PX } from '../overlapPicker';
+import { hitImageCropHandle, pointerCropTo } from '../imageCropUi';
+import { rectCorners } from '../model';
+import { rectRadiusFromLocal } from '../radiusDrag';
 
 const RIGHT_PAN_KEY = 'kizamubeam.rightPan';
 /** Right-drag panning is opt-in: off unless switched on in the settings */
 export function loadRightPan(): boolean {
   try {
     return JSON.parse(localStorage.getItem(RIGHT_PAN_KEY) ?? 'false') === true;
+  } catch {
+    return false;
+  }
+}
+
+const ZOOM_INVERTED_KEY = 'kizamubeam.zoomInverted';
+/** Inverted wheel-zoom direction is opt-in: off unless switched on in the settings */
+export function loadZoomInverted(): boolean {
+  try {
+    return JSON.parse(localStorage.getItem(ZOOM_INVERTED_KEY) ?? 'false') === true;
   } catch {
     return false;
   }
@@ -59,7 +74,7 @@ export class EditorPointer {
 
   onDown(this: Editor, e: PointerEvent) {
     // A second pointer must not replace an in-progress freehand stroke.
-    if (this.drag?.type === 'pencil' || this.drag?.type === 'shaper' || this.drag?.type === 'freehand-edit') return;
+    if (this.drag?.type === 'pencil' || this.drag?.type === 'shaper' || this.drag?.type === 'shaper-point' || this.drag?.type === 'freehand-edit') return;
     if(this.drag?.type==='lasso')return;
     const { sx, sy } = this.evPt(e);
     const wp = this.toWorld(sx, sy);
@@ -111,6 +126,22 @@ export class EditorPointer {
         this.drag = { type: 'builder', last: wp, pointerId: e.pointerId };
         return;
       case 'select': {
+        // Bild-Entwurf (Zuschnitt/Perspektive) fängt seine Griffe vor Auswahl/Skalierung ab.
+        const ih = this.imageDraft?.() ? hitImageCropHandle(this, sx, sy, { all: e.shiftKey }) : null;
+        if (ih) {
+          this.drag = ih.mode === 'crop'
+            ? { type: 'image-crop', mode: 'crop', handle: ih.handle }
+            : ih.mode === 'perspective'
+              ? { type: 'image-crop', mode: 'perspective', handle: ih.index }
+              : { type: 'image-crop', mode: 'rounding', handle: ih.index };
+          return;
+        }
+        if (this.hitRectRadius(sx, sy)) {
+          const o = this.rectRadiusTarget()!;
+          if (o.shape.kind !== 'rect') return;
+          this.drag = { type: 'rect-radius', obj: o, radius: o.shape.r, corners: o.shape.corners ? [...o.shape.corners] as [number, number, number, number] : null, moved: false, redo: this.history.saveRedo() };
+          return;
+        }
         if (this.hitPivot(sx, sy)) {
           this.drag = { type: 'pivot' };
           return;
@@ -145,7 +176,7 @@ export class EditorPointer {
           }
           if (!this.sel.includes(o)) return;
           // Wird an einem Fangpunkt der Auswahl gegriffen, fängt genau dieser Punkt
-          const own = findSnap(buildSnapSet(this.sel, (l) => this.layer(l.layer).show), wp, SNAP_PX / this.view.zoom);
+          const own = findSnap(buildSnapSet(this.sel, (l) => this.layer(l.layer).show), wp, this.snapTol().normal / this.view.zoom);
           this.drag = {
             type: 'move', start: wp, orig: this.sel.map((x) => x.m), moved: false,
             toggleRotate: was && !e.shiftKey && !ctrl, sx, sy,
@@ -220,6 +251,32 @@ export class EditorPointer {
       }
       case 'shaper':
         e.preventDefault();
+        // Sparse Bézier anchors and tangents, never the raw mouse samples.
+        if (this.shaperEditValid()) {
+          const se = this.shaperEdit!;
+          {
+            const stol = Math.max(10, (this.handleSize ?? DEFAULT_HANDLE_SIZE) / 2 + 3) / this.view.zoom;
+            const spline = gestureSpline(se, this.shaperSmoothing);
+            const handle = hitSpline(spline.path, wp, stol);
+            if (handle) {
+              this.clearSnap();
+              const result = this.doc.objs.find((o) => o.id === se.resultId)!;
+              // Boolean operations replace their operands in the document. Keep
+              // those original contours available without snapping to the live cut.
+              const snapSet = this.buildSnap([result]);
+              const originals = buildSnapSet(se.inputs, (o) => this.layer(o.layer).show);
+              snapSet.pts.push(...originals.pts);
+              snapSet.pieces.push(...originals.pieces);
+              snapSet.boxes.push(...originals.boxes);
+              this.drag = { type: 'shaper-point', ...handle, pointerId: e.pointerId, moved: false,
+                original: structuredClone(se), shape: structuredClone(result.shape), mat: [...result.m], snapSet };
+              this.redraw();
+              return;
+            }
+          }
+        }
+        // An existing session is edit-only until the user leaves the tool.
+        if (this.shaperEdit) return;
         this.clearSnap();
         this.shaperCloseHint = null;
         this.drag = { type: 'shaper', points: [wp], pointerId: e.pointerId, overflow: false };
@@ -378,6 +435,16 @@ export class EditorPointer {
     }
   }
 
+  /** Invert the mouse-wheel zoom direction (Edit → Settings → Mouse and keyboard) */
+  setZoomInverted(this: Editor, on: boolean) {
+    this.zoomInverted = on;
+    try {
+      localStorage.setItem(ZOOM_INVERTED_KEY, JSON.stringify(on));
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
   onMove(this: Editor, e: PointerEvent) {
     if(this.drag?.type==='freehand-edit' && this.drag.pointerId!==e.pointerId)return;
     if(this.drag?.type==='lasso'&&this.drag.pointerId!==e.pointerId)return;
@@ -385,6 +452,7 @@ export class EditorPointer {
     const { sx, sy } = this.evPt(e);
     const wp = this.toWorld(sx, sy);
     this.cursor = wp;
+    this.cursorOnCanvas = true;
     const d = this.drag;
     this.emit('view');
     if (!d && this.outlinePreview) {
@@ -420,7 +488,9 @@ export class EditorPointer {
       if (hadSnap) this.redraw();
       if (this.tool === 'select') {
         const h = this.hitHandle(sx, sy);
-        this.canvas.style.cursor = this.hitPivot(sx, sy)
+        this.canvas.style.cursor = this.hitRectRadius(sx, sy)
+          ? 'pointer'
+          : this.hitPivot(sx, sy)
           ? 'move'
           : h >= 0
             ? this.rotateMode
@@ -480,6 +550,28 @@ export class EditorPointer {
         }
         this.redraw(); return;
       }
+      case 'shaper-point': {
+        if (e.pointerId !== d.pointerId) return;
+        const se = this.shaperEdit;
+        if (!this.shaperEditValid() || !se) { this.drag = null; this.redraw(); return; }
+        if (!Number.isFinite(wp.x) || !Number.isFinite(wp.y)) return;
+        // Keep targets stable during rebuilds; the edited result must not snap to itself.
+        const target = this.snapPt(wp, e, { set: d.snapSet });
+        const spline = gestureSpline(se, this.shaperSmoothing);
+        const node = spline.path.nodes[d.index];
+        const handle = d.which === 'p' ? node : node?.[d.which];
+        if (!handle || (handle.x === target.x && handle.y === target.y)) { this.redraw(); return; }
+        const previous = structuredClone(se);
+        deformGesture(se, d, target, this.shaperSmoothing);
+        se.pick = 'freehand';
+        try {
+          if (this.shaperRebuild()) d.moved = true;
+          else this.shaperEdit = previous;
+        } catch {
+          this.shaperEdit = previous;
+        }
+        this.redraw(); return;
+      }
       case 'pencil': {
         if (e.pointerId !== d.pointerId || d.overflow) return;
         const samples = e.getCoalescedEvents?.() ?? [];
@@ -536,8 +628,16 @@ export class EditorPointer {
           ay = fromCenter ? 0.5 : 1 - hy;
         const A = { x: b.x + ax * b.w, y: b.y + ay * b.h };
         const H = { x: b.x + hx * b.w, y: b.y + hy * b.h };
-        let fx = hx === 0.5 || !b.w ? 1 : (wp.x - A.x) / (H.x - A.x);
-        let fy = hy === 0.5 || !b.h ? 1 : (wp.y - A.y) / (H.y - A.y);
+        // Fang nur für Bilder (andere Typen unverändert): Ecken ohne Shift bleiben
+        // seitenverhältnistreu, der Fang wirkt über die dominante Achse.
+        let pw = wp;
+        if (this.sel.length === 1 && (this.sel[0].shape as any)?.kind === 'image') {
+          try {
+            pw = this.snapPt(wp, e as never, { set: this.buildSnap([this.sel[0]]), toggle: true });
+          } catch { /* Fang ist best-effort; ungefangen weiter */ }
+        }
+        let fx = hx === 0.5 || !b.w ? 1 : (pw.x - A.x) / (H.x - A.x);
+        let fy = hy === 0.5 || !b.h ? 1 : (pw.y - A.y) / (H.y - A.y);
         const corner = d.handle % 2 === 0;
         if (corner && !e.shiftKey) {
           const s = Math.abs(fx) > Math.abs(fy) ? fx : fy;
@@ -559,6 +659,45 @@ export class EditorPointer {
         const D = about(scale(clampS(fx), clampS(fy)), A.x, A.y);
         this.sel.forEach((o, i) => (o.m = mul(D, d.orig[i])));
         this.emit('doc');
+        return;
+      }
+      case 'image-crop': {
+        // Einheitlicher, reihenfolge-bewusster Zeigerweg ohne eigene Umrechnung:
+        // cropFirst entzerrt, perspectiveFirst und Perspektiv-Ecken nicht (Griff = Speicher-Frame).
+        const draft = this.imageDraft?.();
+        const target = draft ? this.doc.objs.find((x) => x.id === draft.objId) ?? null : null;
+        if (!draft || !target || target.shape.kind !== 'image') { this.drag = null; return; }
+        const err = pointerCropTo(this, sx, sy, { aspectLock: e.shiftKey, event: e });
+        if (err) { this.hint = err; this.emit('tool'); }
+        return;
+      }
+      case 'rect-radius': {
+        const o = this.rectRadiusTarget();
+        if (!o || o.shape.kind !== 'rect') { this.drag = null; return; }
+        const inverse = inv(o.m);
+        const corner = apply(inverse, wp.x, wp.y);
+        // Roundoff bound in local mm for screen unprojection + inverse affine.
+        // Scale with the actual operands, not a fixed movement/pixel threshold.
+        const screenScale = Math.max(1, Math.abs(e.clientX), Math.abs(e.clientY), Math.abs(sx), Math.abs(sy),
+          Math.abs(this.view.ox), Math.abs(this.view.oy)) / this.view.zoom;
+        const tolerance = 16 * Number.EPSILON * Math.max(1,
+          Math.abs(inverse[0] * wp.x) + Math.abs(inverse[2] * wp.y) + Math.abs(inverse[4]),
+          Math.abs(inverse[1] * wp.x) + Math.abs(inverse[3] * wp.y) + Math.abs(inverse[5]),
+          screenScale * Math.max(Math.abs(inverse[0]) + Math.abs(inverse[2]), Math.abs(inverse[1]) + Math.abs(inverse[3])));
+        let r = rectRadiusFromLocal(corner.x, corner.y, o.shape.w, o.shape.h);
+        const cur = o.shape.corners ? Math.max(...rectCorners(o.shape)) : o.shape.r;
+        if (Math.abs(r - d.radius) <= tolerance) r = d.radius;
+        else if (Math.abs(r - cur) <= tolerance) r = cur;
+        if (r !== cur) {
+          if (!d.moved) this.snapshot(t('Form-Eigenschaften'));
+          // Ziehen legt den gemeinsamen Radius fest (Einzelradien werden synchronisiert).
+          delete o.shape.corners;
+          o.shape.r = r;
+          this.touch(o.shape);
+          d.moved = true;
+          this.hint = `${t('Eckenradius')}: ${r.toFixed(1)} mm`;
+          this.emit('doc');
+        }
         return;
       }
       case 'rotate': {
@@ -745,6 +884,7 @@ export class EditorPointer {
     // Ignore unrelated releases before clearing the active drag. In particular,
     // a second touch/pen can otherwise make a Pencil stroke silently disappear.
     if (this.drag && 'pointerId' in this.drag && this.drag.pointerId !== e.pointerId) return;
+    if (this.drag?.type === 'shaper-point') this.onMove(e);
     if (this.tool === 'sketch') this.sketchUp();
     const d = this.drag;
     this.drag = null;
@@ -762,6 +902,7 @@ export class EditorPointer {
         if (e.pointerId !== d.pointerId || d.overflow) return;
         const p = this.evPt(e), end = this.toWorld(p.sx, p.sy);
         if (Number.isFinite(end.x) && Number.isFinite(end.y) && d.points.length < MAX_VECTOR_SAMPLES) d.points.push(end);
+        if (this.shaperEdit) return;
         void this.finishShaper(d.points);
         return;
       }
@@ -817,6 +958,26 @@ export class EditorPointer {
         this.hint = '';
         this.emit('sel');
         return;
+      case 'rect-radius': {
+        // onMove snaps roundoff-close backtracking to the exact original value.
+        const same = (a: readonly number[] | null | undefined, b: readonly number[] | null | undefined) =>
+          (a ?? null) === null ? (b ?? null) === null : (b ?? null) !== null
+            && (a as readonly number[]).length === (b as readonly number[]).length
+            && (a as readonly number[]).every((v, i) => v === (b as readonly number[])[i]);
+        if (d.moved && d.obj.shape.kind === 'rect' && d.obj.shape.r === d.radius
+          && same(d.obj.shape.corners, d.corners)) {
+          this.dropSnapshot();
+          this.history.restoreRedo(d.redo);
+        }
+        this.hint = '';
+        this.emit('sel');
+        return;
+      }
+      case 'image-crop':
+        // Entwurf bleibt aktiv (kein Snapshot, kein Anwenden bei Pointer-Down/Up).
+        this.drag = null;
+        this.redraw();
+        return;
       case 'marquee': {
         const r = normBox(d.start, d.end);
         if (r.w * this.view.zoom < 3 && r.h * this.view.zoom < 3) {
@@ -845,7 +1006,7 @@ export class EditorPointer {
         this.hint = '';
         if (d.obj) {
           this.emit('doc');
-          this.setTool('select');
+          if (this.selectAfterDraw ?? true) this.setTool('select');
           this.setSel([d.obj]);
         }
         return;
@@ -965,7 +1126,10 @@ export class EditorPointer {
     e.preventDefault();
     if (e.ctrlKey && pinchGestureActive(this.canvas)) return;
     const { sx, sy } = this.evPt(e);
-    if (e.deltaY) this.zoomAt(canvasWheelFactor(e, Math.log(1.0015)), sx, sy);
+    if (e.deltaY) {
+      const factor = canvasWheelFactor(e, Math.log(1.0015));
+      this.zoomAt(this.zoomInverted && factor > 0 ? 1 / factor : factor, sx, sy);
+    }
   }
 
   newShape(this: Editor): Shape {
@@ -1055,6 +1219,7 @@ export class EditorPointer {
       this.arcDraft = null;
       this.hint = TOOL_HINTS.arc;
     }
+    this.saveToolOptions();
     if (this.arcDraft) this.arcHint(this.arcDraft);
     this.redraw();
     this.emit('tool');
@@ -1086,7 +1251,7 @@ export class EditorPointer {
     const o: Obj = { id: newId(), m: IDENT, layer: this.currentLayer, shape: { kind: 'path', subs: [{ nodes: sub.nodes, closed: false }] } };
     this.doc.objs.push(o);
     this.emit('doc');
-    this.setTool('select');
+    if (this.selectAfterDraw ?? true) this.setTool('select');
     this.setSel([o]);
     return true;
   }
@@ -1108,7 +1273,7 @@ export class EditorPointer {
     const o: Obj = { id: newId(), m: IDENT, layer: this.currentLayer, shape: { kind: 'path', subs: [d] } };
     this.doc.objs.push(o);
     this.emit('doc');
-    this.setTool('select');
+    if (this.selectAfterDraw ?? true) this.setTool('select');
     this.setSel([o]);
   }
 
@@ -1123,7 +1288,26 @@ export class EditorPointer {
     const d = this.drag;
     if (!d) return;
     this.drag = null;
-    if (d.type === 'move' || d.type === 'scale' || d.type === 'rotate') {
+    if (d.type === 'shaper-point') {
+      if (this.shaperEditValid() && this.shaperEdit) {
+        const result = this.doc.objs.find((o) => o.id === this.shaperEdit!.resultId)!;
+        this.shaperEdit = d.original;
+        result.shape = d.shape;
+        result.m = d.mat;
+        this.touch(result.shape);
+        this.emit('doc');
+        this.emit('tool');
+      }
+    } else if (d.type === 'rect-radius') {
+      if (d.moved && d.obj.shape.kind === 'rect') {
+        d.obj.shape.r = d.radius;
+        if (d.corners) d.obj.shape.corners = [...d.corners] as [number, number, number, number];
+        else delete d.obj.shape.corners;
+        this.touch(d.obj.shape);
+        this.dropSnapshot();
+        this.history.restoreRedo(d.redo);
+      }
+    } else if (d.type === 'move' || d.type === 'scale' || d.type === 'rotate') {
       this.sel.forEach((o, i) => (o.m = d.orig[i]));
       if (d.type !== 'move' || d.moved) this.dropSnapshot();
     } else if (d.type === 'guide') {

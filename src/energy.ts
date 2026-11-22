@@ -1,4 +1,5 @@
 import type { Estimate, Job, Moves } from './gcode';
+import { dwellSeconds } from './gcode';
 import { t } from './i18n';
 
 export type OperatingRule = 'job' | 'laser' | 'air';
@@ -28,28 +29,53 @@ export function energyDraft(value?: EnergySettings): EnergySettings {
 export function electricityTariffText(): string {
   try { return localStorage.getItem('kizamubeam.electricityTariff') ?? ''; } catch { return ''; }
 }
-/** ISO-4217-Auswahl für die Kostenanzeige; Default EUR, Fallback bei unbekanntem Wert. */
+/** Vorschläge für die frei eingebbare Währung der Kostenanzeige; Vorgabe EUR. */
 export const ELECTRICITY_CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'PLN', 'CZK', 'SEK', 'JPY'] as const;
-export type ElectricityCurrency = typeof ELECTRICITY_CURRENCIES[number];
+/** Jede eingebbare Währungsbezeichnung: ISO-Code oder eigene Kennzeichnung, höchstens 16 Zeichen. */
+export type ElectricityCurrency = string;
+export const ELECTRICITY_CURRENCY_MAX_LENGTH = 16;
+/** Leer → EUR; umgebende Leerzeichen weg; dreibuchstabige Codes groß (chf → CHF). */
+export function normalizeElectricityCurrency(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return 'EUR';
+  return /^[A-Za-z]{3}$/.test(trimmed) ? trimmed.toUpperCase() : trimmed;
+}
+/** Live-Variante für die Eingabe: erhält Leer, damit das Feld löschbar bleibt (Speichern mappt leer → EUR). */
+export function normalizeElectricityCurrencyInput(value: string): string {
+  return value.trim() ? normalizeElectricityCurrency(value) : value;
+}
+/** Zur Laufzeit bekannte ISO-4217-Codes; auf älteren Laufzeiten die acht Vorschläge. */
+function isoCurrencyCodes(): readonly string[] {
+  try {
+    const supported = (Intl as unknown as { supportedValuesOf?: (key: string) => unknown }).supportedValuesOf?.('currency');
+    if (Array.isArray(supported) && supported.length > 0 && supported.every((code): code is string => typeof code === 'string')) return supported;
+  } catch { /* ältere Laufzeit ohne supportedValuesOf: Vorschläge unten */ }
+  return ELECTRICITY_CURRENCIES;
+}
 export function electricityCurrency(): ElectricityCurrency {
   try {
-    const v = localStorage.getItem('kizamubeam.electricityCurrency');
-    if ((ELECTRICITY_CURRENCIES as readonly string[]).includes(v ?? '')) return v as ElectricityCurrency;
+    const stored = localStorage.getItem('kizamubeam.electricityCurrency');
+    if (stored !== null && stored.trim() !== '') return normalizeElectricityCurrency(stored);
   } catch { /* storage unavailable */ }
   return 'EUR';
 }
 export function setElectricityCurrency(value: string): void {
-  if (!(ELECTRICITY_CURRENCIES as readonly string[]).includes(value)) {
-    throw new Error(t('Unbekannte Währung. Wählen Sie eine der angebotenen Währungen.'));
+  const normalized = normalizeElectricityCurrency(value);
+  if (normalized.length > ELECTRICITY_CURRENCY_MAX_LENGTH) {
+    throw new Error(t('Die Währungsangabe ist zu lang. Geben Sie höchstens 16 Zeichen ein.'));
   }
-  try { localStorage.setItem('kizamubeam.electricityCurrency', value); } catch { /* storage unavailable */ }
+  try { localStorage.setItem('kizamubeam.electricityCurrency', normalized); } catch { /* storage unavailable */ }
 }
-/** Kosten betragssprachig formatieren, mit Fallback ohne Intl. */
+/** Kosten betragssprachig formatieren: ISO-Codes mit Intl, eigene Kennzeichnungen als Klartext. */
 export function formatCost(value: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat(document.documentElement.lang || undefined,
-      { style: 'currency', currency }).format(value);
-  } catch { return `${value.toFixed(2)} ${currency}`; }
+  const code = normalizeElectricityCurrency(currency);
+  if (isoCurrencyCodes().includes(code)) {
+    try {
+      return new Intl.NumberFormat(document.documentElement.lang || undefined,
+        { style: 'currency', currency: code }).format(value);
+    } catch { /* fällt unten auf Klartext zurück */ }
+  }
+  return `${value.toFixed(2)} ${code}`;
 }
 export function setElectricityTariffText(value: string): void {
   if (value.trim() && parseEnergyNumber(value) === null) {
@@ -73,17 +99,24 @@ export interface EnergyComponent {
   kWh: number | null;
 }
 export function estimateEnergy(moves: Moves, timing: Estimate, air: Job['air'], settings: EnergySettings) {
-  const durations = { job: timing.total, laser: 0, air: 0 };
+  // Pausen stehen in der Zeitschätzung, zählen aber nicht in der Energie: Anstechleistung im
+  // Stillstand und Grundverbrauch während Pausen sind nicht modelliert (Energie bleibt bewegungsbasiert).
+  let dwellSum = 0;
+  const durations = { job: 0, laser: 0, air: 0 };
   const airLayers = new Set(air);
   const laserValid = settings.laserWatts.every(validWatts);
   let laserWs = 0;
   for (let i = 0; i < moves.n; i++) {
-    const seconds = timing.t[i] - (i ? timing.t[i - 1] : 0);
+    const dw = dwellSeconds(moves, i, timing);
+    const seconds = Math.max(0, timing.t[i] - (i ? timing.t[i - 1] : 0) - dw);
+    dwellSum += dw;
     const power = moves.f[i] > 0 ? moves.s[i] : 0;
     if (power > 0) durations.laser += seconds;
     if (airLayers.has(moves.layer[i])) durations.air += seconds;
     if (laserValid) laserWs += seconds * laserElectricalWatts(power, settings.laserWatts as [number, number, number]);
   }
+  dwellSum += dwellSeconds(moves, moves.n, timing);
+  durations.job = Math.max(0, timing.total - dwellSum);
   const components: EnergyComponent[] = [
     { name: 'base', included: true, kWh: validWatts(settings.baseWatts) ? settings.baseWatts * durations.job / 3600000 : null },
     { name: 'laser', included: true, kWh: laserValid ? laserWs / 3600000 : null },

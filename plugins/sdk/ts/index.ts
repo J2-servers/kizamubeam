@@ -67,7 +67,8 @@ export interface GenResult {
   distribute?: { rotate?: boolean };
   /**
    * Where each part sits in space for the 3D view, by part key: a point (x, y) of the outline at height s lies at
-   * o + x·u + y·v + s·n (mm; X right, Y back, Z up)
+   * o + x·u + y·v + s·n (mm; X right, Y back, Z up). The face that lies up on the work area (cut and engraved) faces
+   * −(u×v): for outer parts of a box it should point out of the box (#463).
    */
   poses?: { poses: Record<string, Pose>; spin?: Record<string, number> };
 }
@@ -387,9 +388,13 @@ export type JointAnswer =
 export interface MaterialContext {
   name: string | null;
   thickness: number | null;
-  /** Calibrated kerf width, play per side for two parts fitted together, slot width over the thickness */
+  /** Calibrated kerf width */
   kerf: number | null;
+  /** Calibrated play per side for two parts fitted together. Deprecated: use pairPlayTotal (the play is the total play of the joint since #402) */
   pairPlay: number | null;
+  /** Calibrated total play (both sides together) for two parts fitted together, the meaning of `clearance` in `host.joints` with `"v": 2` */
+  pairPlayTotal: number | null;
+  /** Calibrated slot width over the thickness */
   slotPlay: number | null;
 }
 /** host.context("workArea"): the machine's work area in mm */

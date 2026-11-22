@@ -1,7 +1,7 @@
 // Editor: Auswahl automatisch verschachteln (Nesting) – Teile bestimmen, Platte wählen, Ergebnis anwenden.
 import ClipperLib from 'clipper-lib';
 import type { Editor } from '../editor';
-import { cloneObj, isCutLayer, leaves, Mat, mul, newId, Obj, Pt, SubPath } from '../model';
+import { cloneObj, leaves, Mat, mul, newId, Obj, Pt, shapeCutsThrough, SubPath } from '../model';
 import { shapeSubs, textLayout, textOutline } from '../geom';
 import { execute, flattenSub, Paths, SCALE } from '../clip';
 import { autoCell, DEFAULT_NEST, leftover, nestSteps, NestResult, Poly, regionArea } from '../nest';
@@ -159,7 +159,8 @@ export class EditorNest {
         if (sp.closed && p.length >= 3) closed.push(p);
         else if (p.length >= 2) open.push(p);
       }
-      const isCut = isCutLayer(this.layer(leaf.layer)) && s.kind !== 'image';
+      // Gravur- und Markierungs-Layer (#265) schneiden nicht: ihre Formen sind Gravuren, auch geschlossene
+      const isCut = shapeCutsThrough(leaf, this.layer(leaf.layer)) && s.kind !== 'image';
       if (isCut) cut.push(...closed);
       else if (closed.length) solid.push(...execute(ClipType.ctUnion, closed, [], PolyFillType.pftEvenOdd));
       if (open.length) {
@@ -192,7 +193,7 @@ export class EditorNest {
     const foot = own.map((p) => outersOnly(p));
     const area = foot.map(areaOf);
     const box = foot.map(boxOf);
-    const isCut = objs.map((o) => [...leaves([o])].some(([l]) => isCutLayer(this.layer(l.layer)) && l.shape.kind !== 'image' && l.shape.kind !== 'text'));
+    const isCut = objs.map((o) => [...leaves([o])].some(([l]) => shapeCutsThrough(l, this.layer(l.layer)) && l.shape.kind !== 'image' && l.shape.kind !== 'text'));
     const touches = (i: number, j: number) => !(box[i].x1 < box[j].x0 || box[j].x1 < box[i].x0 || box[i].y1 < box[j].y0 || box[j].y1 < box[i].y0);
     const inter = (i: number, j: number) => (touches(i, j) ? areaOf(execute(ClipType.ctIntersection, foot[i], foot[j], PolyFillType.pftNonZero)) : 0);
     const parent = objs.map((_, i) => i);

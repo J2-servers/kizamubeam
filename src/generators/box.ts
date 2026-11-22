@@ -10,7 +10,7 @@ import type { Pt, SubPath } from '../model';
 import { t, locale } from '../i18n';
 import type { Generator, GenPart, Issue, Params } from './types';
 import { layoutParts } from './build';
-import { neg, pose, X, Y, Z, type Pose } from './pose';
+import { neg, pose, X, Y, Z, type Pose, type V3 } from './pose';
 import { fieldCount, panelCut, type EdgeSpec, type PanelSpec, type Pattern } from './panelJoints';
 
 export { cleanup, fieldCount, offsetOrtho } from './panelJoints';
@@ -57,8 +57,7 @@ export function panelPolys(p: BoxParams): { key: string; a: number; b: number; p
     key: panel.key,
     a: panel.a,
     b: panel.b,
-    // The box's clearance is still per side: total play twice that (#402)
-    pts: panelCut(panel, p.thickness, p.finger, 2 * p.clearance, p.kerf),
+    pts: panelCut(panel, p.thickness, p.finger, p.clearance, p.kerf),
   }));
 }
 
@@ -71,29 +70,37 @@ const PART_NAMES: Record<string, () => string> = {
   right: () => t('Seitenwand rechts'),
 };
 
-/** Box: Boden auf Z = 0, Vorderwand bei Y = 0, linke Wand bei X = 0 */
-export function boxPoses(p: BoxParams): Record<string, Pose> {
+/** The box parts that lie on the work area seen from outside only since #463 (see boxPoses) */
+export const TURNED_OVER = ['top', 'back', 'left'];
+
+/**
+ * Box: Boden auf Z = 0, Vorderwand bei Y = 0, linke Wand bei X = 0. Every outer part lies outer face up on the work
+ * area (#463): back, left and top are seen from outside, so their x runs the other way (their outlines are symmetric
+ * in x). legacy: the orientation before #463 (back, left and top inner face up), for saved parts that are not.
+ */
+export function boxPoses(p: BoxParams, legacy = false): Record<string, Pose> {
   const { W, D, H } = boxOuter(p);
   const th = p.thickness;
   const down = neg(Z);
+  const turn = (a: V3) => (legacy ? a : neg(a));
   return {
     bottom: pose([W / 2, D / 2, 0], X, Y, Z),
-    top: pose([W / 2, D / 2, H - th], X, Y, Z),
+    top: pose([W / 2, D / 2, H - th], turn(X), Y, Z),
     front: pose([W / 2, 0, H / 2], X, down, Y),
-    back: pose([W / 2, D - th, H / 2], X, down, Y),
-    left: pose([0, D / 2, H / 2], Y, down, X),
+    back: pose([W / 2, D - th, H / 2], turn(X), down, Y),
+    left: pose([0, D / 2, H / 2], turn(Y), down, X),
     right: pose([W - th, D / 2, H / 2], Y, down, X),
   };
 }
 
 export const BOX: Generator = {
   id: 'box',
-  version: 2,
+  version: 3,
   kind: 'assembly',
   name: t('Box'),
   icon: 'box',
   poses: (p) => ({ poses: boxPoses({ ...(p as unknown as BoxParams), kerf: 0 }) }),
-  fit: { kind: 'pair', play: 'clearance' },
+  fit: { kind: 'pair', play: 'clearance', total: true },
   assemblyCheck: true,
   tile: {
     group: 'box',
@@ -114,11 +121,12 @@ export const BOX: Generator = {
     { key: 'thickness', type: 'length', label: t('Materialdicke'), min: 0.3, max: 50, def: 3 },
     { key: 'top', type: 'enum', label: t('Oben'), def: 'open', options: [['open', t('Offen')], ['closed', t('Geschlossen (Deckel mit Zinken)')]] },
     { key: 'finger', type: 'length', label: t('Zinkenbreite'), min: 0.5, max: 500, def: 10, title: t('Mindestbreite der Zinken; jede Kante bekommt eine ungerade Zahl gleich breiter Zinken') },
-    { key: 'clearance', type: 'length', label: t('Steckspiel'), min: -1, max: 2, def: 0, title: t('Jede Zinke wird um so viel schmaler; negativ = Presspassung') },
+    { key: 'clearance', type: 'length', label: t('Steckspiel gesamt'), min: -2, max: 4, def: 0, playTotal: true, title: t('Gesamtspiel der Zinken: Lücke minus Zinke, auf beide Seiten verteilt; negativ = Presspassung') },
     { key: 'kerf', type: 'length', label: t('Schnittfuge (Kerf)'), min: 0, max: 2, def: 0.15, title: t('Breite des Laserschnitts: Die Kontur wird um die Hälfte nach außen versetzt, damit die Teile die Sollmaße haben. Der Kerf des Layers wirkt beim Lasern zusätzlich.') },
   ],
   // Saved boxes keep their row layout; new boxes are nested compactly.
-  migrate(p, from) { return from < 2 ? { ...p, partLayout: 'rows' } : p; },
+  // 2: saved boxes keep their row layout; 3 (#402): the clearance was per side, now it is the total play
+  migrate(p, from) { return { ...p, ...(from < 2 ? { partLayout: 'rows' } : {}), ...(from < 3 ? { clearance: 2 * Number(p.clearance ?? 0) } : {}) }; },
   validate(raw) {
     const p = P(raw);
     const out: Issue[] = [];
@@ -127,7 +135,7 @@ export const BOX: Generator = {
     const minSide = Math.min(W, D, H);
     if (minSide <= 4 * th) out.push({ key: 'thickness', level: 'error', msg: t('Die Platten sind zu dick für diese Maße (jede Seite braucht mehr als die vierfache Materialdicke).') });
     if (p.finger < th) out.push({ key: 'finger', level: 'warn', msg: t('Zinken schmaler als die Materialdicke brechen leicht.') });
-    if (Math.abs(p.clearance) >= p.finger / 4) out.push({ key: 'clearance', level: 'error', msg: t('Das Steckspiel ist zu groß für diese Zinkenbreite.') });
+    if (Math.abs(p.clearance) >= p.finger / 2) out.push({ key: 'clearance', level: 'error', msg: t('Das Steckspiel ist zu groß für diese Zinkenbreite.') });
     if (minSide - 2 * th < p.finger) out.push({ key: 'finger', level: 'warn', msg: t('Die Zinken sind breiter als die kürzeste Kante: Dort gibt es nur eine Zinke.') });
     return out;
   },
@@ -146,7 +154,7 @@ export const BOX: Generator = {
       let x = -rowW[ri] / 2;
       const y0 = -totalH / 2 + (ri ? rowH[0] + gap : 0);
       for (const panel of r) {
-        const sub: SubPath = { closed: true, nodes: panelCut(panel, th, p.finger, 2 * p.clearance, p.kerf) };
+        const sub: SubPath = { closed: true, nodes: panelCut(panel, th, p.finger, p.clearance, p.kerf) };
         parts.push({ key: panel.key, subs: [sub], at: { x: x + panel.a / 2, y: y0 + panel.b / 2 } });
         x += panel.a + gap;
       }

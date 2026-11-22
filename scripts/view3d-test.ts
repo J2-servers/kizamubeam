@@ -16,6 +16,7 @@ import type { Obj, Mate } from '../src/model';
 import type { JointOptions } from '../src/joints';
 const { loadDoc, IDENT } = await import('../src/model');
 const { collectScene } = await import('../src/view3d/panel');
+const { computeBlueprintLayout, computeOrthoScale } = await import('../src/view3d/blueprint');
 
 let failed = 0;
 function test(name: string, fn: () => void) {
@@ -886,6 +887,45 @@ test('Rohplatte: Teile darauf bleiben Teile, die Platte bekommt Löcher; die Anz
   assert.deepEqual(collectScene(ed, 3, false).loose, [], 'Gravur auf der Platte ist nicht lose');
   assert.deepEqual(off.loose, [], 'auch nicht, wenn die Platte ausgeblendet ist');
   assert.deepEqual(collectScene({ ...ed, sel: [engr] } as never, 3, false, undefined, false).loose, [], 'auch nicht, wenn nur die Gravur gewählt ist');
+});
+
+test('Darstellungsmodus Layer-Farben: collectScene übernimmt die Layer-Farbe für jedes Teil', () => {
+  const rect = (id: number, layer: number, x: number, y: number): Obj => ({ id, m: [1, 0, 0, 1, x, y], layer, shape: { kind: 'rect', w: 20, h: 20, r: 0 } });
+  const a = rect(1, 0, 0, 0), b = rect(2, 2, 40, 0);
+  const doc = loadDoc({ version: 2, bed: { w: 300, h: 200 }, page: 0, layers: {}, pages: [{ name: 'A', objs: [a, b] }] });
+  const colors = ['#112233', '#445566', '#cc3311'];
+  const ed = {
+    doc,
+    sel: [],
+    layer: () => ({ mode: 'line', output: true, show: true, material: undefined }),
+    layerDrawColor: (i: number) => colors[i] ?? '#000000',
+  } as never;
+  const solids = collectScene(ed, 3, false).scene.solids;
+  assert.equal(solids.length, 2);
+  assert.deepEqual(solids.map((s) => s.layerColor).sort(), ['#112233', '#cc3311']);
+});
+
+test('Blueprint-Layout: 4 Ansichten ohne Überlappung und einheitlicher Orthografik-Maßstab', () => {
+  const layout = computeBlueprintLayout(800, 600);
+  assert.equal(layout.iso.w, 800);
+  assert.equal(layout.iso.y, 0);
+  assert.equal(layout.front.x, 0);
+  assert.equal(layout.front.y, layout.iso.h);
+  assert.equal(layout.front.h, 600 - layout.iso.h);
+  assert.equal(layout.top.x, layout.front.w);
+  assert.equal(layout.side.x, layout.front.w);
+  assert.equal(layout.top.y, layout.front.y);
+  assert.equal(layout.side.y, layout.top.y + layout.top.h);
+  assert.equal(layout.top.h + layout.side.h, layout.front.h);
+  assert.equal(layout.front.w + layout.top.w, 800);
+
+  // Einheitlicher Maßstab: das größte Projektionsmaß passt mit Rand in alle 3 Ortho-Ansichten
+  const size = { x: 200, y: 120, z: 80 };
+  const s = computeOrthoScale(size, layout);
+  assert.ok(s > 0);
+  assert.ok(size.x * s <= layout.front.w * 0.65 && size.z * s <= layout.front.h * 0.65);
+  assert.ok(size.x * s <= layout.top.w * 0.65 && size.y * s <= layout.top.h * 0.65);
+  assert.ok(size.y * s <= layout.side.w * 0.65 && size.z * s <= layout.side.h * 0.65);
 });
 
 if (failed) {

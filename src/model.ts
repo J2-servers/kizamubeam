@@ -1,4 +1,6 @@
 import { t } from './i18n';
+import type { ImageCrop, ImageQuad } from './imageGeometry';
+import type { ImageCut, ImageCutLink } from './imageCut';
 import type { ProjectParam } from './params';
 import type { SeriesTable, TemplateInfo } from './templates';
 import { conditionHolds } from './params';
@@ -35,8 +37,66 @@ export interface SubPath {
   start?: boolean;
 }
 
+export type RectCorners = [number, number, number, number];
+
+/** Reihenfolge der Einzelradien: [oben-links, oben-rechts, unten-rechts, unten-links] in lokalen mm (y nach unten). */
+export type RectShape = { kind: 'rect'; w: number; h: number; r: number; corners?: RectCorners };
+
+/** Effektive Einzelradien eines Rechtecks: corners oder viermal der gemeinsame Radius. */
+export function rectCorners(s: Pick<RectShape, 'r' | 'corners'>): RectCorners {
+  const c = s.corners;
+  if (c && c.length === 4 && c.every((v) => typeof v === 'number' && Number.isFinite(v) && v >= 0))
+    return [c[0], c[1], c[2], c[3]];
+  const r = typeof s.r === 'number' && Number.isFinite(s.r) && s.r > 0 ? s.r : 0;
+  return [r, r, r, r];
+}
+
+/** True, wenn alle vier Ecken denselben Radius haben (gemeinsamer Radius, Checkbox an). */
+export function isRectSynced(s: Pick<RectShape, 'r' | 'corners'>): boolean {
+  const c = rectCorners(s);
+  return c[0] === c[1] && c[0] === c[2] && c[0] === c[3];
+}
+
+/** Einzelradien auf 0..min(|w|,|h|)/2 klemmen; ungültige werden 0. */
+export function clampRectCorners(corners: readonly number[], w: number, h: number): RectCorners {
+  const limit = Math.min(Math.abs(w), Math.abs(h)) / 2;
+  const lim = Number.isFinite(limit) && limit > 0 ? limit : 0;
+  const cl = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? Math.min(lim, Math.max(0, v)) : 0);
+  return [cl(corners[0]), cl(corners[1]), cl(corners[2]), cl(corners[3])];
+}
+
+/** Rechteck normalisieren: r und corners endlich/clampen; einheitliche corners fallen weg (r trägt sie). */
+export function normalizeRect(s: RectShape): void {
+  const w = s.w, h = s.h;
+  const r = typeof s.r === 'number' && Number.isFinite(s.r) && s.r >= 0 ? s.r : 0;
+  if (s.corners !== undefined) {
+    if (!Array.isArray(s.corners) || s.corners.length !== 4) {
+      delete s.corners;
+      s.r = clampRectCorners([r, r, r, r], w, h)[0];
+      return;
+    }
+    const c = clampRectCorners(s.corners, w, h);
+    if (c[0] === c[1] && c[0] === c[2] && c[0] === c[3]) {
+      delete s.corners;
+      s.r = c[0];
+    } else {
+      s.corners = c;
+      // r bleibt für ältere Versionen lesbar (erste Ecke als Vertreter).
+      s.r = c[0];
+    }
+  } else {
+    s.r = clampRectCorners([r, r, r, r], w, h)[0];
+  }
+}
+
+/** Alle Rechtecke eines Objektbaums normalisieren (Datei-Migration alter Dokumente mit nur r). */
+export function normalizeRectsDeep(o: Obj): void {
+  if (o.shape.kind === 'rect') normalizeRect(o.shape);
+  else if (o.shape.kind === 'group') o.shape.children.forEach(normalizeRectsDeep);
+}
+
 export type Shape =
-  | { kind: 'rect'; w: number; h: number; r: number }
+  | RectShape
   | { kind: 'ellipse'; rx: number; ry: number }
   | { kind: 'polygon'; sides: number; r: number; star: boolean; inner: number }
   /** mark: Gravur eines Generator-Teils („Baugruppe/Teil“), wird mit dem Teil neu berechnet */
@@ -88,7 +148,23 @@ export interface ImageAdjust {
 
 export const DEFAULT_ADJUST: ImageAdjust = { brightness: 0, contrast: 0, gamma: 1, sharpen: 0, sharpenRadius: 1, denoise: 0 };
 
-/** Rasterbild. Lokale Fläche 0..w × 0..h in mm; die Bilddaten liegen im Asset-Speicher (images.ts). */
+/** Reihenfolge von Zuschnitt und Perspektive je Bild: cropFirst (Standard, auch bei fehlendem Feld)
+ *  wählt im Original aus, perspectiveFirst schneidet achsparallel auf dem entzerrten Ergebnis zu. */
+export type ImageEditOrder = 'cropFirst' | 'perspectiveFirst';
+
+/** Nondestructive geometry; neither field changes the original asset or dimensions. */
+export interface ImageEdit {
+  /** Normalized source axes (cropFirst) or result-frame axes (perspectiveFirst). */
+  crop?: ImageCrop;
+  /** Full original rectangle's TL/TR/BR/BL destinations in original image-local mm, before crop. */
+  perspective?: ImageQuad;
+  /** Application order; absent (including all legacy files) means cropFirst. */
+  order?: ImageEditOrder;
+  /** Tangent radii in final world mm, in visible contour order; unused entries are retained. */
+  cornerRadii?: readonly number[];
+}
+
+/** Rasterbild. Originalfläche 0..w × 0..h in mm; die Bilddaten liegen im Asset-Speicher (images.ts). */
 export interface ImageShape {
   kind: 'image';
   asset: string;
@@ -99,6 +175,9 @@ export interface ImageShape {
   pxH: number;
   name?: string;
   adjust: ImageAdjust;
+  edit?: ImageEdit;
+  /** Optionale Schnittkontur (Modus und ggf. verknüpfte Vektorkontur). */
+  cut?: ImageCutLink;
 }
 
 export type DitherMode = 'threshold' | 'ordered' | 'atkinson' | 'floyd' | 'stucki' | 'jarvis' | 'newsprint' | 'halftone' | 'sketch' | 'grayscale';
@@ -144,6 +223,8 @@ export interface ImageLayer {
   angle: number;
   /** Schwellwert-Verfahren: Grenze 0 … 255 */
   threshold: number;
+  /** Eigene Schnittparameter je Bildlayer; ohne Feld bleibt der Schnitt aus. */
+  cut?: ImageCut;
 }
 
 /** Verfahren mit veränderlicher Leistung (Min. bis Max.); alle anderen brennen mit Max. oder gar nicht */
@@ -217,6 +298,8 @@ export interface TextShape {
   hSpace: number;
   /** zusätzlicher Zeilenabstand in mm */
   vSpace: number;
+  /** Schreibrichtung rechts-nach-links (Hebräisch/Arabisch); Best-Effort ohne arabische Buchstaben-Verbindung */
+  rtl?: boolean;
   /** Buchstaben schweißen: überlappende Glyphen zu einer Kontur verschmelzen */
   weld?: boolean;
   /** Text auf Pfad: die Grundlinie folgt dieser Kurve */
@@ -321,6 +404,8 @@ export interface Obj {
   /** Not lasered (still drawn, faded): e.g. a part that is already cut or parked for later.
    * Schließt die Laser-Ausgabe immer aus, auch bei sichtbarem Objekt und eingeschalteter Ausgabe. */
   noLaser?: boolean;
+  /** Rückverweis der Schnittkontur auf ihr Bild; prevNoLaser sichert den Zustand vor der Zuordnung. */
+  cutLink?: { imageId: number; prevNoLaser: boolean };
   /** Mit dem Verbindungs-Werkzeug angelegte Verbindungen zu anderen Teilen (für die 3D-Ansicht) */
   mates?: Mate[];
   /** Formeln mit Projekt-Parametern für Lage, Größe, Drehung und Formmaße (nur oberste Ebene) */
@@ -382,11 +467,23 @@ export interface Mate {
   out?: boolean;
   /** Überblattung: Kreuzungspunkt auf beiden Kanten (Anteil vom Anfang) und Schlitztiefen */
   lap?: { ua: number; ub: number; da: number; db: number };
-  /** Kerf und Spiel, mit denen die Verbindung gezeichnet wurde (für „Konstruktion prüfen“; fehlt bei älteren) */
-  fit?: { k: number; c: number };
+  /**
+   * Kerf und Spiel, mit denen die Verbindung gezeichnet wurde (für „Konstruktion prüfen“; fehlt bei älteren). v: Version
+   * der Verbindungsgeometrie (jointsGeom.ts); ab 2 ist c das Gesamtspiel, ohne v das Spiel je Seite bei Zinken (#402).
+   */
+  fit?: { k: number; c: number; v?: number };
 }
 
 export type LayerMode = 'line' | 'fill';
+
+/**
+ * Was ein Layer am Werkstück tut (#265): schneiden, gravieren oder markieren. Lesen nur die 3D-Ansicht, die Steckprüfung,
+ * die Konstruktionsprüfung und das Verschachteln; der G-Code hängt nicht davon ab. Fehlt = wie bisher aus Modus und
+ * Sub-Layern abgeleitet.
+ */
+export type LayerType = 'cut' | 'engrave' | 'mark';
+export const LAYER_TYPES: LayerType[] = ['cut', 'engrave', 'mark'];
+export const layerTypeName = (k: LayerType) => (k === 'mark' ? t('Markieren') : k === 'engrave' ? t('Gravieren') : t('Schneiden'));
 
 /** Haltestege (Tabs/Brücken): kurze Stellen, an denen der Laser aus ist, damit Teile nicht herausfallen */
 export interface TabSettings {
@@ -399,6 +496,12 @@ export interface TabSettings {
   spacing: number;
   /** Formen, die in anderen Formen liegen (Löcher), bekommen keine Stege */
   skipInner: boolean;
+  /** Begrenzung der Stege je Form (0 = unbegrenzt) */
+  maxTabs: number;
+  /** Mindestzahl der Stege je Form (Passform-Regel gewinnt bei zu kleinen Formen) */
+  minTabs: number;
+  /** Leistung auf den Stegen in % (0 = Laser aus wie bisher, darüber reduzierter Schnitt) */
+  tabPower: number;
 }
 
 /**
@@ -437,6 +540,8 @@ export interface CutSettings {
   lead: LeadSettings;
   /** Nur Linie: Leistung in Ecken auf Min. Leistung absenken */
   ramp: RampSettings;
+  /** Nur Linie: Pausen am Anfang/Ende jedes Schnitts */
+  dwell: DwellSettings;
   /** Nur Linie: doppelte/überlappende Schnittlinien beim Export nur einmal schneiden (opt-in pro Bearbeitung) */
   dedup: boolean;
   /** Nur Linie: Abstand in mm, unter dem Linien als deckungsgleich gelten (wie in der Konstruktionsprüfung) */
@@ -451,6 +556,8 @@ export interface CutSettings {
   sub?: SubLayer[];
   /** Aussehen des Materials in der 3D-Ansicht (Farbe, Textur, Gravurdarstellung); fehlt = automatisch */
   look?: MaterialLook;
+  /** Was der Layer am Werkstück tut (gilt für seine Sub-Layer mit); fehlt = aus Modus und Sub-Layern abgeleitet */
+  layerType?: LayerType;
 }
 
 export type FillStyle = 'scan' | 'offset';
@@ -468,7 +575,7 @@ export interface LeadSettings {
   leadOut: boolean;
   /** Länge von Anschnitt und Auslauf in mm */
   length: number;
-  /** Gerade: Winkel zur Kontur in Grad (90 = senkrecht); Bogen: Bogenwinkel */
+  /** Gerade: Winkel zur Kontur in Grad (90 = senkrecht); Vorzeichen = Seite (+ Abfallseite, − Gegenseite); Bogen: Bogenwinkel */
   angle: number;
   /** Bogen statt Gerade */
   arc: boolean;
@@ -486,20 +593,33 @@ export interface RampSettings {
   ends: boolean;
 }
 
+/** Nur Linie: Pausen am Anfang/Ende jedes Schnitts (Beruhigung, Absaugung, Anstechen) */
+export interface DwellSettings {
+  /** Pause in ms vor dem Schnitt (Anfahrberuhigung, Absaugung anlaufen lassen) */
+  start: number;
+  /** Pause in ms nach dem Schnitt */
+  end: number;
+  /** Strahl während der Startpause an (Anstechen dicker Materialien) */
+  cutThrough: boolean;
+  /** Leistung in % während Cut-Through */
+  power: number;
+}
+
 /** Sub-Layer: eigene Bearbeitung derselben Formen; Air Assist und Aussehen gelten vom Layer */
-export type SubLayer = Omit<CutSettings, 'air' | 'look' | 'sub'> & { output: boolean; name: string };
+export type SubLayer = Omit<CutSettings, 'air' | 'look' | 'sub' | 'layerType'> & { output: boolean; name: string };
 
 export const CUT_KEYS: (keyof CutSettings)[] = [
   'mode', 'speed', 'power', 'minPower', 'passes', 'air', 'kerf', 'tabs', 'fillStyle', 'interval', 'angle', 'crossHatch', 'bidirectional', 'overscan',
-  'perf', 'lead', 'ramp', 'dedup', 'dedupTol', 'zOffset', 'zStep', 'sub', 'look', 'galvo',
+  'perf', 'lead', 'ramp', 'dwell', 'dedup', 'dedupTol', 'zOffset', 'zStep', 'sub', 'look', 'galvo', 'layerType',
 ];
 
-/** Felder eines Sub-Layers (alles außer Air Assist, Aussehen und weiteren Sub-Layern) */
-const SUB_KEYS = CUT_KEYS.filter((k) => k !== 'air' && k !== 'look' && k !== 'sub') as (keyof SubLayer)[];
+/** Felder eines Sub-Layers (alles außer Air Assist, Aussehen, Layer-Art und weiteren Sub-Layern) */
+const SUB_KEYS = CUT_KEYS.filter((k) => k !== 'air' && k !== 'look' && k !== 'sub' && k !== 'layerType') as (keyof SubLayer)[];
 
 export const defaultPerf = (): PerfSettings => ({ enabled: false, on: 1, off: 1 });
 export const defaultLead = (): LeadSettings => ({ leadIn: false, leadOut: false, length: 2, angle: 90, arc: false, overcut: 0 });
 export const defaultRamp = (): RampSettings => ({ enabled: false, length: 1, angle: 45, ends: false });
+export const defaultDwell = (): DwellSettings => ({ start: 0, end: 0, cutThrough: false, power: 0 });
 
 export function defaultSubLayer(mode: LayerMode = 'line'): SubLayer {
   const d = defaultCutSettings(mode) as Partial<CutSettings>;
@@ -517,15 +637,16 @@ function normalizeSub(s: SubLayer): SubLayer {
   return s;
 }
 
-function fillNested(s: Pick<CutSettings, 'tabs' | 'perf' | 'lead' | 'ramp'>) {
+function fillNested(s: Pick<CutSettings, 'tabs' | 'perf' | 'lead' | 'ramp' | 'dwell'>) {
   s.tabs = { ...defaultTabs(), ...s.tabs };
   s.perf = { ...defaultPerf(), ...s.perf };
   s.lead = { ...defaultLead(), ...s.lead };
   s.ramp = { ...defaultRamp(), ...s.ramp };
+  s.dwell = { ...defaultDwell(), ...s.dwell };
 }
 
 export function defaultTabs(): TabSettings {
-  return { enabled: false, size: 0.5, useCount: true, count: 4, spacing: 50, skipInner: true };
+  return { enabled: false, size: 0.5, useCount: true, count: 4, spacing: 50, skipInner: true, maxTabs: 0, minTabs: 1, tabPower: 0 };
 }
 
 export function defaultCutSettings(mode: LayerMode = 'line'): CutSettings {
@@ -547,6 +668,7 @@ export function defaultCutSettings(mode: LayerMode = 'line'): CutSettings {
     perf: defaultPerf(),
     lead: defaultLead(),
     ramp: defaultRamp(),
+    dwell: defaultDwell(),
     dedup: false,
     dedupTol: 0.05,
     zOffset: 0,
@@ -579,16 +701,31 @@ export interface Layer extends CutSettings {
 /** Schneidet der Layer Linien (selbst im Modus Linie oder über einen eingeschalteten Sub-Layer)? */
 export const isCutLayer = (L: Layer) => L.mode === 'line' || !!L.sub?.some((s) => s.output && s.mode === 'line');
 
+/** Gespeicherte Layer-Art prüfen; undefined, wenn sie fehlt oder unbekannt ist */
+export const cleanLayerType = (v: unknown): LayerType | undefined => (LAYER_TYPES.includes(v as LayerType) ? (v as LayerType) : undefined);
+
+/**
+ * Schneidet der Layer durch das Material (3D-Ansicht, Steckprüfung, Konstruktionsprüfung, Verschachteln)? Wie isCutLayer, außer der Layer ist
+ * ausdrücklich Gravur oder Markierung (#265): Seine Formen liegen dann auf der Oberfläche, auch geschlossene.
+ */
+export const cutsThrough = (L: Layer) => isCutLayer(L) && (cleanLayerType(L.layerType) ?? 'cut') === 'cut';
+
+/**
+ * cutsThrough für eine Form. Auch Generator-Objekte (Zahnrad, Musterfüllung) folgen der Layer-Art; nur Teile einer
+ * Baugruppe nicht, die baut die 3D-Ansicht unabhängig vom Layer räumlich auf.
+ */
+export const shapeCutsThrough = (o: Obj, L: Layer) => (o.shape.kind === 'gen' && o.shape.asm ? isCutLayer(L) : cutsThrough(L));
+
 /** Ältere Dateien kennen nicht alle Einstellungen: fehlende mit Standardwerten auffüllen */
 export function normalizeLayer(L: Layer): Layer {
-  if (L.tabs && L.fillStyle !== undefined && L.ramp && L.dedup !== undefined && L.dedupTol !== undefined && L.zStep !== undefined && (!L.sub || L.sub.every((s) => s.ramp && s.dedup !== undefined && s.dedupTol !== undefined && s.output !== undefined && s.name !== undefined))) return L;
+  if (L.tabs && L.fillStyle !== undefined && L.ramp && L.dwell && L.dedup !== undefined && L.dedupTol !== undefined && L.zStep !== undefined && (!L.sub || L.sub.every((s) => s.ramp && s.dwell && s.dedup !== undefined && s.dedupTol !== undefined && s.output !== undefined && s.name !== undefined))) return L;
   return normalizeCut(L);
 }
 
 /** Fehlende Bearbeitungseinstellungen mit Standardwerten auffüllen (ältere Dateien, Material-Bibliotheken, Import) */
 export function normalizeCut<T extends CutSettings>(L: T): T {
   const d = defaultCutSettings(L.mode);
-  for (const k of CUT_KEYS) if (L[k] === undefined && k !== 'sub' && k !== 'look' && k !== 'galvo') (L as unknown as Record<string, unknown>)[k] = d[k];
+  for (const k of CUT_KEYS) if (L[k] === undefined && k !== 'sub' && k !== 'look' && k !== 'galvo' && k !== 'layerType') (L as unknown as Record<string, unknown>)[k] = d[k];
   fillNested(L);
   if (L.sub !== undefined) L.sub = Array.isArray(L.sub) && L.sub.length ? L.sub.map(normalizeSub) : undefined;
   return L;
@@ -633,6 +770,10 @@ export interface Doc {
   meshes?: Record<string, string>;
   /** Frei gestaltete, gestapelte Platten für die 3D-Ansicht. */
   multiLayerAssemblies?: MultiLayerAssembly[];
+  /** Nur Auswahl lasern: Stand beim Speichern, wird beim Öffnen aufs Gerät übernommen */
+  cutSelected?: boolean;
+  /** Job-Ursprung 0 … 8: Stand beim Speichern, wird beim Öffnen aufs Gerät übernommen */
+  jobOrigin?: number;
 }
 
 /** Eine Platte referenziert ein oberstes Objekt; dessen Inhalt bleibt vollständig editierbar. */
@@ -731,6 +872,7 @@ export function loadDoc(raw: unknown): Doc {
   d.bed ??= { w: 400, h: 400 };
   d.layers ??= {};
   migrateImageOutput(d.layers as Record<number, Layer>, pages);
+  for (const p of pages) for (const o of p.objs) normalizeRectsDeep(o);
   const mla = Array.isArray(d.multiLayerAssemblies) ? d.multiLayerAssemblies : [];
   const seen = new Set<number>();
   const cleanAssemblies: MultiLayerAssembly[] = [];
@@ -839,6 +981,8 @@ export function cloneObjs(objs: Obj[]): Obj[] {
   const asms = new Map<string, string>();
   const texts: TextShape[] = [];
   const mated: Obj[] = [];
+  const cuts: ImageShape[] = [];
+  const links: Obj[] = [];
   const re = (x: Obj) => {
     const id = newId();
     ids.set(x.id, id);
@@ -855,6 +999,8 @@ export function cloneObjs(objs: Obj[]): Obj[] {
       x.shape.mark = `${asms.get(a)}/${part}`;
     }
     if (x.shape.kind === 'text' && x.shape.path?.link !== undefined) texts.push(x.shape);
+    if (x.shape.kind === 'image' && x.shape.cut?.contourId !== undefined) cuts.push(x.shape);
+    if (x.cutLink) links.push(x);
     if (x.mates) mated.push(x);
   };
   const out = objs.map((o) => {
@@ -866,6 +1012,16 @@ export function cloneObjs(objs: Obj[]): Obj[] {
     const link = ids.get(s.path!.link!);
     if (link !== undefined) s.path!.link = link;
     else delete s.path!.link;
+  }
+  // Bildkonturen bleiben anders als Textlinks auch dann verknüpft, wenn die Kontur nicht
+  // mitkopiert wurde: die hängende ID blockiert den aktivierten Schnitt (Review-Vorgabe).
+  for (const s of cuts) {
+    const target = ids.get(s.cut!.contourId!);
+    if (target !== undefined) s.cut!.contourId = target;
+  }
+  for (const x of links) {
+    const target = ids.get(x.cutLink!.imageId);
+    if (target !== undefined) x.cutLink!.imageId = target;
   }
   // Verbindungen bleiben nur zwischen mitkopierten Teilen erhalten
   for (const x of mated) {

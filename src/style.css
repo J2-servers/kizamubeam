@@ -41,6 +41,38 @@
   --ty-control-height: calc(22px * var(--ty-interface));
   color: var(--text);
 }
+/* Fire status stays reachable even when the Move panel is hidden. */
+.fire-overlay {
+  position: fixed;
+  z-index: 2000;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  overflow: auto;
+  padding: 10px;
+  border: 2px solid var(--text);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 4px 16px #0004;
+}
+.fire-overlay[hidden] { display: none; }
+.fire-overlay .btn, .move-fire .btn, .move-fire input { min-width: 24px; min-height: 24px; }
+.fire-overlay .btn:focus-visible, .move-fire :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.fire-overlay .fire-confirm:not(:disabled), .move-fire .fire-confirm:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--text);
+  color: #fff;
+  font-weight: 700;
+  min-height: 36px;
+  padding-inline: 14px;
+}
 /* Dunkles Design: ausdrücklich gewählt oder vom System vorgegeben */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
@@ -266,6 +298,20 @@ body {
   color: var(--muted);
   font-size: calc(10px * var(--ty-interface));
 }
+/* Fehlende Schrift (#233): Warnung in der Textleiste, Klick öffnet die Schriftenverwaltung */
+.fontpick-fallback {
+  border: 1px solid var(--warn, #d9822b);
+  border-radius: 4px;
+  background: none;
+  color: var(--warn, #d9822b);
+  font: inherit;
+  padding: 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fontpick-fallback:hover {
+  background: var(--accent-soft);
+}
 .fontpick-pop {
   position: fixed;
   z-index: 120;
@@ -445,6 +491,12 @@ select:focus {
 .toolbar-popup button {
   min-width: 24px;
   min-height: 24px;
+}
+.toolbar-popup.rect-corners-pop {
+  position: fixed;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 6px;
 }
 .toolbar-popup.toolbar-menu {
   min-width: 220px;
@@ -812,6 +864,37 @@ select:focus {
 .ot-row.sel {
   background: var(--accent-soft);
 }
+/* S6-Follow-up: angepinnte Hilfslinie in der Liste */
+.ot-guide.hi {
+  background: var(--accent-soft);
+}
+/* S6-Follow-up: Farbvorschläge im Projektfarb-Dialog */
+.tab-color-presets {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tab-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  padding: 0;
+}
+.tab-color-swatch.cur {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.tab-color-custom {
+  width: 44px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
 .ot-row.sel-in {
   background: color-mix(in srgb, var(--accent-soft) 45%, transparent);
 }
@@ -824,6 +907,13 @@ select:focus {
 }
 .ot-row.dragging {
   opacity: 0.5;
+}
+/* S6-Follow-up: Zeilen fremder Seiten sind blasser (Klick wechselt dorthin) */
+.ot-row.ot-foreign {
+  opacity: 0.68;
+}
+.ot-row.ot-foreign:hover {
+  opacity: 1;
 }
 .ot-row.drop-before {
   border-top-color: var(--accent);
@@ -1340,6 +1430,19 @@ dialog::backdrop {
 .offset-dialog {
   margin: 110px 330px auto auto;
 }
+/* Modeless Bild-Dialog über der Andockleiste halten: .dock-edge (z-index 3)
+   malt und klickt sonst durch den Dialog (Titel-Tooltip, Übernehmen blockiert) */
+.image-crop-dialog {
+  z-index: 40;
+}
+/* Unten angedockt und sichtbar: bottom verankert wirklich am Viewport. margin-bottom allein trägt
+   nicht (statische Position am Body-Ende): der Dialog stünde unsichtbar unterhalb des Fensters und
+   Chrome scrollte beim Öffnen/Fokussieren das ganze Dokument (Menü oben abgeschnitten, Palette
+   versetzt). 40 px Abstand wie bisher, rechts neben der Andockleiste. */
+.offset-dialog.array-dialog.image-crop-dialog {
+  margin-bottom: 0;
+  bottom: 40px;
+}
 /* Manual layer assignment for groups on several layers (#255) */
 .layer-assign-map th,
 .layer-assign-map td {
@@ -1396,6 +1499,15 @@ dialog {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+}
+.laser-tab .job-order {
+  margin: 4px 0;
+}
+.laser-tab .job-order summary {
+  cursor: pointer;
+}
+.laser-tab .job-order .btn {
+  margin-top: 6px;
 }
 label.check {
   display: inline-flex;
@@ -1624,6 +1736,45 @@ label.check {
   grid-template-columns: 1fr 1fr;
   gap: 4px;
   margin-top: 8px;
+}
+.move-fire {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.move-fire h4 {
+  margin: 0 0 6px;
+  font-size: inherit;
+}
+.move-fire-controls {
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.move-fire-controls.fire-disabled {
+  opacity: .7;
+}
+.fire-hold { touch-action: none; }
+.move-fire [role='status']:empty { display: none; }
+.fire-settings-link {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fire-settings-link:disabled {
+  color: inherit;
+  cursor: default;
+}
+.move-fire input {
+  width: 6ch;
+}
+.move-fire .note {
+  margin-top: 4px;
 }
 .console-log {
   height: 170px;
@@ -2149,7 +2300,22 @@ table.devices .actions {
 
 /* Layer-Dialog */
 .layer-dialog {
-  width: min(400px, 96vw);
+  width: min(760px, 96vw);
+}
+/* Zwei Spalten: links Allgemein/Geometrie, rechts Linie-Füllen/Bild/Bildschnitt/3D-Look; schmal einspaltig */
+.layer-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+  align-items: start;
+}
+.layer-col {
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .layer-cols {
+    grid-template-columns: 1fr;
+  }
 }
 .layer-dialog h3 {
   display: flex;
@@ -2166,31 +2332,75 @@ table.devices .actions {
   max-height: 92vh;
   overflow-y: auto;
 }
-.sub-tabs {
+/* Tab bars in dialogs (#409): the look of the panel tabs (.dg-tab) */
+.tab-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 8px;
+  align-items: flex-end;
+  gap: 2px;
+  margin: 0 0 8px;
+  border-bottom: 1px solid var(--line);
 }
-.sub-tabs .btn.active,
-.sub-tab.active .btn {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.sub-tab {
+.tab-bar .tab,
+.tab-bar .tab:hover {
   display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 28px;
+  margin: 0 0 -1px;
+  padding: 0 10px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
 }
-.sub-tab .btn:first-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+.tab-bar .tab:hover {
+  color: var(--text);
 }
-.sub-tab .sub-del {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: none;
-  padding: 0 6px;
+.tab-bar .tab.on {
+  color: var(--text);
+  border-bottom-color: var(--accent);
 }
-.sub-tab.off .btn:first-child {
+.tab-bar .tab.invalid {
+  color: var(--warn, #d9822b);
+}
+.tab-bar .tab.invalid.on {
+  border-bottom-color: var(--warn, #d9822b);
+}
+.tab-bar button:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+/* A command at the end of a tab bar (+ Sub-Layer, reload) */
+.tab-bar > .btn {
+  align-self: center;
+  margin: 0 0 4px auto;
+}
+/* Sub-layer tab: name and delete button (×) in one tab, like the panel tabs */
+.tab-bar .sub-tab > button {
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.tab-bar .sub-tab .sub-del {
+  padding: 0 4px;
+  margin-right: -4px;
+  border-radius: 3px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.tab-bar .sub-tab .sub-del:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.sub-tab.off > button:first-child {
   opacity: 0.6;
   text-decoration: line-through;
 }
@@ -3393,10 +3603,6 @@ body.dock-resizing #canvas {
   min-width: 320px;
   margin-top: 4px;
 }
-.gen-surface-area .conn-row button.on {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-}
 .gen-surface {
   position: absolute;
   inset: 0;
@@ -3432,20 +3638,6 @@ body.dock-resizing #canvas {
    height, so a message that comes or goes must not make it jump (#411) */
 .gen-surface-area > .note:not(.muted) {
   min-height: 2.9em;
-}
-/* Steps of a generator dialog (#211 stage 7): numbered tabs, one step at a time */
-.gen-steps {
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 6px;
-}
-.gen-steps button.on {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-}
-.gen-steps button.invalid {
-  border-color: var(--warn);
-  color: var(--warn);
 }
 .gen-step .jig-panel:first-child {
   margin-top: 0;
@@ -3680,6 +3872,13 @@ input.bound {
   color: var(--accent);
   font-style: italic;
   font-weight: 600;
+  padding: 0 4px;
+  cursor: pointer;
+}
+/* Fehlende Schrift (#233): Roboto springt ein, Klick öffnet die Schriftenverwaltung */
+.ot-warn {
+  color: var(--warn, #d9822b);
+  font-weight: 700;
   padding: 0 4px;
   cursor: pointer;
 }
@@ -4228,7 +4427,7 @@ input.bound {
 
 /* Erweiterungen */
 .packs-dialog {
-  width: min(560px, 96vw);
+  width: min(1020px, 96vw);
 }
 .packs-dialog .error {
   color: var(--danger);
@@ -4240,7 +4439,7 @@ input.bound {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 50vh;
+  max-height: 52vh;
   overflow: auto;
 }
 .pack-card {
@@ -4251,6 +4450,11 @@ input.bound {
   background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 6px;
+  cursor: pointer;
+}
+.pack-card.selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 .pack-text {
   flex: 1;
@@ -4262,11 +4466,82 @@ input.bound {
 .pack-filter {
   display: flex;
   gap: 6px;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
 }
 .pack-filter .pack-search {
   flex: 1;
   min-width: 0;
+}
+.pack-workspace {
+  display: grid;
+  grid-template-columns: 170px minmax(320px, 1fr) 250px;
+  min-height: 420px;
+  border: 1px solid var(--line);
+}
+.pack-categories,
+.pack-details {
+  padding: 12px;
+  background: var(--surface-2);
+}
+.pack-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 1px solid var(--line);
+}
+.pack-categories h4 {
+  margin: 0 0 8px;
+}
+.pack-category {
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  padding: 7px 8px;
+  text-align: left;
+  cursor: pointer;
+}
+.pack-category:hover,
+.pack-category.active {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.pack-workspace > .pack-panel {
+  min-width: 0;
+  padding: 12px;
+}
+.pack-details {
+  border-left: 1px solid var(--line);
+  overflow: auto;
+}
+.pack-details:empty::before {
+  content: '…';
+  color: var(--muted);
+}
+.pack-details h4 {
+  margin: 0 0 4px;
+}
+.pack-details p {
+  margin: 10px 0;
+}
+.pack-details-actions {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+}
+.pack-tabs {
+  margin-bottom: 12px;
+}
+.pack-panel > h4,
+.pack-section-heading h4 {
+  margin: 0;
+}
+.pack-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
 }
 .pack-card.disabled .pack-text {
   opacity: 0.6;
@@ -4320,6 +4595,23 @@ input.bound {
   overflow: auto;
   margin: 6px 0;
   padding-left: 20px;
+}
+.pack-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+}
+.pack-progress[hidden] {
+  display: none;
+}
+.pack-progress-text {
+  color: var(--muted);
+  font-size: calc(12px * var(--ty-supporting));
+}
+.pack-progress-bar {
+  width: 100%;
+  accent-color: var(--accent);
 }
 
 /* Nachsteuern während des Jobs (Overrides), Eingänge */
@@ -4681,6 +4973,111 @@ input.bound {
   padding: 0 10px;
   color: var(--muted);
 }
+/* S6: gruppierte Tabs — einzeilig, Projektkopf mit Seiten-Untertabs */
+#tabbar.grouped {
+  gap: 6px;
+}
+.pgroup {
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  flex: none;
+  max-width: 60vw;
+  /* S6-Follow-up: --pgroup-color ist die volle Projektfarbe (manuelle Wahl oder stabile Vorgabe) */
+  --pgroup-color: hsl(210 65% 55%);
+  border-radius: 4px;
+}
+.pgroup.open {
+  background: color-mix(in srgb, var(--pgroup-color) 9%, transparent);
+}
+.pgroup-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 200px;
+  padding: 0 4px 0 3px;
+  font-size: calc(12px * var(--ty-interface));
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-left: 3px solid var(--pgroup-color);
+  border-right: 1px solid var(--line);
+  border-radius: 4px 0 0 4px;
+  cursor: default;
+  user-select: none;
+}
+.pgroup.active .pgroup-head,
+.pgroup-head.active {
+  color: var(--text);
+  background: var(--panel);
+  box-shadow: inset 0 2px 0 var(--pgroup-color);
+}
+/* S6-Follow-up: der Schließen-Knopf war in gruppierten Köpfen unsichtbar
+   (.ptab-Regeln greifen hier nicht); bei offen/aktiv/Hover zeigen */
+.pgroup-head .ptab-close {
+  visibility: hidden;
+}
+.pgroup-head:hover .ptab-close,
+.pgroup.open .pgroup-head .ptab-close,
+.pgroup.active .pgroup-head .ptab-close {
+  visibility: visible;
+}
+.pgroup-head .ptab-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pgroup-head.changed .ptab-name::after {
+  content: ' •';
+  color: var(--accent);
+}
+.pgroup-caret {
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: calc(12px * var(--ty-interface));
+  line-height: 1;
+  padding: 2px 3px;
+  border-radius: 3px;
+  cursor: pointer;
+  flex: none;
+}
+.pgroup-caret:hover {
+  background: var(--accent-soft);
+}
+.ppage {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: calc(11px * var(--ty-interface));
+  line-height: 1;
+  padding: 0 8px;
+  border-right: 1px solid var(--line);
+  border-left: 2px solid color-mix(in srgb, var(--pgroup-color) 55%, transparent);
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ppage:hover {
+  color: var(--text);
+}
+.ppage.active {
+  color: var(--text);
+  background: var(--panel);
+  box-shadow: inset 0 -2px 0 var(--pgroup-color);
+}
+/* Umbenennen direkt in der Leiste */
+.ppage-rename {
+  width: 90px;
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--pgroup-color);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
 /* Werkzeugkasten */
 :root {
   --app-mech-bg: #e6edfb; --app-mech-fg: #2f5fc8;
@@ -5032,7 +5429,6 @@ input.bound {
 .font-dialog {
   width: min(680px, 96vw);
 }
-.font-tabs,
 .font-tools {
   display: flex;
   gap: 6px;
@@ -5295,6 +5691,14 @@ input.jig-count {
 .slot-projection-dialog footer { flex-shrink: 0; }
 .slot-features-dialog { width: min(1400px, calc(100vw - 16px)); }
 .slot-features-dialog > [role="status"] { flex: 0 0 3.6em; min-height: 3.6em; overflow: auto; }
+.slot-features-dialog > .note.error {
+  color: var(--danger, #c0392b);
+  border: 1px solid var(--danger, #c0392b);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--danger, #c0392b) 12%, transparent);
+}
 .slot-feature-toolbar { display: flex; flex-wrap: wrap; gap: 4px; flex-shrink: 0; }
 .slot-icon-button { width: 34px; height: 34px; min-width: 34px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
 .slot-icon-button svg, .slot-feature-visibility svg { width: 22px; height: 22px; pointer-events: none; }
@@ -5577,6 +5981,10 @@ label.settings-label input {
   gap: 4px;
   width: 100%;
 }
+.settings-suggest {
+  display: flex;
+  width: 100%;
+}
 .settings-unit input {
   flex: 1;
   min-width: 0;
@@ -5653,6 +6061,66 @@ label.settings-label input {
 }
 .settings-keys td:first-child {
   width: 38%;
+}
+/* Settings → keyboard shortcuts (#453) */
+.shortcut-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+}
+.shortcut-filter {
+  flex: 1;
+  min-width: 0;
+}
+.shortcut-status:empty {
+  display: none;
+}
+.shortcut-table {
+  width: 100%;
+}
+/* Lines between the rows so name, key and buttons of a row are easy to follow */
+.shortcut-table td {
+  padding: 4px 8px 4px 4px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--line);
+}
+.shortcut-table tbody tr:not(.shortcut-cat):not(.shortcut-ask-row):hover td {
+  background: var(--accent-soft);
+}
+.shortcut-table th {
+  padding: 12px 0 4px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+.shortcut-ask {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent-soft);
+}
+.shortcut-ask > span {
+  flex: 1 1 auto;
+}
+.shortcut-table tr.customized kbd {
+  font-weight: 600;
+}
+.shortcut-table kbd.capturing {
+  color: var(--accent);
+}
+.shortcut-buttons {
+  white-space: nowrap;
+  text-align: right;
+}
+.shortcut-buttons .btn.small {
+  margin-left: 4px;
+  padding: 1px 8px;
 }
 .form > .form-title {
   grid-column: 1 / -1;

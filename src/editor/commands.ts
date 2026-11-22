@@ -1,9 +1,10 @@
 // Editor: Befehle: Löschen, Kopieren, Einfügen, Transformieren, Formparameter.
-import { about, clone, cloneObjs, homeLayer, Mat, mul, Pt, rotate, scale, translate, visibleLeaves } from '../model';
+import { about, clampRectCorners, clone, cloneObjs, homeLayer, Mat, mul, Pt, rectCorners, rotate, scale, translate, visibleLeaves } from '../model';
 import type { Editor } from '../editor';
 import { t } from '../i18n';
 import { genLeaves } from './generators';
 import { copyMultiLayers, pruneMultiLayers } from '../multilayer';
+import { assignImageContour, expandImageCutSelection, unassignImageContour } from '../imageCut';
 
 export class EditorCommands {
   deleteSel(this: Editor) {
@@ -27,13 +28,25 @@ export class EditorCommands {
     this.setSel(this.doc.objs.filter((o) => this.selectable(o) && [...visibleLeaves([o])].some(([l]) => layers.has(l.layer))));
   }
   copy(this: Editor) {
-    this.clipboard = this.sel.map((o) => clone(o));
+    // Verknüpfte Schnittkonturen mitkopieren; cloneObjs vergibt danach frische Links.
+    this.clipboard = expandImageCutSelection(this.sel, this.doc.objs).map((o) => clone(o));
     // System-Zwischenablage überschreiben, damit danach nicht ein älteres Bild aus einem anderen Programm eingefügt wird
     navigator.clipboard?.writeText('').catch(() => undefined);
   }
   async onPaste(this: Editor, e: ClipboardEvent) {
     const el = e.target as HTMLElement;
     if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+    // A modal tool dialog owns a captured document snapshot (e.g. the slot tool rejects
+    // any source change as stale). Importing clipboard content behind it would silently
+    // invalidate the tool — this includes OS-level middle-click paste on Linux, which can
+    // otherwise drop e.g. a screenshot image into the document. Same guard as file drops.
+    if (typeof document !== 'undefined' && typeof document.querySelector === 'function'
+      && document.querySelector('dialog[open]')) {
+      e.preventDefault();
+      this.hint = t('Laufende Bearbeitung beenden, bevor Dateien abgelegt werden.');
+      this.emit('view');
+      return;
+    }
     clearTimeout(this.pasteTimer);
     e.preventDefault();
     const data = e.clipboardData;
@@ -49,7 +62,8 @@ export class EditorCommands {
   paste(this: Editor, offset = 5) {
     if (!this.clipboard.length) return;
     this.snapshot(t('Einfügen'));
-    const objs = cloneObjs(this.clipboard).map((c) => {
+    const copied = expandImageCutSelection(this.clipboard, this.clipboard);
+    const objs = cloneObjs(copied).map((c) => {
       c.m = mul(translate(offset, offset), c.m);
       return c;
     });
@@ -60,12 +74,48 @@ export class EditorCommands {
   }
   duplicate(this: Editor) {
     if (!this.sel.length) return;
+    // Die Auswahl schließt eine verknüpfte Schnittkontur ein, damit der Duplikat-Link erhalten bleibt.
+    const src = expandImageCutSelection(this.sel, this.doc.objs);
     this.snapshot(t('Duplizieren'));
-    const objs = cloneObjs(this.sel);
+    const objs = cloneObjs(src);
     this.doc.objs.push(...objs);
-    copyMultiLayers(this.doc, this.sel.map((o, i) => [o, objs[i]] as const));
+    copyMultiLayers(this.doc, src.map((o, i) => [o, objs[i]] as const));
     this.setSel(objs);
     this.emit('doc');
+  }
+  /** Assign one selected closed contour as the cut path of one selected image (one undo step). */
+  assignImageCutSel(this: Editor) {
+    const images = this.sel.filter((o) => o.shape.kind === 'image');
+    const paths = this.sel.filter((o) => o.shape.kind === 'path');
+    if (this.sel.length !== 2 || images.length !== 1 || paths.length !== 1)
+      throw new Error(t('Für den Bildschnitt genau ein Bild und eine geschlossene Kontur auswählen.'));
+    this.snapshot(t('Bildschnitt-Kontur zuweisen'));
+    if (!assignImageContour(images[0], paths[0], this.worldMatrix(images[0]))) {
+      this.dropSnapshot();
+      throw new Error(t('Die ausgewählte Schnittkontur ist ungültig. Kontur schließen, prüfen oder eine andere Kontur auswählen.'));
+    }
+    this.emit('doc');
+    this.emit('sel');
+  }
+  /** Release the assigned contour, restoring its original laser output (one undo step). */
+  unassignImageCutSel(this: Editor) {
+    const images = this.sel.filter((o) => o.shape.kind === 'image');
+    const image = images[0];
+    if (images.length !== 1 || !image || image.shape.kind !== 'image')
+      throw new Error(t('Für den Bildschnitt genau ein Bild und eine geschlossene Kontur auswählen.'));
+    const shape = image.shape;
+    if (shape.cut?.mode !== 'contour')
+      throw new Error(t('Für den Bildschnitt genau ein Bild und eine geschlossene Kontur auswählen.'));
+    const contour = this.doc.objs.find((o) => o.id === shape.cut!.contourId);
+    if (!contour || contour.shape.kind !== 'path' || !contour.cutLink || contour.cutLink.imageId !== image.id)
+      throw new Error(t('Zugewiesene Schnittkontur fehlt. Schnittkontur erneut zuweisen oder Bildschnitt deaktivieren.'));
+    this.snapshot(t('Bildschnitt-Kontur lösen'));
+    if (!unassignImageContour(image, contour, this.worldMatrix(image))) {
+      this.dropSnapshot();
+      throw new Error(t('Die ausgewählte Schnittkontur ist ungültig. Kontur schließen, prüfen oder eine andere Kontur auswählen.'));
+    }
+    this.emit('doc');
+    this.emit('sel');
   }
   /** Weltmatrix auf alle ausgewählten Objekte anwenden. */
   /** snap: Undo-Schritt anlegen (true oder dessen Name) */
@@ -92,17 +142,70 @@ export class EditorCommands {
     this.transformSel(about(rotate((-deg * Math.PI) / 180), c.x, c.y), t('Drehen'));
   }
   /** Formparameter (Eckenradius, Seiten …) der Auswahl ändern */
-  updateShapes(this: Editor, kind: 'rect' | 'polygon', patch: Record<string, number | boolean>) {
-    if (kind === 'rect' && typeof patch.r === 'number') this.rectRadius = patch.r;
+  updateShapes(this: Editor, kind: 'rect' | 'polygon', patch: Record<string, number | boolean | readonly (number | null | undefined)[]>) {
+    if (kind === 'rect') {
+      if (Array.isArray(patch.corners)) {
+        const raw = (patch.corners as readonly unknown[]).slice(0, 4);
+        // Leereinträge (null/undefined/keine Zahl) behalten den bisherigen Wert je Objekt.
+        const set = [0, 1, 2, 3].map((i) => {
+          const v = raw[i];
+          return typeof v === 'number' && Number.isFinite(v) ? Math.max(0, v) : undefined;
+        });
+        if (set.every((v) => v === undefined)) return;
+        const fullSet = set.every((v) => v !== undefined);
+        if (fullSet) {
+          const u = set as number[];
+          if (u[0] === u[1] && u[0] === u[2] && u[0] === u[3]) this.rectRadius = u[0];
+        }
+        this.saveToolOptions();
+        const objs = this.sel.filter((o) => o.shape.kind === kind);
+        if (!objs.length) return;
+        this.snapshot(t('Form-Eigenschaften'));
+        const results: number[][] = [];
+        objs.forEach((o) => {
+          if (o.shape.kind !== 'rect') return;
+          const base = rectCorners(o.shape);
+          const next: [number, number, number, number] = [0, 1, 2, 3].map((i) =>
+            set[i] !== undefined ? set[i] as number : base[i]) as [number, number, number, number];
+          const clamped = clampRectCorners(next, o.shape.w, o.shape.h);
+          if (clamped[0] === clamped[1] && clamped[0] === clamped[2] && clamped[0] === clamped[3]) {
+            delete o.shape.corners;
+            o.shape.r = clamped[0];
+          } else {
+            o.shape.corners = clamped;
+            o.shape.r = clamped[0];
+          }
+          results.push([...clamped]);
+          this.touch(o.shape);
+        });
+        // Alle Rechtecke nachher einheitlich rund: Werkzeug-Default nachführen.
+        if (results.length && results.every((c) => c[0] === results[0][0] && c[1] === results[0][1] && c[2] === results[0][2] && c[3] === results[0][3])
+          && results[0][0] === results[0][1] && results[0][0] === results[0][2] && results[0][0] === results[0][3]) {
+          this.rectRadius = results[0][0];
+          this.saveToolOptions();
+        }
+        this.emit('doc');
+        this.emit('sel');
+        return;
+      }
+      if (typeof patch.r === 'number') this.rectRadius = patch.r;
+    }
     if (kind === 'polygon') {
       if (typeof patch.sides === 'number') this.polySides = patch.sides;
       if (typeof patch.star === 'boolean') this.polyStar = patch.star;
     }
+    this.saveToolOptions();
     const objs = this.sel.filter((o) => o.shape.kind === kind);
     if (!objs.length) return;
     this.snapshot(t('Form-Eigenschaften'));
     objs.forEach((o) => {
-      Object.assign(o.shape, patch);
+      if (o.shape.kind === 'rect' && typeof patch.r === 'number') {
+        const r = clampRectCorners([patch.r, patch.r, patch.r, patch.r], o.shape.w, o.shape.h)[0];
+        delete o.shape.corners;
+        o.shape.r = r;
+      } else {
+        Object.assign(o.shape, patch);
+      }
       this.touch(o.shape);
     });
     this.emit('doc');

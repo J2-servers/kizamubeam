@@ -5,14 +5,19 @@ import { fingerboxParts, fingerboxSegments, horizontalSegments, type FingerboxPa
 import { defaultDistribution, distributeGaps } from './fingerbox-distribution';
 import { resizeDistribution } from './fingerbox-resize';
 import { makeDividers, type DividerParams } from './fingerbox-dividers';
-import { panelPolys, offsetOrtho } from './box';
-import { layoutParts } from './build';
+import { panelPolys, offsetOrtho, TURNED_OVER } from './box';
+import { layoutParts, mirrorX } from './build';
 import { boxPoses } from './box';
 import { neg, pose, X, Y, Z, type AsmPoses } from './pose';
 
-type FingerParams = FingerboxParams & { partLayout: string; slotClearance: number; compartmentsX: number; compartmentsY: number; ratiosX: string; ratiosY: string; dividerDrop: number; kerf: number; clearance: number };
+type FingerParams = FingerboxParams & { partLayout: string; faces: string; slotClearance: number; dividerClearance?: number; compartmentsX: number; compartmentsY: number; ratiosX: string; ratiosY: string; dividerDrop: number; kerf: number; clearance: number };
 // clearance/kerf kommen aus dem Dialog; slotClearance folgt dem Steckspiel (Standard der Trennwand-Geometrie).
-const values = (p: Params) => ({ ...p, clearance: Number(p.clearance ?? 0), kerf: Number(p.kerf ?? 0) }) as unknown as FingerParams;
+// dividerClearance: hidden, only in boxes saved before #402 (the old play of the dividers, see migrate); '' = clearance.
+// faces: hidden, 'legacy' in boxes saved before #463 (back, left and lid lie inner face up, see boxPoses).
+const values = (p: Params) => {
+  const d = String(p.dividerClearance ?? '');
+  return { ...p, clearance: Number(p.clearance ?? 0), kerf: Number(p.kerf ?? 0), dividerClearance: d === '' ? undefined : Number(d) } as unknown as FingerParams;
+};
 const names: Record<string, () => string> = {
   bottom: () => t('Boden'), top: () => t('Deckel'), front: () => t('Vorderwand'), back: () => t('Rückwand'),
   left: () => t('Seitenwand links'), right: () => t('Seitenwand rechts'),
@@ -108,6 +113,8 @@ function adjustedParts(p: FingerParams): GenPart[] {
   }
   // Kerf: Außenkontur um kerf/2 nach außen, Ausschnitte (Schlitze) um kerf/2 nach innen versetzen.
   if (p.kerf) for (const part of parts) part.subs = part.subs.map((sub, i) => ({ ...sub, nodes: offsetOrtho(dropCollinear(sub.nodes), i === 0 ? p.kerf / 2 : -p.kerf / 2) }));
+  // Outer face up (#463): these parts are seen from outside, mirrored like their poses
+  if (p.faces !== 'legacy') for (const part of parts) if (TURNED_OVER.includes(part.key)) part.subs = part.subs.map(mirrorX);
   // Saved boxes keep their row layout ('rows', set by migrate); new boxes are nested compactly.
   return layoutParts(parts, 5 + p.kerf, p.partLayout);
 }
@@ -118,7 +125,7 @@ export function fingerboxPoses(raw: Params): AsmPoses | null {
     const p = raw as Params & { width: number; depth: number; height: number; thickness: number; compartmentsX: number; compartmentsY: number; ratiosX: string; ratiosY: string; dividerDrop: number };
     const shell = boxPoses({ sizeMode: 'outer', width: p.width, depth: p.depth, height: p.height,
       thickness: p.thickness, top: p.top === 'closed' ? 'closed' : 'open', finger: Number(p.finger),
-      clearance: 0, kerf: 0 });
+      clearance: 0, kerf: 0 }, p.faces === 'legacy');
     const xs = distributeGaps(p.width, p.thickness, p.compartmentsX, p.ratiosX).centres;
     const ys = distributeGaps(p.depth, p.thickness, p.compartmentsY, p.ratiosY).centres;
     const hd = p.height - p.dividerDrop;
@@ -131,7 +138,7 @@ export function fingerboxPoses(raw: Params): AsmPoses | null {
 }
 
 export const FINGERBOX: Generator = {
-  id: 'box-divided', version: 3, kind: 'assembly', icon: 'boxDivided',
+  id: 'box-divided', version: 5, kind: 'assembly', icon: 'boxDivided',
   preview: { center: true },
   onChange(key, old, p) {
     // Changing the compartment count keeps the user's ratios: cut or extended with 1, asking before values are dropped
@@ -161,6 +168,8 @@ export const FINGERBOX: Generator = {
   schema: [
     { key: 'jointLayout', type: 'data', label: '', def: 'current', resetOnNew: true },
     { key: 'partLayout', type: 'data', label: '', def: 'nest', resetOnNew: true },
+    { key: 'dividerClearance', type: 'data', label: '', def: '', resetOnNew: true },
+    { key: 'faces', type: 'data', label: '', def: 'out', resetOnNew: true },
     { key: 'width', type: 'length', label: t('Breite'), min: 5, max: 3000, def: 100 },
     { key: 'depth', type: 'length', label: t('Tiefe'), min: 5, max: 3000, def: 80 },
     { key: 'height', type: 'length', label: t('Höhe'), min: 5, max: 3000, def: 50 },
@@ -173,7 +182,7 @@ export const FINGERBOX: Generator = {
     { key: 'dividerDrop', type: 'length', label: t('Trennwände niedriger als Box'), min: 0, max: 3000, def: 10, showIf: { or: [{ gt: ['compartmentsX', 1] }, { gt: ['compartmentsY', 1] }] } },
     { key: 'kerf', type: 'length', label: t('Schnittfuge (Kerf)'), min: 0, max: 2, def: 0, title: t('Breite des Laserschnitts: Die Kontur wird um die Hälfte nach außen versetzt, damit die Teile die Sollmaße haben. Der Kerf des Layers wirkt beim Lasern zusätzlich.') },
     { key: 'finger', type: 'length', label: t('Zinkenbreite'), min: 0.5, max: 500, def: 10, advanced: true },
-    { key: 'clearance', type: 'length', label: t('Steckspiel'), min: -1, max: 2, def: 0, advanced: true, title: t('Jede Zinke wird um so viel schmaler; negativ = Presspassung') },
+    { key: 'clearance', type: 'length', label: t('Steckspiel gesamt'), min: -2, max: 4, def: 0, playTotal: true, advanced: true, title: t('Gesamtspiel der Zinken: Lücke minus Zinke, auf beide Seiten verteilt; negativ = Presspassung') },
   ],
   validate(raw) {
     const p = values(raw), out: Issue[] = [];
@@ -182,7 +191,7 @@ export const FINGERBOX: Generator = {
       out.push({ key: 'thickness', level: 'error', msg: t('Alle Außenmaße müssen größer als die doppelte Materialdicke sein.') });
       return out;
     }
-    if (Math.abs(p.clearance) >= p.finger / 4) out.push({ key: 'clearance', level: 'error', msg: t('Das Steckspiel ist zu groß für diese Zinkenbreite.') });
+    if (Math.abs(p.clearance) >= p.finger / 2) out.push({ key: 'clearance', level: 'error', msg: t('Das Steckspiel ist zu groß für diese Zinkenbreite.') });
     const legacy = p.jointLayout === 'legacy';
     const lengths = [p.width - 2 * p.thickness, p.depth - 2 * p.thickness, legacy ? p.height : p.height - p.thickness * (p.top === 'closed' ? 2 : 1)];
     try {
@@ -208,7 +217,12 @@ export const FINGERBOX: Generator = {
     }
     return out;
   },
-  migrate(p, from) { return { ...p, ...(from < 2 ? { jointLayout: 'legacy' } : {}), ...(from < 3 ? { partLayout: 'rows' } : {}) }; },
+  // 4 (#402): the clearance was per side at the corners (total 2c) and whole at the dividers (c); now it is the total
+  // play: doubled, and the dividers keep theirs in dividerClearance. 5 (#463): saved boxes keep back, left and lid inner face up
+  migrate(p, from) {
+    const c = Number(p.clearance ?? 0);
+    return { ...p, ...(from < 2 ? { jointLayout: 'legacy' } : {}), ...(from < 3 ? { partLayout: 'rows' } : {}), ...(from < 4 ? { clearance: 2 * c, dividerClearance: String(c) } : {}), ...(from < 5 ? { faces: 'legacy' } : {}) };
+  },
   generate(raw) {
     const p = values(raw), parts = adjustedParts(p);
     const gx = distributeGaps(p.width,p.thickness,p.compartmentsX,p.ratiosX).gaps;

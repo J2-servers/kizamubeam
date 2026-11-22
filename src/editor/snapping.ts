@@ -2,16 +2,92 @@
 import { Obj, Pt } from '../model';
 import { alignBox, alignPoint, buildSnapSet, findSnap, SnapHit, SnapSet } from '../snap';
 import type { Editor } from '../editor';
-import { Drag, SNAP_PX } from './shared';
+import { Drag } from './shared';
 import { cleanGrid, GRID_KEY, GridSettings } from '../grid';
+import { t } from '../i18n';
 
 const SNAP_KEY = 'kizamubeam.snap';
 
 const SNAP_PX_ALT = 20;
 
+/** Fangdistanzen in px (normal, mit Alt); frei einstellbar, Defaults wie bisher */
+export interface SnapTolerance { normal: number; alt: number }
+const SNAP_TOLERANCE_KEY = 'kizamubeam.snapTolerance';
+const DEFAULT_SNAP_TOLERANCE: SnapTolerance = { normal: 8, alt: SNAP_PX_ALT };
+const SNAP_TOL_MIN = 1, SNAP_TOL_MAX = 64;
+const validSnapTol = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= SNAP_TOL_MIN && v <= SNAP_TOL_MAX;
+export function loadSnapTolerance(): SnapTolerance {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SNAP_TOLERANCE_KEY) ?? 'null');
+    if (raw && typeof raw === 'object') {
+      return {
+        normal: validSnapTol(raw.normal) ? raw.normal : DEFAULT_SNAP_TOLERANCE.normal,
+        alt: validSnapTol(raw.alt) ? raw.alt : DEFAULT_SNAP_TOLERANCE.alt,
+      };
+    }
+  } catch {
+    /* Standardwerte */
+  }
+  return { ...DEFAULT_SNAP_TOLERANCE };
+}
+/** Fangdistanzen speichern (Edit → Settings → Arbeitsfläche und Fangen); false bei ungültigen Werten */
+export function saveSnapTolerance(v: SnapTolerance): boolean {
+  if (!validSnapTol(v.normal) || !validSnapTol(v.alt)) return false;
+  try {
+    localStorage.setItem(SNAP_TOLERANCE_KEY, JSON.stringify({ normal: v.normal, alt: v.alt }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Vorheriger Fang-Zustand für den Hauptschalter (wird beim Ausschalten gemerkt) */
+export const SNAP_PREV_KEY = 'kizamubeam.snapPrev';
+const snapPrevByEditor = new WeakMap<Editor, { grid: boolean; objects: boolean }>();
+
+/** Fang an/aus als Ganzes: an, sobald Raster oder Objekte fangen */
+export function isSnapOn(ed: Editor): boolean {
+  return ed.snapObjects || ed.snapGrid;
+}
+/** Fang-Hauptschalter: alles aus (vorherigen Stand merken) bzw. vorherigen Stand oder Standard wiederherstellen */
+export function toggleSnapMaster(ed: Editor) {
+  if (isSnapOn(ed)) {
+    const prev = { grid: ed.snapGrid, objects: ed.snapObjects };
+    snapPrevByEditor.set(ed, prev);
+    try {
+      localStorage.setItem(SNAP_PREV_KEY, JSON.stringify(prev));
+    } catch {
+      /* Speicher nicht verfügbar */
+    }
+    ed.setSnap({ grid: false, objects: false });
+    return;
+  }
+  let prev: { grid?: unknown; objects?: unknown } | null = null;
+  try {
+    const raw = snapPrevByEditor.get(ed) ?? JSON.parse(localStorage.getItem(SNAP_PREV_KEY) ?? 'null');
+    if (raw && typeof raw === 'object') prev = raw;
+  } catch {
+    /* Standardwerte */
+  }
+  ed.setSnap({
+    grid: typeof prev?.grid === 'boolean' ? prev.grid : false,
+    objects: typeof prev?.objects === 'boolean' ? prev.objects : true,
+  });
+}
+
 type Mods = { altKey: boolean; ctrlKey: boolean; metaKey: boolean };
 
 export class EditorSnapping {
+  /** Fangdistanzen mit Rückfall auf die Standardwerte (Tests ohne Konstruktor) */
+  snapTol(this: Editor): SnapTolerance {
+    return this.snapTolerance ?? DEFAULT_SNAP_TOLERANCE;
+  }
+  /** Fangdistanzen ändern und merken */
+  setSnapTolerance(this: Editor, patch: { normal?: number; alt?: number }) {
+    const next = { ...this.snapTolerance, ...patch };
+    if (!saveSnapTolerance(next)) throw new Error(t('Einstellung konnte nicht gespeichert werden.'));
+    this.snapTolerance = next;
+  }
   /** Fang-Einstellungen ändern und merken */
   setSnap(this: Editor, patch: { grid?: boolean; objects?: boolean; step?: number; centers?: Editor['centerMarks'] }) {
     if (patch.centers !== undefined) this.centerMarks = patch.centers;
@@ -94,7 +170,7 @@ export class EditorSnapping {
     const md = this.snapModes(e, opt.toggle ?? true);
     if (md.obj) {
       const set = opt.set ?? this.hoverSnapSet();
-      const tol = (md.alt ? SNAP_PX_ALT : SNAP_PX) / this.view.zoom;
+      const tol = (md.alt ? this.snapTol().alt : this.snapTol().normal) / this.view.zoom;
       const hit = findSnap(set, p, tol, opt.extra);
       if (hit) {
         this.snapHit = hit;
@@ -114,7 +190,7 @@ export class EditorSnapping {
   snapMove(this: Editor, d: Extract<Drag, { type: 'move' }>, dx: number, dy: number, e: Mods): [number, number] {
     this.clearSnap();
     const md = this.snapModes(e, true);
-    const tol = (md.alt ? SNAP_PX_ALT : SNAP_PX) / this.view.zoom;
+    const tol = (md.alt ? this.snapTol().alt : this.snapTol().normal) / this.view.zoom;
     if (md.obj) {
       const b = d.box;
       const own = d.anchor
@@ -163,7 +239,7 @@ export class EditorSnapping {
     const md = this.snapModes(e, true);
     const ax = d.axis;
     if (md.obj) {
-      const tol = (md.alt ? SNAP_PX_ALT : SNAP_PX) / this.view.zoom;
+      const tol = (md.alt ? this.snapTol().alt : this.snapTol().normal) / this.view.zoom;
       let best: (typeof d.snapSet.pts)[number] | null = null;
       for (const q of d.snapSet.pts) if (Math.abs(q[ax] - wp[ax]) <= tol && (!best || Math.abs(q[ax] - wp[ax]) < Math.abs(best[ax] - wp[ax]))) best = q;
       if (best) {

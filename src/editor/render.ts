@@ -1,6 +1,8 @@
 // Editor: Zeichnen der Arbeitsfläche.
 import { apply, IDENT, ImageShape, inv, leaves, Mat, mul, noLaserLeaves, Node, Obj, PALETTE, Pt, SubPath, TextShape, visibleLeaves } from '../model';
-import { displayCanvas } from '../images';
+import { displayCanvas, displayCanvasDraft, ImageProcessingError, isReducedImageDisplay, imageDisplayActivity, cancelImageDisplay } from '../images';
+import { resolveImageContour } from '../imageContour';
+import { resolveImageRasterGeometry } from '../imageRaster';
 import { EdgePick } from '../joints';
 import { bezierPt, Box, boundsOf, drawText, localPath, segments, shapeSubs, subsToPath2D, textOutline, worldPath } from '../geom';
 import { SNAP_LABELS } from '../snap';
@@ -11,11 +13,73 @@ import { CON_GLYPHS } from './sketch';
 import { dec, t } from '../i18n';
 import type { Editor } from '../editor';
 import { RULER, HANDLE_OFF, cachedWorldPath, SNAP_COLOR } from './shared';
+import { gestureSpline } from '../shaperSpline';
 import { curvaturePreview } from './vector';
 import { arcSubPath } from './arc';
 import { GRID_MIN_PX, gridLevels, gridLines, LEVEL_ALPHA } from '../grid';
 import { closurePreview } from '../shaper';
+import { renderImageCropOverlay } from '../imageCropUi';
+import { imageDraftEdit } from './imageHandles';
 import { groupFactor, withBaselineTypography } from '../uiTypography';
+
+const imageErrorStatuses = new WeakMap<Editor, HTMLSpanElement>();
+const imageProgressStatuses = new WeakMap<Editor, { root: HTMLSpanElement; label: HTMLSpanElement; progress: HTMLProgressElement; button: HTMLButtonElement; owners: object[]; cursor?: string }>();
+
+function showImageDisplayProgress(editor: Editor, owners: object[]) {
+  let status = imageProgressStatuses.get(editor);
+  for (const previous of status?.owners ?? []) if (!owners.includes(previous)) cancelImageDisplay(previous);
+  if (!owners.length) {
+    if (status) {
+      status.owners = []; status.root.hidden = true;
+      if (status.cursor !== undefined && editor.canvas.style.cursor === 'progress') editor.canvas.style.cursor = status.cursor;
+      if (document.activeElement === status.button) editor.canvas.focus();
+    }
+    return;
+  }
+  if (!status) {
+    const parent = document.getElementById('status');
+    if (!parent) return;
+    const root = document.createElement('span'), label = document.createElement('span');
+    const progress = document.createElement('progress'), button = document.createElement('button');
+    root.setAttribute('role', 'group'); root.setAttribute('aria-label', t('Bild'));
+    label.setAttribute('role', 'status'); label.setAttribute('aria-live', 'polite');
+    progress.max = 4; progress.setAttribute('aria-label', t('Vorschau'));
+    button.type = 'button'; button.textContent = t('Abbrechen');
+    button.style.minWidth = button.style.minHeight = '24px';
+    root.append(label, progress, button); parent.append(root);
+    status = { root, label, progress, button, owners: [] };
+    imageProgressStatuses.set(editor, status);
+    const cancel = () => { for (const owner of imageProgressStatuses.get(editor)?.owners ?? []) cancelImageDisplay(owner); };
+    button.onclick = cancel;
+    root.onkeydown = (event) => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); cancel(); } };
+  }
+  status.owners = owners; status.root.hidden = false;
+  if (editor.canvas.style.cursor !== 'progress') status.cursor = editor.canvas.style.cursor;
+  editor.canvas.style.cursor = 'progress';
+  // One worker executes at a time: queued images must not hide its phase progress.
+  status.progress.value = Math.max(...owners.map(owner => imageDisplayActivity(owner)?.phase ?? 0));
+  const text = `${t('Vorschau')} ${status.progress.value} / ${status.progress.max}`;
+  if (status.label.textContent !== text) status.label.textContent = text;
+}
+
+/** Keep image failures in the existing status bar without replacing tool hints or stealing focus. */
+function showImageErrors(editor: Editor, errors: string[]) {
+  let status = imageErrorStatuses.get(editor);
+  if (!status) {
+    if (!errors.length) return;
+    const root = document.getElementById('status');
+    if (!root) return;
+    status = document.createElement('span');
+    status.className = 'hint';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    status.setAttribute('aria-atomic', 'true');
+    root.append(status);
+    imageErrorStatuses.set(editor, status);
+  }
+  const text = errors.join('\n');
+  if (status.textContent !== text) status.textContent = text;
+}
 
 function rectPath(w: number, h: number): Path2D {
   const p = new Path2D();
@@ -27,6 +91,118 @@ function closedPath(subs: SubPath[], m: Mat): Path2D {
   const p = new Path2D();
   p.addPath(subsToPath2D(subs.filter((sp) => sp.closed)), new DOMMatrix(m));
   return p;
+}
+
+// Anzeigewünsche der Arbeitsfläche (Phase 3 der Settings-Quick-Wins): eigenes Thema-unabhängiges
+// Dunkel, Griffgröße, Fadenkreuz und Bettmittel-Kreuz. Alles Opt-in, Defaults = heutiges Verhalten.
+const CANVAS_DARK_KEY = 'kizamubeam.canvasDark';
+const HANDLE_SIZE_KEY = 'kizamubeam.handleSize';
+const CROSSHAIR_KEY = 'kizamubeam.crosshair';
+const BED_CENTER_CROSS_KEY = 'kizamubeam.bedCenterCross';
+const CANVAS_FILLED_KEY = 'kizamubeam.canvasFilled';
+const IMAGE_SMOOTHING_KEY = 'kizamubeam.imageSmoothing';
+/** Kantenglättung beim Bild-Zoomen: true = heutiges automatisches Verhalten (vergrößert scharf, verkleinert geglättet) */
+export const DEFAULT_IMAGE_SMOOTHING = true;
+
+export function loadCanvasFilled(): boolean {
+  try {
+    return JSON.parse(localStorage.getItem(CANVAS_FILLED_KEY) ?? 'true') !== false;
+  } catch {
+    return true;
+  }
+}
+
+export function saveCanvasFilled(on: boolean) {
+  try {
+    localStorage.setItem(CANVAS_FILLED_KEY, JSON.stringify(on));
+  } catch {
+    /* Speicher nicht verfügbar */
+  }
+}
+
+export function loadImageSmoothing(): boolean {
+  try {
+    return JSON.parse(localStorage.getItem(IMAGE_SMOOTHING_KEY) ?? 'true') !== false;
+  } catch {
+    return true;
+  }
+}
+
+export function saveImageSmoothing(on: boolean) {
+  try {
+    localStorage.setItem(IMAGE_SMOOTHING_KEY, JSON.stringify(on));
+  } catch {
+    /* Speicher nicht verfügbar */
+  }
+}
+export const DEFAULT_HANDLE_SIZE = 8;
+export const MIN_HANDLE_SIZE = 4;
+export const MAX_HANDLE_SIZE = 16;
+
+export function loadCanvasDark(): boolean {
+  try {
+    return JSON.parse(localStorage.getItem(CANVAS_DARK_KEY) ?? 'false') === true;
+  } catch {
+    return false;
+  }
+}
+
+export function saveCanvasDark(on: boolean) {
+  try {
+    localStorage.setItem(CANVAS_DARK_KEY, JSON.stringify(on));
+  } catch {
+    /* Speicher nicht verfügbar */
+  }
+}
+
+export function loadHandleSize(): number {
+  try {
+    const v = JSON.parse(localStorage.getItem(HANDLE_SIZE_KEY) ?? String(DEFAULT_HANDLE_SIZE));
+    if (Number.isFinite(v) && v >= MIN_HANDLE_SIZE && v <= MAX_HANDLE_SIZE) return Math.round(v);
+  } catch {
+    /* Speicher nicht verfügbar oder beschädigt */
+  }
+  return DEFAULT_HANDLE_SIZE;
+}
+
+export function saveHandleSize(v: number) {
+  try {
+    localStorage.setItem(HANDLE_SIZE_KEY, JSON.stringify(v));
+  } catch {
+    /* Speicher nicht verfügbar */
+  }
+}
+
+export function loadShowCrosshair(): boolean {
+  try {
+    return JSON.parse(localStorage.getItem(CROSSHAIR_KEY) ?? 'false') === true;
+  } catch {
+    return false;
+  }
+}
+
+export function saveShowCrosshair(on: boolean) {
+  try {
+    localStorage.setItem(CROSSHAIR_KEY, JSON.stringify(on));
+  } catch {
+    /* Speicher nicht verfügbar */
+  }
+}
+
+export function loadBedCenterCross(): boolean {
+  try {
+    return JSON.parse(localStorage.getItem(BED_CENTER_CROSS_KEY) ?? 'false') === true;
+  } catch {
+    return false;
+  }
+}
+
+export function saveBedCenterCross(on: boolean) {
+  try {
+    localStorage.setItem(BED_CENTER_CROSS_KEY, JSON.stringify(on));
+  } catch {
+    /* Speicher nicht verfügbar */
+  }
 }
 
 /** Sehr dunkle Layerfarben auf dunklem Grund aufhellen (Farbton bleibt), Schwarz wird Hellgrau. */
@@ -63,7 +239,57 @@ export class EditorRender {
     return Math.hypot(f.x - c.x, f.y - c.y) < 8;
   }
   setDark(this: Editor, dark: boolean) {
-    this.dark = dark;
+    this.themeDark = dark;
+    this.dark = this.canvasDark || dark;
+    this.redraw();
+  }
+
+  /** Griff- und Knotengröße als Faktor (Standard 8 px); Fadenkreuz und Bettmitte s. unten */
+  handleScale(this: Editor): number {
+    return (this.handleSize ?? DEFAULT_HANDLE_SIZE) / DEFAULT_HANDLE_SIZE;
+  }
+
+  /** Dunkle Arbeitsfläche unabhängig vom UI-Design (Edit → Settings → Darstellung → Arbeitsfläche) */
+  setCanvasDark(this: Editor, on: boolean) {
+    this.canvasDark = on;
+    saveCanvasDark(on);
+    this.dark = on || this.themeDark;
+    this.redraw();
+  }
+
+  /** Griff- und Knotengröße in px (Edit → Settings → Darstellung → Arbeitsfläche) */
+  setHandleSize(this: Editor, v: number) {
+    if (!Number.isFinite(v) || v < MIN_HANDLE_SIZE || v > MAX_HANDLE_SIZE) throw new Error(t('Die Griffgröße muss zwischen 4 und 16 px liegen.'));
+    this.handleSize = Math.round(v);
+    saveHandleSize(this.handleSize);
+    this.redraw();
+  }
+
+  /** Vollbild-Fadenkreuz an der Zeigerposition (Edit → Settings → Darstellung → Arbeitsfläche) */
+  setShowCrosshair(this: Editor, on: boolean) {
+    this.showCrosshair = on;
+    saveShowCrosshair(on);
+    this.redraw();
+  }
+
+  /** Kreuz in der Bettmitte (Edit → Settings → Darstellung → Arbeitsfläche) */
+  setBedCenterCross(this: Editor, on: boolean) {
+    this.bedCenterCross = on;
+    saveBedCenterCross(on);
+    this.redraw();
+  }
+
+  /** Füll-Layer gefüllt anzeigen (Edit → Settings → Darstellung → Arbeitsfläche; Alt+W) */
+  setFilled(this: Editor, on: boolean) {
+    this.filled = on;
+    saveCanvasFilled(on);
+    this.emit('view');
+  }
+
+  /** Kantenglättung beim Bild-Zoomen (Edit → Settings → Darstellung → Arbeitsfläche) */
+  setImageSmoothing(this: Editor, on: boolean) {
+    this.imageSmoothing = on;
+    saveImageSmoothing(on);
     this.redraw();
   }
   /** Layerfarbe zum Zeichnen: Schwarz wird auf dunklem Grund hell dargestellt */
@@ -211,29 +437,84 @@ export class EditorRender {
       }
     }
     // Bilder liegen unter den Vektoren und zeigen das Ergebnis der Bildverarbeitung
+    const imageErrors: string[] = [];
+    const pendingImageDisplays: object[] = [];
     for (const [o, m, selected] of images) {
       const s = o.shape as ImageShape;
-      const cv = displayCanvas(s, m, this.imgOutput(o.layer));
+      // Live-Vorschau: aktiver Entwurf speist die Pixel, sonst das Modell.
+      const draftEdit = imageDraftEdit(this, o.id);
+      const eff: ImageShape = draftEdit ? { ...s, edit: draftEdit } : s;
+      let cv: HTMLCanvasElement | null = null;
+      const geometry = eff.edit === undefined ? null : resolveImageRasterGeometry(eff);
+      if (eff.edit !== undefined) {
+        let error = '';
+        if (geometry && !geometry.ok && geometry.reason !== 'geometry' && geometry.reason !== 'invalid-rounding') error = t('Ungültiger Bildzuschnitt oder ungültige Perspektive. Zuschnitt und Perspektive zurücksetzen oder das Bild ersetzen.');
+        else if (!geometry?.ok || !resolveImageContour(eff, m).ok) error = t('Bildverarbeitung fehlgeschlagen. Bildeinstellungen prüfen oder das Bild ersetzen.');
+        else {
+          const output = this.imgOutput(o.layer);
+          // Validate now; completed worker errors surface through this same boundary.
+          const displayOptions = { zoom: z, dpr, dragging: this.drag?.type === 'image-crop', owner: o };
+          try {
+            cv = draftEdit ? displayCanvasDraft(eff, m, output, draftEdit, displayOptions) : displayCanvas(eff, m, output, true, displayOptions);
+            if (imageDisplayActivity(o)) pendingImageDisplays.push(o);
+          }
+          catch (cause) {
+            if (!(cause instanceof ImageProcessingError)) throw cause;
+            error = t('Bildverarbeitung fehlgeschlagen. Bildeinstellungen prüfen oder das Bild ersetzen.');
+          }
+        }
+        if (error) {
+          imageErrors.push(`${o.id}: ${error}`);
+          // Original dimensions locate an explicitly marked error, never a valid contour.
+          ctx.save();
+          ctx.transform(...m);
+          const w = Number.isFinite(s.w) && s.w > 0 ? s.w : 32;
+          const h = Number.isFinite(s.h) && s.h > 0 ? s.h : 32;
+          ctx.strokeStyle = this.colors.sel;
+          ctx.lineWidth = 2 * px;
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, h); ctx.moveTo(w, 0); ctx.lineTo(0, h); ctx.stroke();
+          ctx.restore();
+          const at = this.toScreen(apply(m, 0, 0));
+          ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.font = '12px sans-serif'; ctx.textBaseline = 'top';
+          const tw = ctx.measureText(error).width;
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(at.x, at.y, tw + 8, 20);
+          ctx.fillStyle = '#111111'; ctx.fillText(error, at.x + 4, at.y + 3);
+          ctx.restore();
+          continue;
+        }
+      } else cv = displayCanvas(eff, m, this.imgOutput(o.layer));
+      const edited = eff.edit !== undefined;
+      // Sampling fills the raster rectangle, not the smaller rounded visible bounds.
+      const box = geometry?.ok ? { x: geometry.bounds.x, y: geometry.bounds.y,
+        w: geometry.bounds.width, h: geometry.bounds.height } : { x: 0, y: 0, w: s.w, h: s.h };
+      const outline = edited ? localPath(eff, m) : null;
       ctx.save();
       if (faded.has(o)) ctx.globalAlpha = FADE;
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      if (outline) { ctx.save(); ctx.clip(outline); }
       if (cv) {
-        // Vergrößert scharfe Punkte zeigen, verkleinert glätten
-        const scr = (z * Math.hypot(m[0], m[1]) * s.w) / cv.width;
-        ctx.imageSmoothingEnabled = scr < 1.5;
+        // Vergrößert scharfe Punkte zeigen, verkleinert glätten (abschaltbar über die Kantenglättung)
+        const scr = (z * Math.hypot(m[0], m[1]) * box.w) / cv.width;
+        ctx.imageSmoothingEnabled = (this.imageSmoothing ?? DEFAULT_IMAGE_SMOOTHING) && (edited ? isReducedImageDisplay(cv) : scr < 1.5);
         ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(cv, 0, 0, s.w, s.h);
+        ctx.drawImage(cv, box.x, box.y, box.w, box.h);
       } else {
         ctx.fillStyle = 'rgba(128,128,128,0.25)';
-        ctx.fillRect(0, 0, s.w, s.h);
+        if (outline) ctx.fill(outline);
+        else ctx.fillRect(0, 0, s.w, s.h);
       }
+      if (outline) ctx.restore();
       const k = 1 / Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2]) || 1);
       ctx.strokeStyle = this.layerDrawColor(o.layer);
       ctx.lineWidth = (selected ? 1.5 : 1) * px * k;
       ctx.setLineDash(selected ? [5 * px * k, 3 * px * k] : []);
-      ctx.strokeRect(0, 0, s.w, s.h);
+      if (outline) ctx.stroke(outline);
+      else ctx.strokeRect(0, 0, s.w, s.h);
       ctx.restore();
     }
+    showImageErrors(this, imageErrors);
+    showImageDisplayProgress(this, pendingImageDisplays);
     for (const bt of batches.values()) {
       const a = bt.faded ? FADE : 1;
       ctx.strokeStyle = ctx.fillStyle = bt.color;
@@ -467,7 +748,7 @@ export class EditorRender {
       for (const M of this.arrayPreview.slice(1)) {
         for (const [leaf, m] of visibleLeaves(this.sel, M)) {
           const s = leaf.shape;
-          const local = s.kind === 'text' ? textOutline(s)?.path : s.kind === 'image' ? rectPath(s.w, s.h) : localPath(s);
+          const local = s.kind === 'text' ? textOutline(s)?.path : s.kind === 'image' && s.edit === undefined ? rectPath(s.w, s.h) : localPath(s, m);
           if (local) p.addPath(local, new DOMMatrix(m));
         }
       }
@@ -546,8 +827,9 @@ export class EditorRender {
         ctx.fillStyle = T.handleFill;
         ctx.strokeStyle = T.sel;
         ctx.lineWidth = 1;
-        ctx.fillRect(h.x - 4, h.y - 4, 8, 8);
-        ctx.strokeRect(h.x - 4 + 0.5, h.y - 4 + 0.5, 7, 7);
+        const hz = this.handleSize ?? DEFAULT_HANDLE_SIZE, hh = hz / 2;
+        ctx.fillRect(h.x - hh, h.y - hh, hz, hz);
+        ctx.strokeRect(h.x - hh + 0.5, h.y - hh + 0.5, hz - 1, hz - 1);
       });
       if (this.rotateMode) {
         const c = this.toScreen(this.rotationCenter()!);
@@ -565,6 +847,51 @@ export class EditorRender {
         ctx.lineWidth = 1;
         ctx.stroke();
       }
+      const rr = this.rectRadiusScreen();
+      if (rr) {
+        ctx.fillStyle = T.handleFill;
+        ctx.strokeStyle = T.sel;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(rr.x, rr.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+    // Derived Bézier curve: square anchors, round tangent controls.
+    const se = this.shaperEdit;
+    if (se && this.shaperEditValid()) {
+      const hz = this.handleSize ?? DEFAULT_HANDLE_SIZE, hh = hz / 2;
+      ctx.fillStyle = T.handleFill;
+      ctx.strokeStyle = T.sel;
+      ctx.lineWidth = 1;
+      const path = gestureSpline(se, this.shaperSmoothing).path;
+      ctx.save();
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      path.nodes.forEach((n, i) => {
+        const q = this.toScreen(n);
+        if (!i) ctx.moveTo(q.x, q.y);
+        else {
+          const a = path.nodes[i - 1], c = this.toScreen(a.cout ?? a), d = this.toScreen(n.cin ?? n);
+          ctx.bezierCurveTo(c.x, c.y, d.x, d.y, q.x, q.y);
+        }
+      });
+      ctx.stroke();
+      for (const n of path.nodes) {
+        const a = this.toScreen(n);
+        for (const control of [n.cin, n.cout]) if (control) {
+          const q = this.toScreen(control);
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+          ctx.beginPath(); ctx.arc(q.x, q.y, Math.max(2, hh - 1), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        }
+      }
+      for (const p of path.nodes) {
+        const q = this.toScreen(p);
+        ctx.fillRect(q.x - hh, q.y - hh, hz, hz);
+        ctx.strokeRect(q.x - hh + 0.5, q.y - hh + 0.5, hz - 1, hz - 1);
+      }
+      ctx.restore();
     }
     // Winkelanzeige beim Drehen
     const d = this.drag;
@@ -648,14 +975,16 @@ export class EditorRender {
           ctx.setLineDash([3, 3]);
           ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(s.x, s.y); ctx.stroke();
           ctx.setLineDash([]);
-          ctx.fillRect(s.x - 3.5, s.y - 3.5, 7, 7);
-          ctx.strokeRect(s.x - 3 + 0.5, s.y - 3 + 0.5, 6, 6);
+          const ah = 3.5 * this.handleScale();
+          ctx.fillRect(s.x - ah, s.y - ah, 2 * ah, 2 * ah);
+          ctx.strokeRect(s.x - ah + 0.5, s.y - ah + 0.5, 2 * ah - 1, 2 * ah - 1);
         }
       } else {
         for (const pt of [arcDraft.start, arcDraft.mid, arcDraft.end].slice(0, arcDraft.phase)) {
           const q = this.toScreen(pt);
-          ctx.fillRect(q.x - 3.5, q.y - 3.5, 7, 7);
-          ctx.strokeRect(q.x - 3 + 0.5, q.y - 3 + 0.5, 6, 6);
+          const ah = 3.5 * this.handleScale();
+          ctx.fillRect(q.x - ah, q.y - ah, 2 * ah, 2 * ah);
+          ctx.strokeRect(q.x - ah + 0.5, q.y - ah + 0.5, 2 * ah - 1, 2 * ah - 1);
         }
       }
       ctx.restore();
@@ -699,7 +1028,7 @@ export class EditorRender {
             const pickedHandle=this.handleSelection(o).has(`${si}:${ni}:${which}`);
             ctx.fillStyle = hot ? '#ff6020' : pickedHandle?T.sel:T.handleFill;
             ctx.beginPath();
-            ctx.arc(hq.x, hq.y, 3.5, 0, Math.PI * 2);
+            ctx.arc(hq.x, hq.y, 3.5 * this.handleScale(), 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
           }
@@ -710,7 +1039,7 @@ export class EditorRender {
           ctx.lineWidth = 1.5;
           ctx.strokeStyle = hot ? '#ff6020' : col;
           ctx.fillStyle = hot ? '#ff6020' : picked ? col : T.handleFill;
-          const r = picked ? 4.5 : 3.5;
+          const r = (picked ? 4.5 : 3.5) * this.handleScale();
           ctx.fillRect(q.x - r, q.y - r, 2 * r, 2 * r);
           ctx.strokeRect(q.x - r, q.y - r, 2 * r, 2 * r);
         });
@@ -748,14 +1077,14 @@ export class EditorRender {
           ctx.stroke();
           ctx.fillStyle = T.handleFill;
           ctx.beginPath();
-          ctx.arc(hq.x, hq.y, 3.5, 0, Math.PI * 2);
+          ctx.arc(hq.x, hq.y, 3.5 * this.handleScale(), 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
         }
         ctx.lineWidth = i === active ? 2 : 1.5;
         ctx.strokeStyle = i === 0 ? '#20a040' : T.sel;
         ctx.fillStyle = T.handleFill;
-        const r = 3.5;
+        const r = 3.5 * this.handleScale();
         ctx.fillRect(q.x - r, q.y - r, 2 * r, 2 * r);
         ctx.strokeRect(q.x - r, q.y - r, 2 * r, 2 * r);
       }
@@ -767,6 +1096,32 @@ export class EditorRender {
       ctx.lineWidth = this.draftCloseHit() ? 2 : 1.5;
       ctx.strokeRect(q.x - 5, q.y - 5, 10, 10);
     }
+    // Bettmittel-Kreuz (Edit → Settings → Darstellung → Arbeitsfläche)
+    if (this.bedCenterCross) {
+      const bed = this.doc.bed;
+      const c = this.toScreen({ x: bed.w / 2, y: bed.h / 2 });
+      ctx.strokeStyle = T.sel;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(c.x - 9, c.y); ctx.lineTo(c.x + 9, c.y);
+      ctx.moveTo(c.x, c.y - 9); ctx.lineTo(c.x, c.y + 9);
+      ctx.stroke();
+    }
+    // Vollbild-Fadenkreuz an der Zeigerposition (Edit → Settings → Darstellung → Arbeitsfläche)
+    if (this.showCrosshair && this.cursorOnCanvas) {
+      const c = this.toScreen(this.cursor);
+      ctx.save();
+      ctx.globalAlpha = 0.35;
+      ctx.strokeStyle = T.sel;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, c.y); ctx.lineTo(this.w, c.y);
+      ctx.moveTo(c.x, 0); ctx.lineTo(c.x, this.h);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // Bild-Entwurf: 8 Zuschnitt-Griffe bzw. 4 Perspektiv-Ecken in Bild-lokalen Achsen
+    renderImageCropOverlay(this, ctx);
   }
 
   /** Befunde aus „Konstruktion prüfen“: Stellen farbig nach Schwere, der angeklickte Befund kräftiger */

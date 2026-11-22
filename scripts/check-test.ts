@@ -1,10 +1,30 @@
 // Tests für „Konstruktion prüfen“. Aufruf: npm run test:check
 import './core-fixtures-env';
 import { strict as assert } from 'node:assert';
-import type { CheckIssue } from '../src/check';
+// Textgeometrie misst über einen Canvas-Context (kein Canvas in Node): Minimal-Stub nur für Maße,
+// damit boundsOf() auch für Texte funktioniert. Echte Schriften werden nicht geladen (isFallbackFont → null).
+{
+  const g = globalThis as Record<string, unknown>;
+  const doc = (g.document ?? {}) as { createElement?: (tag: string) => unknown };
+  const prev = doc.createElement;
+  doc.createElement = (tag: string) => {
+    if (tag === 'canvas') return { getContext: () => ({ font: '', measureText: (s: string) => ({ width: [...s].length * 6 }) }), style: {} };
+    return prev ? prev(tag) : { style: {} };
+  };
+  g.document = doc;
+  // Konturen-Cache baut Path2D-Objekte (nur als Zeichen-Handle, Geometrie steckt in subs)
+  (g as Record<string, unknown>).Path2D ??= class {
+    moveTo() {}
+    lineTo() {}
+    bezierCurveTo() {}
+    closePath() {}
+    rect() {}
+  };
+}
+import type { CheckInput, CheckIssue } from '../src/check';
 import type { Layer, Obj, Shape, SubPath } from '../src/model';
 const { defaultLayer, IDENT, translate } = await import('../src/model');
-const { checkDesign, DEFAULT_CHECK, removeSpans } = await import('../src/check');
+const { checkDesign, checkFallbackFonts, DEFAULT_CHECK, removeSpans } = await import('../src/check');
 const { buildGen, defaultParams, GENERATORS, getGenerator } = await import('../src/generators/index');
 await import('./builtin-generators');
 const { library } = await import('../src/materials');
@@ -32,8 +52,8 @@ const path = (subs: SubPath[], layer = 1) => obj({ kind: 'path', subs }, 0, 0, l
 
 const layers: Record<number, Layer> = {};
 const layerOf = (i: number) => (layers[i] ??= defaultLayer(i));
-const run = (objs: Obj[], settings = {}): CheckIssue[] =>
-  checkDesign({ objs, layer: layerOf, bed: { w: 400, h: 400 }, settings: { ...DEFAULT_CHECK, ...settings } });
+const run = (objs: Obj[], settings = {}, extra: Partial<CheckInput> = {}): CheckIssue[] =>
+  checkDesign({ objs, layer: layerOf, bed: { w: 400, h: 400 }, settings: { ...DEFAULT_CHECK, ...settings }, ...extra });
 const kinds = (xs: CheckIssue[]) => xs.map((x) => x.kind).sort();
 
 test('Saubere Teile: keine Befunde', () => {
@@ -285,14 +305,23 @@ const fitOnly = (xs: CheckIssue[]) => xs.filter((x) => x.kind === 'fit' || x.kin
 
 test('Box: Standard passt, Presspassung zu eng, großes Spiel zu locker', () => {
   assert.deepEqual(fitOnly(run(genObjs('box', {}))), []);
-  const tight = fitOnly(run(genObjs('box', { clearance: -0.3 })));
+  // Das Steckspiel der Box ist das Gesamtspiel (#402): −0,6 = 0,6 Pressung gesamt, 0,4 = 0,4 Luft gesamt
+  const tight = fitOnly(run(genObjs('box', { clearance: -0.6 })));
   assert.equal(tight.length, 1);
   assert.equal(tight[0].level, 'error');
+  assert.match(tight[0].msg, /0[.,]60 mm/, 'Pressung gesamt wie im Feld');
   assert.ok(tight[0].objs.length >= 4, 'alle Teile der Baugruppe');
   assert.ok(tight[0].fix?.kind === 'gen' && tight[0].fix.patch.clearance === 0);
+  assert.deepEqual(fitOnly(run(genObjs('box', { clearance: 0.2 }))), [], '0,1 je Seite passt');
   const loose = fitOnly(run(genObjs('box', { clearance: 0.4 })));
   assert.equal(loose.length, 1);
   assert.match(loose[0].msg, /locker|loose/);
+  // Ohne Kalibrierung, mit Kerf-Versatz am Layer: die Korrektur ist ein Gesamtspiel, danach kein Befund mehr
+  layers[5] = { ...defaultLayer(5), kerf: 0.08 };
+  const kl = fitOnly(run(genObjs('box', { clearance: -0.6 }, 5)))[0];
+  assert.ok(kl.fix?.kind === 'gen');
+  assert.ok(Number(kl.fix.patch.clearance) > 0.2, `${kl.fix.patch.clearance}`);
+  assert.deepEqual(fitOnly(run(genObjs('box', kl.fix.patch as Record<string, number>, 5))), []);
 });
 
 test('Kerf doppelt (Generator und Layer) wird als zu eng erkannt', () => {
@@ -316,7 +345,7 @@ test('Materialdicke am Layer weicht ab: Hinweis mit Korrektur', () => {
 
 test('Mit Kalibrierung: Abweichung gemeldet, Korrektur übernimmt die kalibrierten Werte', () => {
   const e = library.add({ material: 'Birke', thickness: 3, title: 'Schneiden', desc: '', settings: defaultLayer(7) });
-  library.update(e.id, { fit: { kerf: 0.2, pair: -0.05, slot: 0.1, th: 3, date: '' } });
+  library.update(e.id, { fit: { kerf: 0.2, pair: -0.1, slot: 0.1, th: 3, date: '', v: 2 } });
   layers[7] = { ...defaultLayer(7), material: e.id };
   const xs = fitOnly(run(genObjs('box', { clearance: 0 }, 7)));
   assert.equal(xs.length, 1);
@@ -324,8 +353,9 @@ test('Mit Kalibrierung: Abweichung gemeldet, Korrektur übernimmt die kalibriert
   const f = xs[0].fix;
   assert.ok(f && f.kind === 'gen' && f.calibrated);
   assert.equal(f.patch.kerf, 0.2);
-  // gezeichnetes Spiel = 0,15 − 0,2 = −0,05 wie kalibriert
-  assert.ok(Math.abs(drawnFit('pair', Number(f.patch.clearance), 0.2, 0) - -0.05) < 1e-9);
+  // gezeichnetes Spiel je Seite = 0,15 − 0,2 = −0,05 wie kalibriert; das Steckspiel der Box ist das Gesamtspiel (#402)
+  assert.equal(f.patch.clearance, 0.3);
+  assert.ok(Math.abs(drawnFit('pair', Number(f.patch.clearance) / 2, 0.2, 0) - -0.05) < 1e-9);
   // nach dem Übernehmen kein Befund mehr
   assert.deepEqual(fitOnly(run(genObjs('box', f.patch as Record<string, number>, 7))), []);
   // Einsatz: Schlitz = Dicke + 0,1 gezeichnet
@@ -351,6 +381,29 @@ test('Verbindungs-Werkzeug: Passung der gespeicherten Verbindung', () => {
   assert.deepEqual(fitOnly(run([a, b])), []);
 });
 
+test('Verbindungs-Werkzeug: Verbindung mit v: 2 (Gesamtspiel) und ohne v (je Seite) geben denselben Befund', () => {
+  const a = rect(50, 30, 10, 10);
+  const b = rect(50, 30, 10, 60);
+  const mk = (kind: string) => ({ to: b.id, kind, th: 3, a: [{ x: 0, y: 30 }, { x: 50, y: 30 }, { x: 25, y: 20 }], b: [{ x: 0, y: 0 }, { x: 50, y: 0 }, { x: 25, y: 10 }] }) as never as NonNullable<Obj['mates']>[number];
+  const before = (m: NonNullable<Obj['mates']>[number]) => { a.mates = [m]; return fitOnly(run([a, b])).map((x) => ({ level: x.level, msg: x.msg.replace(/ \(Spiel.*$/, '') })); };
+  // Zinken (Teil in Teil): Spiel je Seite c, jetzt das Gesamtspiel 2c; derselbe Befund, auch bei lockeren und strammen
+  for (const c of [-0.5, -0.3, -0.1, 0, 0.1, 0.3, 0.6]) {
+    const old = before({ ...mk('finger'), fit: { k: 0.1, c } });
+    assert.deepEqual(before({ ...mk('finger'), fit: { k: 0.1, c: 2 * c, v: 2 } }), old, `finger ${c}`);
+  }
+  // Zapfen (Schlitz): das Spiel quer zum Schlitz war schon das Gesamtspiel, v ändert nichts
+  for (const c of [-0.3, 0, 0.1, 0.5]) {
+    assert.deepEqual(before({ ...mk('tenon'), fit: { k: 0.1, c, v: 2 } }), before({ ...mk('tenon'), fit: { k: 0.1, c } }), `tenon ${c}`);
+  }
+  // Das Spiel in der Klammer ist das Gesamtspiel, auch bei einer älteren Verbindung mit dem Spiel je Seite
+  const spiel = (m: NonNullable<Obj['mates']>[number]) => { a.mates = [m]; return fitOnly(run([a, b]))[0].msg.match(/\(Spiel (-?[\d.,]+),/)![1]; };
+  assert.equal(spiel({ ...mk('finger'), fit: { k: 0, c: -0.3 } }), spiel({ ...mk('finger'), fit: { k: 0, c: -0.6, v: 2 } }));
+  assert.match(spiel({ ...mk('finger'), fit: { k: 0, c: -0.3 } }), /^-0[.,]60$/);
+  assert.equal(spiel({ ...mk('tenon'), fit: { k: 0, c: -0.5 } }), spiel({ ...mk('tenon'), fit: { k: 0, c: -0.5, v: 2 } }));
+  // Die Meldung nennt das Gesamtspiel: 0,3 Pressung je Seite = 0,60 gesamt
+  assert.match(before({ ...mk('finger'), fit: { k: 0, c: -0.6, v: 2 } })[0].msg, /Pressung gesamt/);
+});
+
 test('Spiel-Formeln', () => {
   assert.ok(Math.abs(realGap('pair', drawnFit('pair', 0, 0.15, 0), 0.15, 3, 3)) < 1e-9);
   assert.ok(Math.abs(realGap('slot', drawnFit('slot', 0.1, 0.15, 0), 0.15, 3, 3) - 0.05) < 1e-9);
@@ -360,17 +413,17 @@ test('Spiel-Formeln', () => {
 // ---------- Kalibrierassistent (Etappe 3) ----------
 
 test('Kalibrier-Testteile: Stufen stimmen, saubere Konstruktion', () => {
-  const opt = { th: 3, pair: { from: -0.2, step: 0.05, count: 6 }, slot: { from: -0.25, step: 0.05, count: 8 } };
-  assert.deepEqual(stepValues(opt.pair), [-0.2, -0.15, -0.1, -0.05, 0, 0.05]);
+  const opt = { th: 3, pair: { from: -0.4, step: 0.1, count: 6 }, slot: { from: -0.25, step: 0.05, count: 8 } };
+  assert.deepEqual(stepValues(opt.pair), [-0.4, -0.3, -0.2, -0.1, 0, 0.1]);
   const { objs, w, h } = buildCalibParts(opt, 1, 0, 'sans');
   assert.ok(w > 0 && h > 0 && w < 200 && h < 120);
   const byName = (n: string) => objs.find((o) => o.name === t(n))!;
-  // Zapfen: Breite TAB − 2·Spiel
+  // Zapfen: Breite TAB − Gesamtspiel
   const tabs = byName('Zapfenkamm').shape as Extract<Shape, { kind: 'path' }>;
   const top = tabs.subs[0].nodes.filter((q) => q.y === 0).map((q) => q.x);
   const widths = [];
   for (let i = 0; i < top.length; i += 2) widths.push(Math.round((top[i + 1] - top[i]) * 1000) / 1000);
-  assert.deepEqual(widths, stepValues(opt.pair).map((c) => TAB - 2 * c));
+  assert.deepEqual(widths, stepValues(opt.pair).map((c) => Math.round((TAB - c) * 1000) / 1000));
   // Schlitze: Dicke + Zugabe
   const comb = byName('Schlitzkamm').shape as Extract<Shape, { kind: 'path' }>;
   const bottom = comb.subs[0].nodes.filter((q) => q.y === 10).map((q) => q.x);
@@ -384,27 +437,28 @@ test('Kalibrier-Testteile: Stufen stimmen, saubere Konstruktion', () => {
 });
 
 test('Kalibrierung auswerten: Schnittfuge, Spiel und Schlitz, Kerf-Versatz eingerechnet', () => {
-  const test0 = { th: 3, kl: 0, layer: 1, pair: [-0.2, -0.15, -0.1], slot: [-0.1, 0, 0.1], date: '2026-10-18' };
+  // Stufen des Zapfenspiels sind das Gesamtspiel (#402), Ergebnis wie vor #402 mit doppeltem Wert
+  const test0 = { th: 3, kl: 0, layer: 1, pair: [-0.4, -0.3, -0.2], slot: [-0.1, 0, 0.1], date: '2026-10-18', v: 2 as const };
   const r = calibResult(test0, 19.84, 2, 3);
   assert.ok('fit' in r);
-  assert.deepEqual(r.fit, { kerf: 0.16, pair: -0.15, slot: 0.1, th: 3, date: '2026-10-18' });
-  assert.deepEqual(calibResult(test0, null, 1, 1), { fit: { kerf: null, pair: -0.2, slot: -0.1, th: 3, date: '2026-10-18' } });
+  assert.deepEqual(r.fit, { kerf: 0.16, pair: -0.3, slot: 0.1, th: 3, date: '2026-10-18', v: 2 });
+  assert.deepEqual(calibResult(test0, null, 1, 1), { fit: { kerf: null, pair: -0.4, slot: -0.1, th: 3, date: '2026-10-18', v: 2 } });
   assert.deepEqual(calibResult(test0, 21, 1, 1), { error: 'square' });
   assert.deepEqual(calibResult(test0, NaN, 1, 1), { error: 'square' });
   assert.deepEqual(calibResult(test0, null, 4, 1), { error: 'pair' });
   // Mit Kerf-Versatz 0,08 am Layer: Quadrat außen größer, gezeichnete Passung enger
   const r2 = calibResult({ ...test0, kl: 0.08 }, SQUARE, 1, 2);
   assert.ok('fit' in r2);
-  assert.deepEqual([r2.fit.kerf, r2.fit.pair, r2.fit.slot], [0.16, -0.36, -0.16]);
+  assert.deepEqual([r2.fit.kerf, r2.fit.pair, r2.fit.slot], [0.16, -0.72, -0.16]);
   // Vorschlag der Stufen liegt um die Schnittbreite herum
   const d = defaultSteps(0.15, 0);
-  assert.ok(stepValues(d.pair).some((c) => Math.abs(c + 0.15) < 1e-9));
+  assert.ok(stepValues(d.pair).some((c) => Math.abs(c + 0.3) < 1e-9));
   assert.ok(stepValues(d.slot).some((c) => Math.abs(c + 0.15) < 1e-9));
 });
 
 test('Kalibrierung → Generator: kein Befund, Layer-Kerf ersetzt die Fuge im Bauteil', () => {
   const e = library.add({ material: 'Pappel', thickness: 3, title: 'Schneiden', desc: '', settings: defaultLayer(8) });
-  library.update(e.id, { fit: { kerf: 0.16, pair: -0.15, slot: 0.1, th: 3, date: '' } });
+  library.update(e.id, { fit: { kerf: 0.16, pair: -0.3, slot: 0.1, th: 3, date: '', v: 2 } });
   layers[8] = { ...defaultLayer(8), material: e.id };
   const p = genFitPatch('box', library.get(e.id)!, defaultParams(getGenerator('box')!), 0)!;
   assert.equal(p.kerf, 0.16);
@@ -448,6 +502,113 @@ test('Steckprüfung: Fehlt ein Teil, hängen andere lose; Teile auf anderen Seit
   const half = all.slice(0, 1);
   const xs = checkDesign({ objs: half, allObjs: all, layer: layerOf, bed: { w: 400, h: 400 }, settings: DEFAULT_CHECK });
   assert.deepEqual(asmOnly(xs), []);
+});
+
+// Ersatzschrift (#233): echte Roboto-Binär seeden, damit loadedFont im Node-Test den Cache trifft
+// (der Bundler kann die ?inline-Woffs nicht laden — ohne Seed würde loadFont async crashen).
+// Läufe: Gruppierung per Stub, still-Pfade (false/null, noLaser, Layer aus, geparkt) sowie Gruppe + Routing.
+const { withFonts } = await import('../src/fonts');
+const { readFileSync } = await import('node:fs');
+const robotoBuf = (() => {
+  const b = readFileSync('node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff');
+  return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+})();
+await withFonts([
+  { family: 'Fehlt', bold: false, italic: false, buf: robotoBuf },
+  { family: 'Fehlt', bold: true, italic: false, buf: robotoBuf },
+  { family: 'Fehlt', bold: false, italic: true, buf: robotoBuf },
+], async () => {
+test('Ersatzschrift (#233): ein Befund je Schrift, fett/kursiv getrennt, Level warn', () => {
+  const t = (font: string, x = 10, y = 10, extra: Record<string, unknown> = {}, layer = 1) =>
+    obj({ kind: 'text', text: 'A', font, size: 10, bold: false, italic: false, upper: false, align: 'left', hSpace: 0, vSpace: 0, ...extra } as Shape, x, y, layer);
+  const a = t('Fehlt'), b = t('Fehlt', 60, 10), c = t('Fehlt', 10, 60, { bold: true }), d = t('Fehlt', 70, 60, { italic: true });
+  const inp = { objs: [a, b, c, d], layer: layerOf, bed: { w: 400, h: 400 }, settings: { ...DEFAULT_CHECK } };
+  const out: CheckIssue[] = [];
+  checkFallbackFonts(inp, out, () => true);
+  assert.deepEqual(out.map((x) => x.key).sort(), ['font:Fehlt|false|false', 'font:Fehlt|false|true', 'font:Fehlt|true|false']);
+  assert.deepEqual(out.map((x) => x.kind), ['font', 'font', 'font']);
+  assert.deepEqual(out.map((x) => x.level), ['warn', 'warn', 'warn']);
+  const plain = out.find((x) => x.key === 'font:Fehlt|false|false')!;
+  assert.deepEqual(plain.objs, [a, b]);
+  assert.match(plain.msg, /Fehlt/);
+  assert.match(plain.msg, /2 Texte/);
+  assert.equal(plain.lines.length, 2);
+});
+
+test('Ersatzschrift (#233): geladen oder noch ladend meldet nichts; ohne Laserbeteiligung still', () => {
+  const t = (font: string, x = 10, y = 10): Obj =>
+    obj({ kind: 'text', text: 'A', font, size: 10, bold: false, italic: false, upper: false, align: 'left', hSpace: 0, vSpace: 0 } as Shape, x, y);
+  const runStub = (objs: Obj[], stub: () => boolean | null, layer = layerOf): CheckIssue[] => {
+    const out: CheckIssue[] = [];
+    checkFallbackFonts({ objs, layer, bed: { w: 400, h: 400 }, settings: { ...DEFAULT_CHECK } }, out, stub);
+    return out;
+  };
+  assert.deepEqual(runStub([t('Fehlt')], () => false), []);
+  assert.deepEqual(runStub([t('Fehlt')], () => null), []);
+  const still = t('Fehlt');
+  still.noLaser = true;
+  assert.deepEqual(runStub([still], () => true), []);
+  const off = (i: number) => ({ ...defaultLayer(i), output: false });
+  assert.deepEqual(runStub([t('Fehlt')], () => true, off), []);
+  // Geparkt (außerhalb des Betts, Platte drinnen): kein Befund
+  assert.deepEqual(runStub([rect(50, 50, 10, 10), t('Fehlt', 500, 500)], () => true), []);
+});
+
+test('Ersatzschrift (#233): Text in Gruppe nennt die Gruppe, checkDesign stürzt ohne geladene Schrift nicht ab', () => {
+  const leaf = { kind: 'text', text: 'A', font: 'Fehlt', size: 10, bold: false, italic: false, upper: false, align: 'left', hSpace: 0, vSpace: 0 } as Shape;
+  const g: Obj = { id: 900, m: IDENT, layer: 1, shape: { kind: 'group', children: [{ id: 901, m: translate(20, 20), layer: 1, shape: leaf }] } };
+  const out: CheckIssue[] = [];
+  checkFallbackFonts({ objs: [g], layer: layerOf, bed: { w: 400, h: 400 }, settings: { ...DEFAULT_CHECK } }, out, () => true);
+  assert.equal(out.length, 1);
+  assert.deepEqual(out[0].objs, [g]);
+  assert.equal(out[0].lines.length, 1);
+  // Echte Prüfung mit realer Ersatzschrift-Erkennung: geseedet = installiert (false) → kein Befund;
+  // null (lädt noch) nimmt denselben !== true-Zweig wie oben per Stub — kein Absturz ohne geladene Schrift
+  assert.deepEqual(kinds(run([obj(leaf, 10, 10)])).filter((k) => k === 'font'), []);
+});
+});
+
+test('Schnittreihenfolge (#153): außen vor innen warnt bei manuellem Auftrag (warn, ohne Fix)', () => {
+  const outer = rect(100, 60, 10, 10);
+  const inner = ellipse(5, 40, 40);
+  const xs = run([outer, inner], {}, { manualOrder: true });
+  assert.deepEqual(kinds(xs), ['order']);
+  assert.equal(xs[0].level, 'warn');
+  assert.equal(xs[0].key, 'order:1');
+  assert.match(xs[0].msg, /innen-vor-außen/);
+  assert.deepEqual(xs[0].objs, [inner]);
+  assert.equal(xs[0].lines.length, 1);
+  assert.equal(xs[0].fix, undefined);
+});
+
+test('Schnittreihenfolge (#153): innen vor außen ist sauber; ohne manualOrder still', () => {
+  const outer = rect(100, 60, 10, 10);
+  const inner = ellipse(5, 40, 40);
+  assert.deepEqual(run([inner, outer], {}, { manualOrder: true }), []);
+  assert.deepEqual(run([outer, inner]), []);
+  assert.deepEqual(run([outer, inner], {}, { manualOrder: false }), []);
+});
+
+test('Schnittreihenfolge (#153): deckungsgleiche Konturen sind Doppellinien, kein Reihenfolge-Befund', () => {
+  const xs = run([rect(50, 50, 10, 10), rect(50, 50, 10, 10)], {}, { manualOrder: true });
+  assert.ok(kinds(xs).includes('double'));
+  assert.ok(!kinds(xs).includes('order'));
+});
+
+test('Layer-Art (#265): Markierungs-Layer schneiden nicht, ihre Formen sind Gravuren', () => {
+  layers[12] = { ...defaultLayer(12), mode: 'line', layerType: 'mark' };
+  layers[13] = { ...defaultLayer(13), mode: 'line', layerType: 'cut' };
+  const plate = rect(50, 50, 10, 10);
+  // Zu kleiner Kreis: als Schnitt ein zu kleiner Ausschnitt, als Markierung nichts
+  assert.deepEqual(kinds(run([plate, ellipse(0.12, 30, 30, 13)])), ['hole'], 'Art Schneiden wie ohne Art');
+  assert.deepEqual(run([plate, ellipse(0.12, 30, 30, 12)]), [], 'Markierung');
+  // Geschlossene Markierung neben jedem Teil trifft die Arbeitsfläche; auf dem Teil nicht
+  const far = rect(20, 20, 200, 200, 12);
+  const xs = run([plate, rect(10, 10, 20, 20, 12), far]);
+  assert.deepEqual(kinds(xs), ['engrave']);
+  assert.deepEqual(xs[0].objs, [far]);
+  // Eine Markierung allein ist kein Teil: ohne Teile keine Meldung, wie bei anderen Gravuren
+  assert.deepEqual(run([far]), []);
 });
 
 if (failed) {

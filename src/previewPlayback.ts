@@ -1,6 +1,6 @@
 // Reine Abspiellogik der Vorschau: Prozessarten, Glättung, Pausen und Zeitmarken.
 // Bewusst ohne DOM, damit die Berechnung unabhängig prüfbar bleibt.
-import { MOVE_CUT, MOVE_ENGRAVE, MOVE_TRAVEL } from './gcode';
+import { dwellSeconds, MOVE_CUT, MOVE_ENGRAVE, MOVE_TRAVEL } from './gcode';
 import type { Estimate, Moves } from './gcode';
 
 /** 0 = reine Verfahrbewegung; 1 = Gravieren (Füllen, Bild); 2 = Schneiden (Linien) */
@@ -143,12 +143,15 @@ export function analyzePlayback(mv: Moves, est: Estimate, settings: PlaybackSett
     }
   }
 
+  // Der Bildschnitt (sub = -2) wird nach Haupt- und Sublayern desselben Layers einsortiert.
+  // Zeitmarken bleiben von der Anzeigesortierung unberührt.
+  const subRank = (s: number) => (s === -2 ? Number.MAX_SAFE_INTEGER : s === -1 ? 0 : s + 1);
   const layerTimes: LayerTime[] = [...layerMap.entries()]
     .map(([key, seconds]) => {
       const [layer, sub] = key.split(':').map(Number);
       return { layer, sub, seconds, share: total > 0 ? seconds / total : 0 };
     })
-    .sort((a, b) => a.layer - b.layer || a.sub - b.sub);
+    .sort((a, b) => a.layer - b.layer || subRank(a.sub) - subRank(b.sub));
 
   return { segmentProcess, processTimes, layerTimes, markers, factors: computeFactors(processTimes, settings) };
 }
@@ -167,6 +170,15 @@ const segmentAt = (mv: Moves, est: Estimate, time: number) => {
 export interface AdvanceResult {
   time: number;
   paused: boolean;
+}
+
+/** Anteil der aktuellen Bewegung für die Kopfinterpolation der Vorschau. */
+export function segmentFraction(mv: Moves, est: Estimate, i: number, time: number): number {
+  const t0 = i ? est.t[i - 1] : 0,
+    t1 = est.t[i];
+  const dw = dwellSeconds(mv, i, est);
+  const tm = Math.min(t1, t0 + dw);
+  return t1 > tm ? Math.min(1, Math.max(0, (time - tm) / (t1 - tm))) : time >= tm ? 1 : 0;
 }
 
 /**
@@ -192,13 +204,28 @@ export function advancePlayback(
   for (let guard = 0; remaining > 1e-9 && t < total && guard < 20000; guard++) {
     const i = segmentAt(mv, est, t);
     if (i >= mv.n) {
-      t = total;
+      t = Math.min(total, t + remaining);
       break;
     }
     const t0 = i ? est.t[i - 1] : 0;
     const t1 = Math.min(total, est.t[i]);
     if (!(t1 > t0)) {
       t = Math.max(t, t1);
+      continue;
+    }
+    // Pause vor der Bewegung läuft in Echtzeit (Faktor 1): der Kopf steht still,
+    // egal wie schnell die Vorschau die Bewegung abspielt.
+    const dw = dwellSeconds(mv, i, est);
+    const tDwellEnd = Math.min(t1, t0 + dw);
+    if (t < tDwellEnd) {
+      const needDwell = tDwellEnd - t;
+      if (needDwell > remaining) {
+        t += remaining;
+        remaining = 0;
+        break;
+      }
+      t = tDwellEnd;
+      remaining -= needDwell;
       continue;
     }
     const f = factorAt(i);

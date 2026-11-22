@@ -3,8 +3,9 @@
 // Sub-Layer bearbeiten dieselben Formen nach dem Layer (z. B. erst füllen, dann ausschneiden) und haben eigene Reiter.
 import type { Editor } from './editor';
 import { h, numInput } from './dom';
-import { CutSettings, cutSettings, defaultCutSettings, defaultSubLayer, FillStyle, LayerMode, layerLabel, PALETTE, SubLayer } from './model';
+import { cleanLayerType, CutSettings, cutSettings, cutsThrough, defaultSubLayer, FillStyle, isCutLayer, Layer, LAYER_TYPES, LayerMode, layerLabel, layerTypeName, PALETTE, SubLayer } from './model';
 import { t } from './i18n';
+import { resetSettings } from './layerCategories';
 import { lookEditor } from './view3d/lookui';
 import { guessLook, lookName, resolveLook } from './view3d/looks';
 import { library } from './materials';
@@ -12,6 +13,7 @@ import { imageLayerFields } from './imageLayerFields';
 import { optionPicture } from './optionArt';
 import { device } from './laser';
 import { galvoLayer, normalizeJcz } from './jcz/settings';
+import { imageCutSettings, type ImageCut } from './imageCut';
 
 /** Opens "Adjust Image" for a layer; set by the UI module (it lives there) */
 let openAdjust: ((ed: Editor, layer: number) => void) | null = null;
@@ -24,6 +26,8 @@ export function openLayerDialog(ed: Editor, i: number) {
   const parts = ed.layerParts(i);
   const vecs = parts.vec || !parts.img;
   const origImg = parts.img ? { ...ed.imgLayer(i) } : null;
+  // Separate working copy: the image cut is optional and committed as one undo step with the layer.
+  const imgCut: ImageCut | null = parts.img ? structuredClone(imageCutSettings(origImg ?? undefined)) : null;
   let name = L.name;
   let output = L.output;
   c.sub = c.sub?.map((s) => structuredClone(s)) ?? [];
@@ -43,9 +47,13 @@ export function openLayerDialog(ed: Editor, i: number) {
   };
   const check = (label: string, get: () => boolean, set: (v: boolean) => void, title?: string, after?: () => void) =>
     h('label', { class: 'check', title }, h('input', { type: 'checkbox', checked: get(), onchange: (e: Event) => (set((e.target as HTMLInputElement).checked), after?.()) }), label);
-  const row = (label: string, el: HTMLElement, title?: string) => [h('label', { title }, label), el];
+  const row = (label: string, el: HTMLElement, title?: string) => {
+    // Zugänglicher Name: Label und Eingabe sind Geschwister, daher bekommt das Feld den Namen direkt
+    if ((el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') && !el.hasAttribute('aria-label') && !el.hasAttribute('aria-labelledby')) el.setAttribute('aria-label', label);
+    return [h('label', { title }, label), el];
+  };
 
-  const tabBar = h('div', { class: 'sub-tabs' });
+  const tabBar = h('div', { class: 'tab-bar', role: 'tablist' });
   /** Sub-Layer k entfernen; danach den benachbarten Reiter (oder den Layer) zeigen */
   const removeSub = (k: number) => {
     if (k < 0 || k >= subs.length) return;
@@ -54,23 +62,23 @@ export function openLayerDialog(ed: Editor, i: number) {
     else if (tab > k) tab--;
     render();
   };
-  const general = h('div', { class: 'form' });
+  const generalForm = h('div', { class: 'form' });
+  const geomForm = h('div', { class: 'form' });
   const modeBox = h('div');
   const render = () => {
     const e = cur();
     tabBar.replaceChildren(
-      h('button', { type: 'button', class: `btn small${tab < 0 ? ' active' : ''}`, onclick: () => ((tab = -1), render()) }, t('Layer')),
+      h('button', { type: 'button', class: `tab${tab < 0 ? ' on' : ''}`, onclick: () => ((tab = -1), render()) }, t('Layer')),
       ...subs.map((s, k) =>
-        h('span', { class: `sub-tab${tab === k ? ' active' : ''}${s.output ? '' : ' off'}` },
+        h('span', { class: `tab sub-tab${tab === k ? ' on' : ''}${s.output ? '' : ' off'}` },
           h('button', {
             type: 'button',
-            class: 'btn small',
             title: s.output ? '' : t('Nicht ausgegeben'),
             onclick: () => ((tab = k), render()),
           }, ((s.name ?? '').trim() || t('Sub-Layer {n}', { n: k + 1 }))),
           h('button', {
             type: 'button',
-            class: 'btn small sub-del',
+            class: 'sub-del',
             title: t('Sub-Layer entfernen'),
             onclick: (ev: Event) => (ev.stopPropagation(), removeSub(k)),
           }, '×'),
@@ -95,6 +103,20 @@ export function openLayerDialog(ed: Editor, i: number) {
       h('option', { value: 'line', selected: e.mode === 'line' }, t('Linie')),
       h('option', { value: 'fill', selected: e.mode === 'fill' }, t('Füllen')),
     );
+    // Layer-Art (#265): gilt für den ganzen Layer samt Sub-Layern; Automatisch = wie bisher aus Modus und Sub-Layern
+    const working = { ...c, sub: subs } as Layer;
+    const typeSel = h('select', {
+      title: t('Was der Layer am Werkstück tut. Gravieren und Markieren schneiden nicht durch, auch geschlossene Formen nicht: In der 3D-Ansicht, der Konstruktionsprüfung und beim Verschachteln liegen sie auf dem Teil. Der G-Code bleibt gleich.'),
+      onchange: (ev: Event) => {
+        const v = cleanLayerType((ev.target as HTMLSelectElement).value);
+        if (v) c.layerType = v;
+        else delete c.layerType;
+        render();
+      },
+    },
+      h('option', { value: '', selected: !c.layerType }, t('Automatisch ({name})', { name: layerTypeName(isCutLayer(working) ? 'cut' : 'engrave') })),
+      ...LAYER_TYPES.map((k) => h('option', { value: k, selected: c.layerType === k }, layerTypeName(k))),
+    );
     const sub = tab >= 0 ? subs[tab] : null;
     // Galvo device (JCZ): speed in mm/s, pulse frequency and (MOPA) pulse width; no Z axis, no air assist command
     const galvo = device.fw === 'jcz';
@@ -109,19 +131,17 @@ export function openLayerDialog(ed: Editor, i: number) {
     const speedRow = galvo
       ? row(t('Geschwindigkeit (mm/s)'), num(() => Math.round((e.speed / 60) * 100) / 100, (v) => (e.speed = v * 60), 1, 20000, false, t('Markiergeschwindigkeit des Galvos')))
       : row(t('Geschwindigkeit (mm/min)'), num(() => e.speed, (v) => (e.speed = v), 1, 100000));
-    general.replaceChildren(
+    generalForm.replaceChildren(
       ...(sub
         ? row(t('Name'), h('input', { type: 'text', value: sub.name ?? '', oninput: (ev: Event) => (sub.name = (ev.target as HTMLInputElement).value) }))
         : row(t('Name'), h('input', { type: 'text', value: name, oninput: (ev: Event) => (name = (ev.target as HTMLInputElement).value) }))),
       ...(vecs ? row(t('Modus'), modeSel) : []),
+      ...(vecs && !sub ? row(t('Art'), typeSel) : []),
       ...speedRow,
       ...row(t('Max. Leistung (%)'), num(() => e.power, (v) => (e.power = v), 0, 100)),
       ...row(t('Min. Leistung (%)'), num(() => e.minPower, (v) => (e.minPower = v), 0, 100, false, t('Leistung in Ecken (Leistungsrampe) und bei Bildern in Graustufen'))),
       ...galvoRows,
       ...row(t('Durchgänge'), num(() => e.passes, (v) => (e.passes = v), 1, 100, true)),
-      ...(!vecs ? [] : row(t('Kerf-Versatz (mm)'), num(() => e.kerf, (v) => (e.kerf = v), -5, 5, false, t('Positiv: Außenkonturen wandern nach außen, Löcher nach innen. Etwa die halbe Schnittbreite eintragen, damit Teile maßhaltig werden. Nur geschlossene Konturen (Kerf → Tabs → Perforation; Fill kerft die Hülle, Bilder ohne Kerf).')))),
-      ...(galvo ? [] : row(t('Z-Versatz (mm)'), num(() => e.zOffset, (v) => (e.zOffset = v), -50, 50, false, t('Fokus beim ersten Durchgang verschieben, positiv = tiefer ins Material. Braucht eine Z-Achse (Geräteeinstellungen); bezogen auf die Höhe beim Start.')))),
-      ...(galvo ? [] : row(t('Je Durchgang tiefer (mm)'), num(() => e.zStep, (v) => (e.zStep = v), -20, 20, false, t('Fokus nach jedem Durchgang um diesen Wert tiefer setzen, z. B. bei dickem Material. Am Ende fährt Z zurück.')))),
       sub
         ? h('span', { class: 'checks' },
             check(t('Ausgabe'), () => sub.output, (v) => (sub.output = v), t('Sub-Layer beim Lasern ausgeben'), render),
@@ -132,13 +152,22 @@ export function openLayerDialog(ed: Editor, i: number) {
             check(t('Ausgabe'), () => output, (v) => (output = v), t('Layer beim Lasern ausgeben')),
           ),
     );
-    modeBox.replaceChildren(...(vecs ? [e.mode === 'line' ? lineSection(e) : fillSection(e)] : []));
-    lookSection.hidden = !!sub;
-    imageSection.hidden = !!sub;
-    if (!sub) renderImage();
+    geomForm.replaceChildren(
+      ...(!vecs ? [] : row(t('Kerf-Versatz (mm)'), num(() => e.kerf, (v) => (e.kerf = v), -5, 5, false, t('Positiv: Außenkonturen wandern nach außen, Löcher nach innen. Etwa die halbe Schnittbreite eintragen, damit Teile maßhaltig werden. Nur geschlossene Konturen (Kerf → Tabs → Perforation; Fill kerft die Hülle, Bilder ohne Kerf).')))),
+      ...(galvo ? [] : row(t('Z-Versatz (mm)'), num(() => e.zOffset, (v) => (e.zOffset = v), -50, 50, false, t('Fokus beim ersten Durchgang verschieben, positiv = tiefer ins Material. Braucht eine Z-Achse (Geräteeinstellungen); bezogen auf die Höhe beim Start.')))),
+      ...(galvo ? [] : row(t('Je Durchgang tiefer (mm)'), num(() => e.zStep, (v) => (e.zStep = v), -20, 20, false, t('Fokus nach jedem Durchgang um diesen Wert tiefer setzen, z. B. bei dickem Material. Am Ende fährt Z zurück.')))),
+    );
+    modeBox.replaceChildren(...(vecs ? [e.mode === 'line'
+      ? fold(t('Linie'), true, t('Haltestege, doppelte Linien, Perforation, Anschnitt, Leistungsrampe und Pause'), lineSection(e))
+      : fold(t('Füllen'), true, t('Füllart, Zeilenabstand und Schraffuroptionen'), fillSection(e))] : []));
+    lookGroup.hidden = !!sub;
+    lookNote.hidden = cutsThrough(working);
+    imageGroup.hidden = !!sub;
+    imageCutGroup.hidden = !!sub;
+    if (!sub) { renderImage(); renderImageCut(); }
   };
 
-  const lineSection = (c: Entry) => {
+  const lineSection = (c: Entry, suffix = '') => {
     const T = c.tabs;
     const box = h('div', { class: 'form' });
     const fill = () => {
@@ -149,19 +178,35 @@ export function openLayerDialog(ed: Editor, i: number) {
               ...row(t('Steglänge (mm)'), num(() => T.size, (v) => (T.size = v), 0.05, 50)),
               h('label', {}, t('Verteilung')),
               h('span', { class: 'radios' },
-                h('label', {}, h('input', { type: 'radio', name: `tabs-${i}`, checked: T.useCount, onchange: () => ((T.useCount = true), fill()) }), t('Anzahl')),
-                h('label', {}, h('input', { type: 'radio', name: `tabs-${i}`, checked: !T.useCount, onchange: () => ((T.useCount = false), fill()) }), t('Abstand')),
+                h('label', {}, h('input', { type: 'radio', name: `tabs-${i}${suffix}`, checked: T.useCount, onchange: () => ((T.useCount = true), fill()) }), t('Anzahl')),
+                h('label', {}, h('input', { type: 'radio', name: `tabs-${i}${suffix}`, checked: !T.useCount, onchange: () => ((T.useCount = false), fill()) }), t('Abstand')),
               ),
               ...(T.useCount
                 ? row(t('Stege je Form'), num(() => T.count, (v) => (T.count = v), 1, 100, true))
                 : row(t('Abstand (mm)'), num(() => T.spacing, (v) => (T.spacing = v), 1, 10000))),
+              ...row(t('Max. Stege je Form'), num(() => T.maxTabs, (v) => (T.maxTabs = v), 0, 1000, true, t('0 = unbegrenzt'))),
+              ...row(t('Min. Stege je Form'), num(() => T.minTabs, (v) => (T.minTabs = v), 1, 1000, true, t('Die Passform-Regel (Stege höchstens halber Umfang) gewinnt bei zu kleinen Formen'))),
+              ...row(t('Stegleistung (%)'), num(() => T.tabPower, (v) => (T.tabPower = v), 0, 100, false, t('0 = Laser aus wie bisher, darüber schneidet der Steg mit reduzierter Leistung'))),
               h('span', { class: 'checks' }, check(t('Innere Formen auslassen'), () => T.skipInner, (v) => (T.skipInner = v), t('Löcher und Formen innerhalb anderer Formen fallen heraus und brauchen keine Stege'))),
+              h('div', {}, h('button', { type: 'button', class: 'btn small', title: t('Automatische Stege dieses Layers entfernen'), onclick: () => ((T.enabled = false), fill()) }, t('Stege entfernen'))),
             ]
           : []),
       );
     };
     fill();
-    return h('div', {}, h('div', { class: 'form-title' }, t('Linie')), box, dedupSection(c), perfSection(c), leadSection(c), rampSection(c));
+    return h('div', {}, box, dedupSection(c), perfSection(c), leadSection(c, suffix), rampSection(c), dwellSection(c));
+  };
+
+  const dwellSection = (c: Entry) => {
+    const D = c.dwell;
+    return fold(t('Pause'), D.start > 0 || D.end > 0 || D.cutThrough, t('Beruhigungspause vor und nach jedem Schnitt; mit Anstechen brennt der Strahl die Startpause über (dicke Materialien). Smoothieware: nur Pause ohne Strahl. Ruida-Steuerungen: keine Pausen.'),
+      h('div', { class: 'form' },
+        ...row(t('Startpause (ms)'), num(() => D.start, (v) => (D.start = v), 0, 60000, true)),
+        ...row(t('Endpause (ms)'), num(() => D.end, (v) => (D.end = v), 0, 60000, true)),
+        h('span', { class: 'checks' }, check(t('Anstechen (Cut-Through)'), () => D.cutThrough, (v) => (D.cutThrough = v), t('Strahl während der Startpause einschalten, damit der Schnitt sicher durchdringt (nicht bei Smoothieware/Ruida)'))),
+        ...row(t('Anstechleistung (%)'), num(() => D.power, (v) => (D.power = v), 0, 100)),
+      ),
+    );
   };
 
   const dedupSection = (c: Entry) =>
@@ -176,6 +221,10 @@ export function openLayerDialog(ed: Editor, i: number) {
   const fold = (title: string, open: boolean, tip: string, ...body: HTMLElement[]) =>
     h('details', { class: 'cut-extra', open }, h('summary', { title: tip }, title), ...body);
 
+  /** Gruppierte Dialogabschnitte (A-13): kurze Kernparameter oben, seltene unten */
+  const generalGroup = fold(t('Allgemein'), true, t('Name, Modus, Geschwindigkeit, Leistung, Durchgänge und Ausgabe'), generalForm);
+  const geomGroup = fold(t('Geometrie'), true, t('Kerf-Versatz und Fokuslage (Z)'), geomForm);
+
   const perfSection = (c: Entry) => {
     const P = c.perf;
     return fold(t('Perforation'), P.enabled, t('Gestrichelt schneiden: abwechselnd ein Stück schneiden und eine Lücke stehen lassen, z. B. für Abreißkanten oder Falzlinien'),
@@ -187,13 +236,13 @@ export function openLayerDialog(ed: Editor, i: number) {
     );
   };
 
-  const leadSection = (c: Entry) => {
+  const leadSection = (c: Entry, suffix = '') => {
     const Ld = c.lead;
     const box = h('div', { class: 'form' });
     const fill = () => {
       const form = h('span', { class: 'radios' },
-        h('label', {}, h('input', { type: 'radio', name: `lead-${i}`, value: 'line', checked: !Ld.arc, onchange: () => ((Ld.arc = false), fill()) }), t('Gerade')),
-        h('label', {}, h('input', { type: 'radio', name: `lead-${i}`, value: 'arc', checked: Ld.arc, onchange: () => ((Ld.arc = true), fill()) }), t('Bogen')),
+        h('label', {}, h('input', { type: 'radio', name: `lead-${i}${suffix}`, value: 'line', checked: !Ld.arc, onchange: () => ((Ld.arc = false), fill()) }), t('Gerade')),
+        h('label', {}, h('input', { type: 'radio', name: `lead-${i}${suffix}`, value: 'arc', checked: Ld.arc, onchange: () => ((Ld.arc = true), fill()) }), t('Bogen')),
       );
       box.replaceChildren(
         h('span', { class: 'checks' },
@@ -204,7 +253,7 @@ export function openLayerDialog(ed: Editor, i: number) {
         h('label', {}, t('Form')),
         form,
         optionPicture(form, 'lead'),
-        ...row(Ld.arc ? t('Bogenwinkel (°)') : t('Winkel zur Kontur (°)'), num(() => Ld.angle, (v) => (Ld.angle = v), Ld.arc ? 1 : 0, Ld.arc ? 180 : 90, false, Ld.arc ? t('Wie weit der Bogen um die Ecke führt') : t('90° = senkrecht zur Kontur, 0° = in Verlängerung'))),
+        ...row(Ld.arc ? t('Bogenwinkel (°)') : t('Winkel zur Kontur (°)'), num(() => Ld.angle, (v) => (Ld.angle = v), Ld.arc ? 1 : -90, Ld.arc ? 180 : 90, false, Ld.arc ? t('Wie weit der Bogen um die Ecke führt') : t('90° = senkrecht zur Kontur, 0° = in Verlängerung, negativ = Gegenseite (Material statt Abfall)'))),
         ...row(t('Überschnitt (mm)'), num(() => Ld.overcut, (v) => (Ld.overcut = v), 0, 100, false, t('Nach dem Schließen der Form so weit weiter schneiden, damit sich Anfang und Ende sicher treffen'))),
       );
     };
@@ -237,7 +286,6 @@ export function openLayerDialog(ed: Editor, i: number) {
       h('option', { value: 'offset', selected: c.fillStyle === 'offset' }, t('Kontur folgend')),
     );
     return h('div', {},
-      h('div', { class: 'form-title' }, t('Füllen')),
       h('div', { class: 'form' },
         ...row(t('Füllart'), style, t('Zeilenweise: Fläche Zeile für Zeile abtasten. Kontur folgend: Ringe, die dem Umriss nach innen folgen (gut für schmale Rahmen, Schrift und Ornamente).')),
         optionPicture(style, 'fill'),
@@ -262,22 +310,25 @@ export function openLayerDialog(ed: Editor, i: number) {
     const g = guessLook(library.get(L.material)?.material ?? '');
     return g ? t('Automatisch ({name})', { name: lookName(resolveLook(g)) }) : t('Automatisch (Standard der 3D-Ansicht)');
   };
-  const lookSection = h('div', {},
-    h('div', { class: 'form-title', title: t('Wie Platten und Gravuren dieses Layers in der 3D-Ansicht aussehen. Automatisch: aus dem Namen des Materials der Bibliothek, sonst der Standard der 3D-Ansicht.') }, t('Aussehen in 3D')),
+  const lookTip = t('Wie Platten und Gravuren dieses Layers in der 3D-Ansicht aussehen. Automatisch: aus dem Namen des Materials der Bibliothek, sonst der Standard der 3D-Ansicht.');
+  // Gravur-, Markierungs- und Füll-Layer bilden keine Platten (#265)
+  const lookNote = h('div', { class: 'note' }, t('Dieser Layer bildet keine Platten: Seine Formen werden auf die Platten darunter graviert, im Aussehen von deren Material.'));
+  const lookGroup = fold(t('Aussehen in 3D'), false, lookTip, h('div', {},
     h('div', { class: 'form look-form' },
       h('label', {}, t('Material')),
       lookEditor(() => c.look, (v) => (c.look = v), autoName()),
     ),
-  );
+    lookNote,
+  ));
 
   // Image settings of this layer (only when it holds images). Interval, bidirectional and overscan belong to the
   // layer: shown here, unless the fill section above already shows them
-  const imageSection = h('div');
+  const imageInner = h('div');
+  const imageGroup = fold(vecs ? t('Bilder') : t('Bild'), true, t('Rastereinstellungen des Layers'), imageInner);
   const renderImage = () => {
     if (!parts.img) return;
     const fillShown = vecs && c.mode === 'fill';
     const kids: (HTMLElement | null)[] = [
-      h('div', { class: 'form-title' }, vecs ? t('Bilder') : t('Bild')),
       h('div', { class: 'form' }, ...imageLayerFields(ed, i, true, undefined, fillShown ? null : { get: () => c, set: (p) => Object.assign(c, p) })),
       fillShown ? h('div', { class: 'note' }, t('Zeilenabstand, Bidirektional und Überfahrweg unter „Füllen“ gelten auch für die Bilder.')) : null,
       openAdjust
@@ -293,7 +344,39 @@ export function openLayerDialog(ed: Editor, i: number) {
           }, t('Bild anpassen …')))
         : null,
     ];
-    imageSection.replaceChildren(...kids.filter((k): k is HTMLElement => !!k));
+    imageInner.replaceChildren(...kids.filter((k): k is HTMLElement => !!k));
+  };
+
+  // Optionaler Bildschnitt: eigene Linienparameter, standardmäßig aus. Kein Eingriff in die Rastereinstellungen.
+  const imageCutBox = h('div', { class: 'form' });
+  const imageCutNote = h('div', { class: 'note' });
+  const imageCutGroup = fold(t('Bildschnitt (optional)'), false, t('Optionaler Konturschnitt für Bilder, mit eigenen Linienparametern'), imageCutBox);
+  const renderImageCut = () => {
+    if (!imgCut) return;
+    const C = imgCut;
+    imageCutGroup.open = C.output;
+    const cutImages = ed.doc.objs.filter((o) => o.layer === i && o.shape.kind === 'image' &&
+      (o.shape as { cut?: { mode?: string } }).cut?.mode === 'contour');
+    const dangling = cutImages.some((o) => !ed.doc.objs.some((c) =>
+      c.id === (o.shape as { cut?: { contourId?: number } }).cut?.contourId));
+    imageCutNote.hidden = !(dangling || !cutImages.length);
+    imageCutNote.textContent = dangling
+      ? t('Zugewiesene Schnittkontur fehlt. Schnittkontur erneut zuweisen oder Bildschnitt deaktivieren.')
+      : cutImages.length ? '' : t('Ohne zugewiesene Kontur folgt der Schnitt der Bildbegrenzung.');
+    const extrasOn = C.tabs.enabled || C.dedup || C.perf.enabled || C.lead.leadIn || C.lead.leadOut || C.lead.overcut > 0 || C.ramp.enabled;
+    imageCutBox.replaceChildren(
+      h('span', { class: 'checks' }, check(t('Bildschnitt ausgeben'), () => C.output, (v) => (C.output = v), t('Bildschnitt beim Lasern ausgeben (ein Undo-Schritt).'), () => { imageCutGroup.open = C.output; })),
+      ...row(t('Geschwindigkeit (mm/min)'), num(() => C.speed, (v) => (C.speed = v), 1, 100000)),
+      ...row(t('Max. Leistung (%)'), num(() => C.power, (v) => (C.power = v), 0, 100)),
+      ...row(t('Min. Leistung (%)'), num(() => C.minPower, (v) => (C.minPower = v), 0, 100)),
+      ...row(t('Durchgänge'), num(() => C.passes, (v) => (C.passes = v), 1, 100, true)),
+      ...row(t('Kerf-Versatz (mm)'), num(() => C.kerf, (v) => (C.kerf = v), -5, 5)),
+      ...row(t('Z-Versatz (mm)'), num(() => C.zOffset, (v) => (C.zOffset = v), -50, 50)),
+      ...row(t('Je Durchgang tiefer (mm)'), num(() => C.zStep, (v) => (C.zStep = v), -20, 20)),
+      h('span', { class: 'checks' }, check(t('Air Assist'), () => C.air, (v) => (C.air = v))),
+      fold(t('Linie'), extrasOn, t('Haltestege, doppelte Linien, Perforation, Anschnitt, Leistungsrampe und Pause'), lineSection(C as unknown as Entry, '-cut')),
+      imageCutNote,
+    );
   };
 
   let applied = false;
@@ -302,10 +385,10 @@ export function openLayerDialog(ed: Editor, i: number) {
     { class: 'layer-dialog' },
     h('h3', {}, h('span', { class: 'swatch', style: `background:${PALETTE[i]}` }, layerLabel(i)), ' ', t('Layer-Einstellungen')),
     vecs ? tabBar : null,
-    general,
-    modeBox,
-    imageSection,
-    lookSection,
+    h('div', { class: 'layer-cols' },
+      h('div', { class: 'layer-col' }, generalGroup, geomGroup),
+      h('div', { class: 'layer-col' }, modeBox, ...(parts.img ? [imageGroup, imageCutGroup] : []), lookGroup),
+    ),
     h(
       'div',
       { class: 'dialog-buttons' },
@@ -313,7 +396,8 @@ export function openLayerDialog(ed: Editor, i: number) {
         class: 'btn',
         title: t('Standardwerte für den gewählten Modus'),
         onclick: () => {
-          if (tab < 0) Object.assign(c, { ...defaultCutSettings(vecs ? c.mode : 'fill'), mode: c.mode, sub: subs });
+          // Voreinstellung der Kategorie des Layers, wenn sie diesen Modus hat (#265), sonst die des Modus
+          if (tab < 0) Object.assign(c, { ...resetSettings(i, vecs ? c.mode : 'fill'), mode: c.mode, sub: subs });
           else subs[tab] = { ...defaultSubLayer(subs[tab].mode), output: subs[tab].output, name: subs[tab].name ?? '' } as SubLayer;
           render();
         },
@@ -336,6 +420,11 @@ export function openLayerDialog(ed: Editor, i: number) {
     const newImg = origImg ? { ...ed.imgLayer(i) } : null;
     if (origImg) L.img = { ...origImg };
     if (applied) {
+      if (imgCut && newImg) {
+        const untouched = JSON.stringify(imgCut) === JSON.stringify(imageCutSettings(undefined));
+        // Only add a cut field when the user enabled/changed it or the layer already had one.
+        if (imgCut.output || origImg?.cut || !untouched) newImg.cut = imgCut;
+      }
       const before = JSON.stringify({ ...cutSettings(L), name: L.name, output: L.output, img: origImg ?? undefined });
       const after = { ...c, sub: subs.length ? subs : undefined, name: name.trim() || L.name, output, img: newImg ?? undefined };
       if (JSON.stringify(after) !== before) ed.updateLayer(i, after);

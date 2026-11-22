@@ -1,12 +1,12 @@
 // Laser-Panel (Laser, Verschieben, Konsole), Geräteeinstellungen, Vorschau und G-Code-Ausgabe.
 import type { Editor } from './editor';
-import { commandMatches } from './commandKeys';
+import { onShortcutsChanged, withShortcut } from './commandKeys';
 import { escapeXml, h, numInput, setIcon, setTrustedSvg } from './dom';
 import { saveBinary, saveText } from './files';
 import { native } from './native';
 import {
-  anchorOf, BedCheck, Box, buildJob, burns, checkBed, DEFAULT_ROTARY, Device, estimate, Firmware, FIRMWARES, liveStatus, formatDuration, frameGCode, Job, jogLines, jogToLines, LASER_TYPES, moveLines, LaserModule, LaserType, loadDevices, Moves, newDevice,
-  isJcz, JCZ_SIM, jczBed, posShift, prepareGCode, Rotary, RotaryAxis, rotaryCirc, rotaryOn, rotaryTestLines, RuidaLaser, RuidaMagic, RuidaOrigin, sameMoves, sanitizeRuidaFilename, saveDevices, StartFrom, startHere, zJogLines,
+  anchorOf, BedCheck, Box, buildJob, burns, checkBed, DEFAULT_DEVICE, DEFAULT_ROTARY, Device, DirOrder, effOrderOf, estimate, FinishMode, Firmware, FIRMWARES, formatDuration, frameGCode, isJcz, isManualOrder, JCZ_SIM, jczBed, Job, jogHoldLines, jogHoldSupported, jogLines, jogToLines,
+  LASER_TYPES, LaserModule, LaserType, liveStatus, loadDevices, moveLines, Moves, newDevice, OrderOpts, OrderOverride, posShift, prepareGCode, Rotary, RotaryAxis, rotaryCirc, rotaryOn, rotaryTestLines, RuidaLaser, RuidaMagic, RuidaOrigin, sameMoves, sanitizeRuidaFilename, saveDevices, StartFrom, startHere, zJogLines,
 } from './gcode';
 import { isTauri, machine, PortInfo } from './machine';
 import type { JczBoard } from './jcz/contract';
@@ -15,11 +15,13 @@ import { JCZ_FIBER_TYPES, normalizeJcz } from './jcz/settings';
 import type { PreparedGCode } from './gcode';
 import { airProblem, digitalOutputs, FluidFs, listCmd, outputCmd, OVERRIDE, parseFileList, pinNames, RAPID_OVERRIDE, TOGGLE_FLOOD, TOGGLE_MIST } from './fluidnc';
 import type { Doc, ImageLayer, Layer, Obj } from './model';
+import { cutOrderGroupOverride } from './lbrn';
 import { forgetHost, openHostDiscovery, openPairDialog, pairedHost, remoteFrame, remoteJob } from './remote';
 import { materialTab } from './materialui';
 import { cameraTab } from './cameraui';
-import { dockWindow, windowBody } from './dock';
+import { dockWindow, isShown, windowBody } from './dock';
 import { loadCheckSettings } from './check';
+import { loadCutSelectedDefault, loadJobOriginDefault } from './editor/document';
 import { openCheck } from './checkPanel';
 import { jobProof, openBatchProof } from './batchProofDialog';
 import { presetList } from './packs';
@@ -34,18 +36,43 @@ import { electricityTariffText, energyDraft, estimateEnergy, parseEnergyNumber }
 import { energyPreview, energySettingsRows, saveEnergySettings } from './energyUi';
 import { previewSplitter } from './previewLayout';
 import { advancePlayback, analyzePlayback, computeFactors, DEFAULT_TARGET, MAX_MARKERS, MAX_TARGET, MIN_TARGET } from './previewPlayback';
+import { drawPreviewHead, previewX, previewY } from './previewRender';
 import type { PlaybackSettings } from './previewPlayback';
+import { fireLockMessage } from './fire';
+import { fireControls, fireSettings, installFireOverlay } from './fireUi';
 
 const store = loadDevices();
 /** Das gewählte Gerät (live gebunden: wechselt mit der Auswahl) */
 export let device: Device = store.devices.find((d) => d.id === store.current) ?? store.devices[0];
 const deviceListeners = new Set<() => void>();
-function deviceChanged() {
+export function deviceChanged() {
+  if (machine.fire.locked && machine.fire.state !== 'unknown') void machine.fire.stop();
   saveDevices(store);
   deviceListeners.forEach((f) => f());
 }
 /** Wird bei jedem Geräte- oder Einstellungswechsel aufgerufen; liefert eine Abmeldefunktion */
 export const onDeviceChange = (f: () => void) => (deviceListeners.add(f), () => deviceListeners.delete(f));
+/** Job-Overrides der Schnittreihenfolge (V3, #153): null = Geräte-Preset; sitzungsweit pro Job, nicht gespeichert */
+const jobOrder: OrderOverride = { innerFirst: null, travel: null, group: null, cornerStart: null };
+/** Effektive Schalter: Override oder Geräte-Preset — eine Stelle für Job, Prüfung (manualOrder) und Anzeige */
+export const effOrder = (): OrderOpts => effOrderOf(device, jobOrder);
+/** Overrides verwerfen: die nächsten Jobs folgen wieder dem Geräte-Preset */
+export const resetJobOrder = () => {
+  jobOrder.innerFirst = jobOrder.travel = jobOrder.group = jobOrder.cornerStart = null;
+  deviceChanged();
+};
+/**
+ * CutOrder aus einer LightBurn-Datei für diesen Job übernehmen (#153-Nr.3): nur der
+ * Gruppen-Schalter ist mappbar (Ebenen laufen ohnehin in Prioritäts-Reihenfolge). Null-if-equal
+ * wie die Checkboxen (Preset-gleich → kein Override, kein Reset-Button). Panel-Refresh über
+ * deviceChanged; Rückgängig per resetJobOrder („Zurück zum Preset“). Sitzungsweit (V3-Semantik):
+ * ein früherer Import überlebt bis zum nächsten Override/Reset.
+ */
+export function applyImportedCutOrder(co: { byGroup?: number } | undefined) {
+  const g = cutOrderGroupOverride(co);
+  jobOrder.group = g === null || g === device.optGroup ? null : g;
+  deviceChanged();
+}
 const fw = () => FIRMWARES[device.fw];
 const sendAll = (lines: string[]) => {
   for (const l of lines) machine.send(l);
@@ -106,6 +133,7 @@ function applyBed(ed: Editor) {
 }
 
 export function selectDevice(ed: Editor, id: string) {
+  if (deviceEditBlocked()) return;
   const d = store.devices.find((x) => x.id === id);
   if (!d || d === device) return;
   if (machine.connected || machine.connecting) {
@@ -121,13 +149,40 @@ export function selectDevice(ed: Editor, id: string) {
 
 /** Einstellungen des gewählten Geräts ändern und speichern (Assistent „Laser einrichten“) */
 export function patchDevice(ed: Editor, patch: Partial<Device>) {
+  if (deviceEditBlocked()) return;
   Object.assign(device, patch);
   applyBed(ed);
   deviceChanged();
 }
 
+/**
+ * Dateiwerte für Nur-Auswahl/Ursprung aufs Gerät übernehmen (pro Datei gespeichert,
+ * Stand aus dem geöffneten Dokument). Fehlt der Wert (alte Datei), bleibt das Gerät.
+ */
+export function applyDocJobSettings(ed: Editor) {
+  if (deviceEditBlocked()) return;
+  const d = ed.doc;
+  let touched = false;
+  if (typeof d.cutSelected === 'boolean' && device.cutSelected !== d.cutSelected) { device.cutSelected = d.cutSelected; touched = true; }
+  if (Number.isInteger(d.jobOrigin) && (d.jobOrigin as number) >= 0 && (d.jobOrigin as number) <= 8 && device.jobOrigin !== d.jobOrigin) {
+    device.jobOrigin = d.jobOrigin as number; touched = true;
+  }
+  if (touched) deviceChanged();
+}
+
+/** Neue Datei: Gerät auf die Standardwerte aus den Einstellungen setzen (passiert sonst nichts) */
+export function applyNewDocDefaults() {
+  if (deviceEditBlocked()) return;
+  const cut = loadCutSelectedDefault(), origin = loadJobOriginDefault();
+  let touched = false;
+  if (device.cutSelected !== cut) { device.cutSelected = cut; touched = true; }
+  if (origin !== null && device.jobOrigin !== origin) { device.jobOrigin = origin; touched = true; }
+  if (touched) deviceChanged();
+}
+
 /** Neues Gerät anlegen und auswählen */
 export function addDevice(ed: Editor, d: Device) {
+  if (deviceEditBlocked()) return;
   store.devices.push(d);
   deviceChanged();
   selectDevice(ed, d.id);
@@ -163,6 +218,7 @@ export async function makeJob(ed: Editor, forPreview: boolean, src?: JobSource):
     layer: src?.layer ?? ((i) => ed.layer(i)),
     imgLayer: src?.imgLayer ?? ((i) => ed.imgLayer(i)),
     device,
+    order: effOrder(),
     only: src ? (src.only ?? null) : device.cutSelected ? ed.sel : null,
     position: pos ? { x: pos[0], y: pos[1] } : null,
     forPreview,
@@ -247,6 +303,8 @@ function designOk(ed: Editor): boolean {
 
 /** Warum gerade kein Job oder Rahmen laufen kann (null = es geht) */
 export function runBlocker(): string | null {
+  if (machine.fire.locked) return fireLockMessage();
+  if (device.startLocked) return t('Der Start ist in den Geräteeinstellungen gesperrt.');
   if (!machine.connected) return t('Nicht verbunden.');
   if (machine.running || uploading) return t('Es läuft bereits ein Auftrag.');
   if (machine.remote) {
@@ -272,6 +330,29 @@ function airOk(job: Job): boolean {
 
 /** Datei, unter der Jobs auf SD-Karte/Flash landen; wird jedes Mal überschrieben */
 const JOB_FILE = 'kizamubeam.gcode';
+
+/**
+ * Dateiname für Steuerungs-Uploads (#08): ohne Inkrement unverändert (überschreibt wie bisher),
+ * mit Inkrement Zähler-Suffix vor der Endung. Reine Vorschau ohne Nebeneffekt.
+ */
+export function suggestStoredName(base: string): string {
+  if (!device.uploadIncrement) return base;
+  const n = device.uploadCounter ?? 0;
+  const dot = base.lastIndexOf('.');
+  const stem = dot > 0 ? base.slice(0, dot) : base;
+  const ext = dot > 0 ? base.slice(dot) : '';
+  return `${stem}_${n}${ext}`;
+}
+
+/** Wie suggestStoredName, zählt den Geräte-Zähler danach hoch (persistiert via deviceChanged) */
+export function confirmStoredName(base: string): string {
+  const name = suggestStoredName(base);
+  if (device.uploadIncrement) {
+    device.uploadCounter = (device.uploadCounter ?? 0) + 1;
+    deviceChanged();
+  }
+  return name;
+}
 /** Fortschritt beim Hochladen auf die Steuerung */
 let uploading: { sent: number; total: number } | null = null;
 const uploadListeners = new Set<() => void>();
@@ -309,8 +390,9 @@ export async function uploadGCode(g: PreparedGCode, fs: FluidFs, file: string): 
 /** Job senden: vom Rechner aus oder (FluidNC, Einstellung „Job ausführen“) erst hochladen und auf der Steuerung starten */
 export async function runGCode(g: PreparedGCode): Promise<boolean> {
   if (device.runFrom === 'stream' || fw().read !== 'fluidnc') return machine.runPrepared(g);
-  if ((await uploadGCode(g, device.runFrom, JOB_FILE)) === null) return false;
-  await machine.runStored(device.runFrom, JOB_FILE);
+  const file = confirmStoredName(JOB_FILE);
+  if ((await uploadGCode(g, device.runFrom, file)) === null) return false;
+  await machine.runStored(device.runFrom, file);
   return true;
 }
 
@@ -321,7 +403,7 @@ export async function uploadJob(ed: Editor, fs: FluidFs, file: string): Promise<
   if (nothingToDo(job)) return null;
   job.warnings.forEach((w) => notify(w));
   const g = await prepareGCode(job, device, estimate(job.moves, device), undefined, (i) => ed.layer(i));
-  return uploadGCode(g, fs, file);
+  return uploadGCode(g, fs, confirmStoredName(file));
 }
 
 /** Nightly builds remind once per session that they are untested on hardware */
@@ -493,7 +575,7 @@ export async function uploadRuidaToController(ed: Editor, src?: JobSource) {
   if (!canRun()) return;
   const job = await makeJob(ed, false, src);
   if (nothingToDo(job) || (!src && !designOk(ed)) || !boundsOk(ed, job) || !airOk(job)) return;
-  const defName = sanitizeRuidaFilename(src?.name || 'KIZAMU');
+  const defName = suggestStoredName(sanitizeRuidaFilename(src?.name || 'KIZAMU'));
   const raw = prompt(t('Dateiname im Ruida-Speicher (max. 8 Zeichen, A–Z / 0–9):'), defName);
   if (!raw) return;
   const fname = sanitizeRuidaFilename(raw);
@@ -501,6 +583,7 @@ export async function uploadRuidaToController(ed: Editor, src?: JobSource) {
   const est = estimate(job.moves, device);
   const g = await prepareGCode(job, device, est, fname, src?.layer ?? ((i) => ed.layer(i)), { filename: fname, upload: true });
   const ok = await machine.runPrepared(g);
+  if (ok && fname === suggestStoredName(fname)) confirmStoredName(fname);
   if (ok && !src) ed.afterJob();
 }
 
@@ -516,9 +599,12 @@ export const deviceList = () => ({ devices: store.devices, current: device.id })
 // ---------- Laser-Panel ----------
 
 export function buildLaser(ed: Editor) {
+  installFireOverlay();
   applyBed(ed);
   // Die Lage auf dem Bett zählt nur, wenn absolut gelasert wird und keine Drehachse läuft
   ed.checkBedApplies = () => device.startFrom === 'absolute' && !rotaryOn(device);
+  // Manuell ist die Reihenfolge nur, wenn kein Optimierer umsortiert (#153: dann warnt die Prüfung vor innen-vor-außen)
+  ed.manualOrder = () => isManualOrder(effOrder());
   // Jeder Bereich ist ein eigenes Fenster (andockbar, als Reiter stapelbar, siehe dock.ts)
   const wins: [string, string, HTMLElement, (() => void)?][] = [
     ['laser', t('Laser'), laserTab(ed)],
@@ -540,17 +626,10 @@ export function buildLaser(ed: Editor) {
       ed.redraw();
     }
   });
-  window.addEventListener('keydown', (e) => {
-    const el = e.target as HTMLElement;
-    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) return;
-    if (!e.defaultPrevented && commandMatches('preview', e)) {
-      e.preventDefault();
-      openPreview(ed);
-    }
-  });
 }
 
 function stateText(): [string, string] {
+  if (machine.fire.locked) return [t('Testfeuer'), 'busy'];
   if (machine.connecting) return [t('Verbinde …'), 'busy'];
   if (!machine.connected) return [t('Nicht verbunden'), ''];
   if (machine.isJcz) {
@@ -591,6 +670,169 @@ function buildFrameViewRow() {
   return { row, pointerB, toolB };
 }
 
+/**
+ * Schnittreihenfolge für diesen Job (V3, #153; V4: plus Ecke-Start): vier Override-Checkboxen mit den gleichen Texten wie das
+ * Geräte-Preset; ein gesetzter Haken gilt nur für die nächsten Jobs (sitzungsweit, nicht gespeichert),
+ * ein Wert gleich dem Preset folgt wieder dem Preset. Zurücksetzen verwirft alle Overrides.
+ */
+function jobOrderBox(ed: Editor, check: (label: string, title: string, get: () => boolean, set: (v: boolean) => void) => HTMLElement): HTMLElement {
+  const preset = { innerFirst: () => device.optInnerFirst, travel: () => device.optTravel, group: () => device.optGroup, cornerStart: () => device.optCornerStart };
+  const box = (key: keyof typeof preset, label: string, title: string) =>
+    check(label, title, () => jobOrder[key] ?? preset[key](), (v) => {
+      jobOrder[key] = v === preset[key]() ? null : v;
+      if (isShown('check')) ed.runCheck();
+    });
+  const reset = h('button', { class: 'btn small', onclick: () => { resetJobOrder(); if (isShown('check')) ed.runCheck(); } }, t('Zurück zum Preset')) as HTMLButtonElement;
+  const refresh = () => {
+    reset.hidden = jobOrder.innerFirst === null && jobOrder.travel === null && jobOrder.group === null && jobOrder.cornerStart === null;
+  };
+  deviceListeners.add(refresh);
+  refresh();
+  return h('details', { class: 'job-order' },
+    h('summary', { title: t('Abweichend vom Geräte-Preset nur für die nächsten Jobs (wird nicht gespeichert).') }, t('Schnittreihenfolge für diesen Job')),
+    box('innerFirst', t('Innere Formen zuerst'), t('Löcher und Innenkonturen vor ihrer Außenkontur schneiden')),
+    box('travel', t('Leerwege verkürzen'), t('Nächstgelegene Form als nächste schneiden (Alternative zur manuellen Reihenfolge)')),
+    box('group', t('Gruppen zusammenhalten'), t('Formen eines Objekts bzw. einer Gruppe bevorzugt nacheinander schneiden')),
+    box('cornerStart', t('In Ecken beginnen'), t('Geschlossene Konturen an der schärfsten Ecke beginnen (Einstich unauffällig)')),
+    reset,
+  );
+}
+
+
+/**
+ * Optimierung der Schnittreihenfolge als eigener Dialog (Geräte-Preset, wie bei anderen Lösungen am Markt üblich): acht Umsortier-Schalter in drei Gruppen als Entwurf,
+ * der erst bei Übernehmen ins Geräte-Preset geschrieben wird (Abbrechen verwirft). Job-Overrides
+ * („Schnittreihenfolge für diesen Job") und CutOrder-Import wirken auf die vier ursprünglichen
+ * Schalter und gehen dort vor; für die vier neuen Schalter (Richtung, Start, Vorgaben) gilt
+ * stets das Geräte-Preset.
+ * „Persönliche Vorgaben" speichert/lädt den Entwurf als JSON unter 'kizamu.optDefaults'
+ * (localStorage, nur dieses Gerät-Rechners) und schreibt nie direkt ins Gerät.
+ */
+export function openOptimizeDialog() {
+  if (deviceEditBlocked()) return;
+  // Acht Opt-Felder direkt aus dem Geräte-Modell (Engine führt sie seit Schritt 3).
+  type OptDraft = Pick<Device,
+    'optInnerFirst' | 'optTravel' | 'optGroup' | 'optCornerStart' |
+    'optDirOrder' | 'optBestStart' | 'optBestDirection' | 'optLessTurns'>;
+  type BoolKey = 'optInnerFirst' | 'optTravel' | 'optGroup' | 'optCornerStart' | 'optBestStart' | 'optBestDirection' | 'optLessTurns';
+  const OPT_STORE = 'kizamu.optDefaults';
+  const DIRS: DirOrder[] = ['none', 'ltr', 'rtl', 'ttb', 'btt'];
+  // Werksvorgabe aus dem Geräte-Modell
+  const factoryBase: OptDraft = {
+    optInnerFirst: DEFAULT_DEVICE.optInnerFirst,
+    optTravel: DEFAULT_DEVICE.optTravel,
+    optGroup: DEFAULT_DEVICE.optGroup,
+    optCornerStart: DEFAULT_DEVICE.optCornerStart,
+    optDirOrder: DEFAULT_DEVICE.optDirOrder,
+    optBestStart: DEFAULT_DEVICE.optBestStart,
+    optBestDirection: DEFAULT_DEVICE.optBestDirection,
+    optLessTurns: DEFAULT_DEVICE.optLessTurns,
+  };
+  // Persönliche Vorgabe: nur bekannte Felder mit passendem Typ übernehmen
+  const loadStored = (): Partial<OptDraft> | null => {
+    try {
+      const raw = localStorage.getItem(OPT_STORE);
+      if (!raw) return null;
+      const p = JSON.parse(raw) as Partial<OptDraft>;
+      if (!p || typeof p !== 'object') return null;
+      const out: Partial<OptDraft> = {};
+      (['optInnerFirst', 'optTravel', 'optGroup', 'optCornerStart', 'optBestStart', 'optBestDirection', 'optLessTurns'] as BoolKey[])
+        .forEach((k) => { if (typeof p[k] === 'boolean') out[k] = p[k]; });
+      if (DIRS.includes(p.optDirOrder as DirOrder)) out.optDirOrder = p.optDirOrder;
+      return out;
+    } catch {
+      return null;
+    }
+  };
+  const d: OptDraft = {
+    optInnerFirst: device.optInnerFirst,
+    optTravel: device.optTravel,
+    optGroup: device.optGroup,
+    optCornerStart: device.optCornerStart,
+    optDirOrder: device.optDirOrder,
+    optBestStart: device.optBestStart,
+    optBestDirection: device.optBestDirection,
+    optLessTurns: device.optLessTurns,
+    ...loadStored(),
+  };
+  const inputs = new Map<BoolKey, HTMLInputElement>();
+  const box = (key: BoolKey, label: string, title: string) => {
+    const c = h('input', { type: 'checkbox', onchange: (e: Event) => (d[key] = (e.target as HTMLInputElement).checked) }) as HTMLInputElement;
+    c.checked = d[key];
+    inputs.set(key, c);
+    return h('label', { class: 'check', title }, c, label);
+  };
+  const dirSel = h('select', { onchange: (e: Event) => (d.optDirOrder = (e.target as HTMLSelectElement).value as DirOrder) }) as HTMLSelectElement;
+  ([
+    ['none', t('Aus')],
+    ['ltr', t('Links nach rechts')],
+    ['rtl', t('Rechts nach links')],
+    ['ttb', t('Oben nach unten')],
+    ['btt', t('Unten nach oben')],
+  ] as [DirOrder, string][]).forEach(([v, label]) => dirSel.append(h('option', { value: v }, label)));
+  dirSel.value = d.optDirOrder;
+  const sync = () => {
+    inputs.forEach((c, k) => (c.checked = d[k]));
+    dirSel.value = d.optDirOrder;
+  };
+  const group = (legend: string, ...body: HTMLElement[]) =>
+    h('fieldset', {}, h('legend', {}, legend), h('div', { class: 'form' }, ...body));
+  const dlg = h('dialog', { class: 'device-dialog' },
+    h('h3', {}, t('Optimierung der Schnittreihenfolge')),
+    group(t('Reihenfolge'),
+      box('optInnerFirst', t('Innere Formen zuerst'), t('Löcher und Innenkonturen vor ihrer Außenkontur schneiden')),
+      box('optTravel', t('Leerwege verkürzen'), t('Nächstgelegene Form als nächste schneiden (Alternative zur manuellen Reihenfolge)')),
+      box('optGroup', t('Gruppen zusammenhalten'), t('Formen eines Objekts bzw. einer Gruppe bevorzugt nacheinander schneiden')),
+      h('label', {}, t('Richtungsreihenfolge')), dirSel,
+      box('optLessTurns', t('Richtungswechsel reduzieren'), t('Bevorzugt Bahnen in aktueller Fahrtrichtung (kein Backlash-Ausgleich)')),
+    ),
+    group(t('Startpunkt & Richtung'),
+      box('optCornerStart', t('In Ecken beginnen'), t('Geschlossene Konturen an der schärfsten Ecke beginnen (Einstich unauffällig)')),
+      box('optBestStart', t('Besten Startpunkt wählen'), t('Geschlossene Konturen: Start am nächsten Eckpunkt, ohne Umsortierung')),
+      box('optBestDirection', t('Beste Richtung wählen'), t('Offene Konturen ab dem näheren Ende; geschlossene werden nie umgedreht')),
+    ),
+    group(t('Persönliche Vorgaben'),
+      h('button', {
+        class: 'btn', title: t('Entwurf auf die persönliche Vorgabe zurücksetzen (sonst Werksvorgabe)'),
+        onclick: () => {
+          Object.assign(d, loadStored() ?? factoryBase);
+          sync();
+        },
+      }, t('Auf Standard zurücksetzen')),
+      h('button', {
+        class: 'btn', title: t('Aktuellen Entwurf als persönliche Vorgabe speichern'),
+        onclick: () => {
+          try {
+            localStorage.setItem(OPT_STORE, JSON.stringify(d));
+          } catch {
+            notify(t('Einstellung konnte nicht gespeichert werden.'), true);
+          }
+        },
+      }, t('Als Vorgabe speichern')),
+    ),
+    h('div', { class: 'note' }, t('Geräte-Preset: gilt für alle Jobs dieses Geräts. Abweichungen nur für diesen Job unter „Schnittreihenfolge für diesen Job“.')),
+    h('div', { class: 'dialog-buttons' },
+      h('button', { class: 'btn', onclick: () => done() }, t('Abbrechen')),
+      h('button', {
+        class: 'btn primary',
+        onclick: () => {
+          (document.activeElement as HTMLElement | null)?.blur();
+          Object.assign(device, d);
+          deviceChanged();
+          done();
+        },
+      }, t('Übernehmen')),
+    ),
+  );
+  // Explizit entfernen: Der close-Listener räumt Esc ab, die Buttons räumen selbst ab
+  // (nicht jede Umgebung stellt das close-Event zuverlässig zu).
+  const done = () => { dlg.close(); dlg.remove(); };
+  dlg.addEventListener('close', () => dlg.remove());
+  dlg.addEventListener('keydown', (e) => e.stopPropagation());
+  document.body.append(dlg);
+  dlg.showModal();
+}
+
 function laserTab(ed: Editor): HTMLElement {
   const root = h('div', { class: 'laser-tab' });
   const big = (icon: string, label: string, title: string, onclick: () => void) =>
@@ -617,7 +859,9 @@ function laserTab(ed: Editor): HTMLElement {
     machine.send((machine.remote ? machine.fw : fw()).home);
   });
   const originB = big('origin', t('Ursprung'), t('Zum Nullpunkt fahren'), () => sendAll(moveLines(device, 'X0 Y0')));
-  const previewB = big('preview', t('Vorschau'), t('Vorschau mit Zeitschätzung (Alt+P)'), () => openPreview(ed));
+  const previewTitle = () => withShortcut(t('Vorschau mit Zeitschätzung'), 'preview');
+  const previewB = big('preview', t('Vorschau'), previewTitle(), () => openPreview(ed));
+  onShortcutsChanged(() => (previewB.title = previewTitle()));
   const saveB = big('gcode', 'G-Code', t('G-Code speichern'), () => saveGCode(ed));
   const ruidaMemB = h('button', {
     class: 'btn',
@@ -714,13 +958,12 @@ function laserTab(ed: Editor): HTMLElement {
     startForm,
     h('div', { class: 'checks' },
       check(t('Nur Auswahl'), t('Nur die ausgewählten Objekte lasern'), () => device.cutSelected, (v) => (device.cutSelected = v)),
-      check(t('Innere Formen zuerst'), t('Löcher und Innenkonturen vor ihrer Außenkontur schneiden'), () => device.optInnerFirst, (v) => (device.optInnerFirst = v)),
-      check(t('Leerwege verkürzen'), t('Nächstgelegene Form als nächste schneiden (Alternative zur manuellen Reihenfolge)'), () => device.optTravel, (v) => (device.optTravel = v)),
-      check(t('Gruppen zusammenhalten'), t('Formen eines Objekts bzw. einer Gruppe bevorzugt nacheinander schneiden'), () => device.optGroup, (v) => (device.optGroup = v)),
       rotaryCheck,
       rotaryBtn,
     ),
+    jobOrderBox(ed, check),
     h('div', { class: 'conn-row' },
+      h('button', { class: 'btn', title: t('Umsortier-Schalter des Geräte-Presets einstellen (Innen zuerst, Leerwege, Gruppen, Ecken)'), onclick: () => openOptimizeDialog() }, t('Optimierung …')),
       h('button', { class: 'btn', onclick: () => openDeviceDialog(ed) }, h('span', { icon: 'settings' }), t('Geräteeinstellungen')),
       h('button', { class: 'btn', title: t('Schritt für Schritt von der Verbindung bis zum ersten Testauftrag'), onclick: () => import('./setupWizard').then((m) => m.openSetupWizard(ed)) }, t('Laser einrichten …')),
     ),
@@ -804,15 +1047,15 @@ function laserTab(ed: Editor): HTMLElement {
     dot.className = `dot ${cls}`;
     const p = machine.connected ? machine.status.wpos : null;
     posTxt.textContent = p ? `X ${dec(p[0].toFixed(2))}  Y ${dec(p[1].toFixed(2))}` : '';
-    devSel.disabled = machine.connected || machine.connecting;
+    devSel.disabled = machine.connected || machine.connecting || machine.fire.locked;
     const on = machine.connected,
-      busy = machine.running || !!uploading;
+      busy = machine.running || !!uploading || machine.fire.locked;
     connBtn.textContent = on ? t('Trennen') : machine.connecting ? t('Verbinde …') : t('Verbinden');
-    connBtn.disabled = machine.connecting || (!isTauri() && !on);
+    connBtn.disabled = machine.connecting || (!isTauri() && !on) || (!on && machine.fire.locked);
     portSel.disabled = on || machine.connecting || !isTauri();
     refreshBtn.disabled = portSel.disabled;
     for (const b of [startB, frameB, contourB, homeB, originB]) b.disabled = !on || busy;
-    pauseB.disabled = !on;
+    pauseB.disabled = !on || machine.fire.locked;
     stopB.disabled = !on;
     saveB.lastChild!.textContent = device.fw === 'ruida' ? '.rd' : 'G-Code';
     saveB.title = device.fw === 'ruida' ? t('Als Ruida-Datei (.rd) speichern') : t('G-Code speichern');
@@ -920,14 +1163,37 @@ function moveTab(ed: Editor): HTMLElement {
     [-1, 0, '←'], [0, 0, '⌖'], [1, 0, '→'],
     [-1, -1, '↙'], [0, -1, '↓'], [1, -1, '↘'],
   ];
-  for (const [dx, dy, label] of arrows)
-    pad.append(
-      h('button', {
-        class: 'btn',
-        title: dx || dy ? t('{step} mm verfahren', { step: st.step }) : t('Zum Nullpunkt fahren'),
-        onclick: () => (dx || dy ? jog(dx, dy) : sendAll(moveLines(device, 'X0 Y0'))),
-      }, label),
-    );
+  for (const [dx, dy, label] of arrows) {
+    const b = h('button', {
+      class: 'btn',
+      title: dx || dy ? t('{step} mm verfahren', { step: st.step }) : t('Zum Nullpunkt fahren'),
+      onclick: () => (dx || dy ? jog(dx, dy) : sendAll(moveLines(device, 'X0 Y0'))),
+    }, label) as HTMLButtonElement;
+    // Hold-to-Jog (#10): Halten fährt (nur $J-Firmwares), Loslassen stoppt per Jog-Cancel.
+    // Sonst und bei kurzem Klick bleibt es beim Einzelschritt (heutiges Verhalten).
+    if (dx || dy) {
+      let timer = 0;
+      let held = false;
+      let suppress = false;
+      const stop = () => {
+        if (timer) { clearTimeout(timer); timer = 0; }
+        if (held) { held = false; b.classList.remove('held'); void machine.realtime(0x85); suppress = true; }
+      };
+      b.onpointerdown = (e) => {
+        if (e.button !== 0 && e.pointerType === 'mouse') return;
+        if (!jogHoldSupported(device) || !machine.connected) return;
+        timer = window.setTimeout(() => {
+          timer = 0; held = true; b.classList.add('held');
+          for (const l of jogHoldLines(device, dx * st.step, dy * st.step, st.speed)) machine.send(l);
+        }, 250);
+      };
+      b.onpointerup = stop;
+      b.onpointercancel = stop;
+      b.onpointerleave = () => { if (held) stop(); else if (timer) { clearTimeout(timer); timer = 0; } };
+      b.addEventListener('click', (e) => { if (suppress) { suppress = false; e.stopImmediatePropagation(); } }, true);
+    }
+    pad.append(b);
+  }
   const stepSel = h('select', { onchange: (e: Event) => (st.step = Number((e.target as HTMLSelectElement).value)) },
     ...[0.1, 1, 5, 10, 50, 100].map((v) => h('option', { value: String(v), selected: v === st.step }, `${dec(String(v))} mm`)),
   );
@@ -964,6 +1230,7 @@ function moveTab(ed: Editor): HTMLElement {
     return !!p && Number.isFinite(p[2]);
   };
   const zBlocker = (): string | null => {
+    if (machine.fire.locked) return fireLockMessage();
     if (!machine.connected || machine.running) return t('Nicht verbunden oder Maschine beschäftigt.');
     if (device.fw !== 'marlin' && machine.status.state !== 'Idle') return t('Z-Jog nur bei Stillstand (Idle).');
     if (!zKnown()) return t('Position unbekannt. Auf eine gültige Positionsmeldung warten.');
@@ -991,6 +1258,7 @@ function moveTab(ed: Editor): HTMLElement {
     ),
   );
   const zNote = h('div', { class: 'note' }, t('Z+/Z− verfahren die Achse in Steuerungsrichtung (unabhängig von „Z+ fährt Richtung Material“). Freiraum prüfen. Hinweis Kopfkamera: Nach einer Z-Fahrt stimmt der Maßstab des Kamera-Overlays nicht mehr.'));
+  const fire = fireControls(() => device, () => openDeviceDialog(ed, device, undefined, 'fire'));
   root.append(
     pos,
     h('div', { class: 'move-row' }, pad,
@@ -1008,6 +1276,7 @@ function moveTab(ed: Editor): HTMLElement {
       clickB,
       unlock,
     ),
+    fire.root,
     modeRow,
   );
   const refresh = () => {
@@ -1015,7 +1284,9 @@ function moveTab(ed: Editor): HTMLElement {
     pos.textContent = machine.connected && s.wpos
       ? t('Position X {x}  Y {y} mm', { x: dec(s.wpos[0].toFixed(2)), y: dec(s.wpos[1].toFixed(2)) }) + (device.zAxis && Number.isFinite(s.wpos[2]) ? `  Z ${dec(s.wpos[2].toFixed(2))}` : '') + (s.mpos && (Math.abs(s.mpos[0] - s.wpos[0]) > 1e-3 || Math.abs(s.mpos[1] - s.wpos[1]) > 1e-3) ? t(' (Maschine {x} / {y})', { x: dec(s.mpos[0].toFixed(2)), y: dec(s.mpos[1].toFixed(2)) }) : '')
       : t('Nicht verbunden');
-    root.querySelectorAll('button').forEach((b) => ((b as HTMLButtonElement).disabled = !machine.connected || machine.running));
+    root.querySelectorAll('button').forEach((b) => {
+      if (!fire.root.contains(b)) b.disabled = !machine.connected || machine.running || machine.fire.locked;
+    });
     zSection.hidden = !device.zAxis;
     zNote.hidden = !device.zAxis;
     const zWhy = device.zAxis ? zBlocker() : null;
@@ -1025,6 +1296,7 @@ function moveTab(ed: Editor): HTMLElement {
     syncClickB();
     if (!fw().clearOrigin) clearO.disabled = true;
     if (!fw().unlock) unlock.disabled = true;
+    fire.refresh();
   };
   machine.on((e) => e.type !== 'line' && refresh());
   deviceListeners.add(refresh);
@@ -1092,7 +1364,14 @@ function consoleTab(): HTMLElement {
 let lastDeviceTab = 0;
 
 /** Einstellungen eines Geräts bearbeiten (ohne Angabe: das gewählte) */
-export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: () => void) {
+function deviceEditBlocked(): boolean {
+  if (!machine.fire.locked) return false;
+  notify(fireLockMessage(), true);
+  return true;
+}
+
+export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: () => void, initialSection?: 'fire') {
+  if (deviceEditBlocked()) return;
   const d = { ...target, energy: energyDraft(target.energy) };
   const bed = { w: d.bedW, h: d.bedH };
   const isCurrent = target === device;
@@ -1122,6 +1401,13 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     rows.push(el);
     return el;
   };
+  /** Zahleneingabe mit 0-Sinn (leer/0/ungültig = unset = heutiges Verhalten), optional gedeckelt */
+  const optNum = (label: string, get: () => number | undefined, set: (v: number | undefined) => void, title?: string, max?: number) => {
+    const el = numInput('', (v) => set(!Number.isFinite(v) || v <= 0 ? undefined : max === undefined ? v : Math.min(v, max)), title);
+    el.value = get() === undefined ? '' : String(get());
+    rows.push(h('label', { title }, label), el);
+    return el;
+  };
   const ruidaEls: HTMLElement[] = [];
   const nonRuidaEls: HTMLElement[] = [];
   // Galvo (JCZ): edited on a copy, own tab; G-code, motion and connection fields do not apply and are hidden
@@ -1132,6 +1418,9 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
   let syncTabs = () => {};
   newTab(t('Allgemein'));
   text(t('Name'), () => d.name, (v) => (d.name = v));
+  text(t('Dateiname für Controller-Uploads'), () => d.uploadName ?? '', (v) => (d.uploadName = v.trim() || undefined));
+  bool(t('Dateiname hochzählen'), () => d.uploadIncrement ?? false, (v) => (d.uploadIncrement = v), t('Pro Upload _2, _3 … anhängen (braucht eine Ziffer im Namen). Aus = überschreiben wie bisher.'));
+  bool(t('Start sperren'), () => d.startLocked ?? false, (v) => (d.startLocked = v), t('Start- und Rahmen-Buttons bleiben gesperrt, bis die Sperre hier aufgehoben wird.'));
   const sMaxRef: { el?: HTMLInputElement; lab?: HTMLElement } = {};
   const fwSel = h('select', {
     onchange: (e: Event) => {
@@ -1212,9 +1501,33 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
   head(t('Bewegung (für die Zeitschätzung)'));
   const rapid = num(t('Eilgang (mm/min)'), () => d.rapid, (v) => (d.rapid = v));
   const accel = num(t('Beschleunigung (mm/s²)'), () => d.accel, (v) => (d.accel = v));
+  optNum(t('Leerfahrt über Leeres (mm/min)'), () => d.whitespaceSpeed, (v) => (d.whitespaceSpeed = v), t('Höhere Verfahrgeschwindigkeit über leeren Bildbereichen (nur GRBL/Marlin/FluidNC). Leer oder 0 = Eilgang wie bisher.'), 100000);
   bool(t('Nach dem Job zurück zum Start'), () => d.returnHome, (v) => (d.returnHome = v));
+  {
+    const modeLabel = t('Ziel nach dem Job');
+    const modeSel = h('select', { onchange: (e: Event) => { d.finishMode = (e.target as HTMLSelectElement).value as FinishMode; syncFinishXY(); } },
+      h('option', { value: 'start', selected: (d.finishMode ?? (d.returnHome === false ? 'stay' : 'start')) === 'start' }, t('Zum Laserstart')),
+      h('option', { value: 'origin', selected: (d.finishMode ?? '') === 'origin' }, t('Zum Ursprung (0,0)')),
+      h('option', { value: 'stay', selected: (d.finishMode ?? (d.returnHome === false ? 'stay' : '')) === 'stay' }, t('Verweilen')),
+      h('option', { value: 'custom', selected: (d.finishMode ?? '') === 'custom' }, t('Eigene XY')),
+    ) as HTMLSelectElement;
+    const xLab = h('label', {}, t('Ziel-X (mm)'));
+    const xEl = numInput('', (v) => (d.finishX = Number.isFinite(v) ? v : undefined));
+    xEl.value = d.finishX === undefined ? '' : String(d.finishX);
+    const yLab = h('label', {}, t('Ziel-Y (mm)'));
+    const yEl = numInput('', (v) => (d.finishY = Number.isFinite(v) ? v : undefined));
+    yEl.value = d.finishY === undefined ? '' : String(d.finishY);
+    const syncFinishXY = () => {
+      const show = (d.finishMode ?? (d.returnHome === false ? 'stay' : 'start')) === 'custom';
+      for (const el of [xLab, xEl, yLab, yEl]) el.style.display = show ? '' : 'none';
+    };
+    modeSel.addEventListener('change', syncFinishXY);
+    rows.push(h('label', { title: t('Wohin der Kopf nach dem Job fährt (nur Absolut- und Benutzer-Position).') }, modeLabel), modeSel, xLab, xEl, yLab, yEl);
+    syncFinishXY();
+  }
   head(t('Achsen'));
   bool(t('Motorische Z-Achse vorhanden'), () => d.zAxis, (v) => (d.zAxis = v), t('Layer dürfen den Fokus verschieben (Z-Versatz, tiefer je Durchgang). Z fährt relativ zur Höhe beim Start und am Ende zurück.'));
+  optNum(t('Materialhöhe (mm)'), () => d.zMaterial, (v) => (d.zMaterial = v), t('Vertrag für den Z-Verfahrweg: warnt, wenn der Fokus tiefer als das Material fahren würde. 0 oder leer = kein Vertrag.'));
   bool(t('Z+ fährt Richtung Material'), () => d.zFlip, (v) => (d.zFlip = v), t('Einschalten, wenn bei dieser Maschine positive Z-Werte den Tisch anheben oder den Kopf absenken'));
   bool(t('Z-Jog nur nach Referenzfahrt'), () => d.zJogStrict ?? true, (v) => (d.zJogStrict = v), t('Bewegen-Fenster: Z-Tasten bleiben gesperrt, bis einmal referenziert wurde (pro Verbindung). Aus = lax: dann genügt eine bekannte Position.'));
   rows.push(h('label', {}, t('Drehachse')), h('span', {}, h('button', { class: 'btn small', onclick: () => openRotaryDialog() }, t('Drehachse (Rotary) …'))));
@@ -1344,6 +1657,17 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
   );
   rows.push(baudLab, baud);
   nonRuidaEls.push(baudLab, baud);
+  const dtrLab = h('label', { title: t('DTR-Signal beim Öffnen der USB-Schnittstelle. Auto = unverändert (heutiges Verhalten).') }, t('DTR-Signal'));
+  const dtrSel = h('select', { onchange: (e: Event) => {
+    const v = (e.target as HTMLSelectElement).value;
+    d.dtr = v === 'auto' ? undefined : v === 'on';
+  } },
+    h('option', { value: 'auto', selected: d.dtr === undefined }, t('Automatisch')),
+    h('option', { value: 'on', selected: d.dtr === true }, t('An')),
+    h('option', { value: 'off', selected: d.dtr === false }, t('Aus')),
+  ) as HTMLSelectElement;
+  rows.push(dtrLab, dtrSel);
+  nonRuidaEls.push(dtrLab, dtrSel);
   const hostIn = h('input', { type: 'text', value: d.host, oninput: (e: Event) => (d.host = (e.target as HTMLInputElement).value.trim()) }) as HTMLInputElement;
   const fluidDiscoverBtn = h('button', {
     class: 'btn small', title: t('FluidNC-Steuerungen im lokalen Netzwerk suchen'),
@@ -1453,6 +1777,10 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
   num(t('Geschwindigkeit (mm/min)'), () => d.frameSpeed, (v) => (d.frameSpeed = v));
   bool(t('Mit Laser (schwach)'), () => d.frameLaser, (v) => (d.frameLaser = v), t('Rahmen mit niedriger Leistung sichtbar machen'));
   num(t('Leistung (%)'), () => d.framePower, (v) => (d.framePower = Math.min(100, v)));
+  head(t('Testfeuer im Bewegen-Fenster'));
+  const fireRows = fireSettings(d);
+  const fireTabIndex = tabs.length - 1;
+  rows.push(...fireRows.rows);
   // Rotpunkt-Zeiger (Issue #213): Versatz je Gerät, mit visueller Darstellung statt Vorzeichenrätsel
   head(t('Rotpunkt-Zeiger (Pointer-Offset)'));
   if (!d.pointerOffset) d.pointerOffset = { x: 0, y: 0, enabled: false }; // Altgeräte aus localStorage/Presets ohne Feld
@@ -1626,7 +1954,7 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
   // „Von der Maschine lesen“ gehört zu Allgemein (erster Tab), nicht ans Ende.
   const readRow = [h('label', {}, ''), h('span', { class: 'conn-row' }, readBtn)];
   tabs[0].rows.push(...readRow, readNote);
-  let activeTab = lastDeviceTab < tabs.length ? lastDeviceTab : 0;
+  let activeTab = initialSection === 'fire' ? fireTabIndex : lastDeviceTab < tabs.length ? lastDeviceTab : 0;
   const selectTab = (i: number) => {
     activeTab = lastDeviceTab = i;
     tabBtns.forEach((b, k) => b.classList.toggle('cur', k === i));
@@ -1655,9 +1983,12 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
         class: 'btn primary',
         onclick: () => {
           // Felder, die noch den Fokus haben, zuerst übernehmen
+          if (deviceEditBlocked()) return;
           (document.activeElement as HTMLElement | null)?.blur();
+          if (!fireRows.save(() => selectTab(fireTabIndex))) return;
           saveEnergySettings(energyRows, () => selectTab(energyTabIndex), () => {
             // Galvo: the work area is the lens field
+            if (deviceEditBlocked()) return;
             Object.assign(target, d, d.fw === 'jcz' ? jczBed(J) : { bedW: bed.w, bedH: bed.h });
             if (isCurrent) applyBed(ed);
             deviceChanged();
@@ -1689,12 +2020,14 @@ export function openDeviceDialog(ed: Editor, target: Device = device, onDone?: (
     if (max > 0) panels.forEach((p) => ((p as HTMLElement).style.minHeight = `${max}px`));
     dlg.style.visibility = prevVis;
   }
+  if (initialSection === 'fire') fireRows.focusEnabled();
 }
 
 // ---------- Drehachse ----------
 
 /** Drehachse (Rotary) des gewählten Geräts einrichten, wie „Rotary Setup“ in LightBurn */
 export function openRotaryDialog() {
+  if (deviceEditBlocked()) return;
   const target = device;
   const r: Rotary = { ...DEFAULT_ROTARY, ...target.rotary };
   const rows: HTMLElement[] = [];
@@ -1780,6 +2113,7 @@ export function openRotaryDialog() {
         class: 'btn primary',
         onclick: () => {
           (document.activeElement as HTMLElement | null)?.blur();
+          if (deviceEditBlocked()) return;
           target.rotary = { ...r };
           deviceChanged();
           dlg.close();
@@ -1797,6 +2131,7 @@ export function openRotaryDialog() {
 
 /** Geräte verwalten: aus Vorlagen anlegen, bearbeiten, kopieren, löschen, auswählen */
 export function openDevicesDialog(ed: Editor) {
+  if (deviceEditBlocked()) return;
   const list = h('table', { class: 'devices' });
   const fill = () => {
     list.textContent = '';
@@ -1816,11 +2151,13 @@ export function openDevicesDialog(ed: Editor) {
         h('td', {}, h('div', { class: 'actions' },
           btn(t('Bearbeiten'), t('Einstellungen dieses Geräts'), () => openDeviceDialog(ed, d, fill)),
           btn(t('Kopieren'), t('Als neues Gerät kopieren'), () => {
+            if (deviceEditBlocked()) return;
             store.devices.push({ ...d, rotary: { ...d.rotary }, id: newDevice(d).id, name: t('{name} (Kopie)', { name: d.name }) });
             deviceChanged();
             fill();
           }),
           btn(t('Löschen'), store.devices.length < 2 ? t('Das letzte Gerät kann nicht gelöscht werden') : t('Gerät löschen'), () => {
+            if (deviceEditBlocked()) return;
             if (!confirm(t('Gerät „{name}“ löschen?', { name: d.name }))) return;
             store.devices = store.devices.filter((x) => x !== d);
             if (d === device) selectDevice(ed, store.devices[0].id);
@@ -1834,6 +2171,7 @@ export function openDevicesDialog(ed: Editor) {
   const presets = presetList();
   const { select: presetSel, details: presetInfo } = presetPicker(presets);
   const add = () => {
+    if (deviceEditBlocked()) return;
     const d = newDevice(presets[Number(presetSel.value)].preset);
     store.devices.push(d);
     deviceChanged();
@@ -1931,6 +2269,7 @@ export async function openPreview(ed: Editor, src?: JobSource) {
   const stat = (k: string, v: string) => [h('dt', {}, k), h('dd', {}, v)];
   const subLabel = (layer: number, sub: number) => {
     const L = layerOf(layer);
+    if (sub === -2) return `${L.name} – ${t('Bildschnitt')}`;
     if (sub < 0) return L.name;
     const custom = L.sub?.[sub]?.name?.trim();
     return `${L.name} – ${custom || t('Sublayer {n}', { n: sub + 1 })}`;
@@ -1938,7 +2277,7 @@ export async function openPreview(ed: Editor, src?: JobSource) {
   const layerRows = analysis.layerTimes.map((lt) => {
     const swatch = h('span', { class: 'preview-layer-swatch' });
     swatch.style.background = layerColor(lt.layer);
-    return h('div', { class: `preview-layer${lt.sub >= 0 ? ' sub' : ''}` },
+    return h('div', { class: `preview-layer${lt.sub >= 0 ? ' sub' : ''}${lt.sub === -2 ? ' cut' : ''}` },
       swatch,
       h('span', { class: 'preview-layer-name' }, subLabel(lt.layer, lt.sub)),
       h('span', { class: 'preview-layer-time' }, formatDuration(lt.seconds)),
@@ -2107,8 +2446,8 @@ export async function openPreview(ed: Editor, src?: JobSource) {
     view = { z, ox: (W - (bx1 - bx0) * z) / 2 - bx0 * z, oy: (H + (by1 - by0) * z) / 2 + by0 * z };
     accN = 0;
   };
-  const sx = (x: number) => x * view.z + view.ox;
-  const sy = (y: number) => view.oy - y * view.z;
+  const sx = (x: number) => previewX(x, view);
+  const sy = (y: number) => previewY(y, view);
 
   const dark = document.documentElement.dataset.theme === 'dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
   const css = getComputedStyle(document.documentElement);
@@ -2209,36 +2548,7 @@ export async function openPreview(ed: Editor, src?: JobSource) {
     const c = cv.getContext('2d')!;
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.drawImage(acc, 0, 0);
-    // Laserkopf mit Teilstück der aktuellen Bewegung
-    let hx = mv.x0,
-      hy = mv.y0;
-    if (i < mv.n) {
-      const t0 = i ? est.t[i - 1] : 0,
-        t1 = est.t[i];
-      const f = t1 > t0 ? Math.min(1, Math.max(0, (time - t0) / (t1 - t0))) : 1;
-      const ax = i ? mv.x[i - 1] : mv.x0,
-        ay = i ? mv.y[i - 1] : mv.y0;
-      hx = ax + (mv.x[i] - ax) * f;
-      hy = ay + (mv.y[i] - ay) * f;
-      c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (mv.f[i] > 0 && mv.s[i] > 0) {
-        c.strokeStyle = colorOf(mv.layer[i]);
-        c.lineWidth = Math.max(1, Math.min(3, view.z * 0.1));
-        c.beginPath();
-        c.moveTo(sx(ax), sy(ay));
-        c.lineTo(sx(hx), sy(hy));
-        c.stroke();
-      }
-    } else if (mv.n) {
-      hx = mv.x[mv.n - 1];
-      hy = mv.y[mv.n - 1];
-    }
-    c.setTransform(dpr, 0, 0, dpr, 0, 0);
-    c.strokeStyle = '#e02020';
-    c.lineWidth = 1.5;
-    c.beginPath();
-    c.arc(sx(hx), sy(hy), 5, 0, Math.PI * 2);
-    c.stroke();
+    drawPreviewHead(c, mv, est, i, time, view, dpr, colorOf);
     timeTxt.textContent = `${formatDuration(time)} / ${formatDuration(est.total)}`;
     slider.value = String(est.total ? Math.round((time / est.total) * 1000) : 1000);
   };

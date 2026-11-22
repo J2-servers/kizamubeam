@@ -1,7 +1,7 @@
 import { installPinchGestures } from './canvasZoom';
 // Editor: Zustand, Ansicht, Auswahl und Werkzeugwahl. Die übrigen Bereiche liegen in src/editor/
 // und werden unten in die Klasse eingehängt.
-import { Doc, Mat, newDoc, Obj, Pt, Shape, SubPath, TextShape, visibleLeaves, VarText } from './model';
+import { Doc, Mat, apply, newDoc, Obj, Pt, Shape, SubPath, TextShape, visibleLeaves, VarText } from './model';
 import { defaultVarText, setVarTextSource } from './vartext';
 import { setParamSource } from './params';
 import type { Issue } from './generators';
@@ -16,21 +16,23 @@ import { AlignGuide, SnapHit, SnapSet } from './snap';
 import { History } from './history';
 import { Tool, RULER, CANVAS_THEMES, HANDLE_OFF, Drag, NodeHover, SegHover, TOOL_HINTS } from './editor/shared';
 import { EditorCommands } from './editor/commands';
-import { EditorDocument } from './editor/document';
+import { EditorDocument, restartAutosaveTimer } from './editor/document';
 import { EditorHinges } from './editor/hinges';
 import { EditorPattern } from './editor/pattern';
-import { EditorImages } from './editor/imageops';
+import { EditorImages, loadDxfFallbackUnit, loadImportAutoGroup, loadImportAutoSelect, loadImportCenterInBed, loadImportCloseTolerance, loadImportHiddenLayers, loadImportSkippedNote, loadSvgDpi, type SvgDpi } from './editor/imageops';
+import { EditorImageHandles } from './editor/imageHandles';
 import { EditorJoints } from './editor/joints';
-import { EditorKeyboard } from './editor/keyboard';
+import { EditorKeyboard, loadNudgeSteps, type NudgeSteps } from './editor/keyboard';
 import { EditorNodes } from './editor/nodes';
 import { EditorObjects } from './editor/objects';
 import { EditorPaths } from './editor/paths';
-import { EditorPointer, loadRightPan } from './editor/pointer';
-import { EditorRender } from './editor/render';
+import { EditorPointer, loadRightPan, loadZoomInverted } from './editor/pointer';
+import { EditorRender, loadBedCenterCross, loadCanvasDark, loadCanvasFilled, loadHandleSize, loadImageSmoothing, loadShowCrosshair } from './editor/render';
 import { EditorShapeOps } from './editor/shapeops';
-import { EditorSnapping } from './editor/snapping';
+import { EditorSnapping, loadSnapTolerance, type SnapTolerance } from './editor/snapping';
+import { EditorToolOptions, loadRememberToolOptions, loadSelectAfterDraw } from './editor/toolOptions';
 import { EditorGuides } from './editor/guides';
-import { EditorText } from './editor/text';
+import { DEFAULT_TEXT_DEFAULTS, EditorText } from './editor/text';
 import { EditorGenerators } from './editor/generators';
 import { EditorParams } from './editor/params';
 import { EditorNest } from './editor/nest';
@@ -44,7 +46,7 @@ import { EditorRelations, RelPick } from './editor/relations';
 import { EditorSketch, SketchSession } from './editor/sketch';
 import type { RelMode } from './relations';
 import { t } from './i18n';
-import { installOverlapPicker } from './overlapPicker';
+import { installOverlapPicker, loadClickTolerance, saveClickTolerance, DEFAULT_CLICK_TOLERANCE_PX } from './overlapPicker';
 import { EditorFreehand } from './editor/freehand';
 import type { FreehandMode } from './freehandEdit';
 import { EditorSelection } from './editor/selection';
@@ -82,7 +84,9 @@ export class Editor {
   /** Frei gesetzter Drehpunkt im Drehmodus */
   pivot: Pt | null = null;
   view = { zoom: 2, ox: 60, oy: 40 };
-  filled = true;
+  filled = loadCanvasFilled();
+  /** Kantenglättung beim Bild-Zoomen (abschaltbar, Default an = heutiges Verhalten) */
+  imageSmoothing = loadImageSmoothing();
   /** Dunkles Design der Arbeitsfläche */
   dark = false;
   /** Aufgelöste Schriftfaktoren je Gruppe (Arbeitsfläche); live über Typografie-Änderungen aktualisiert */
@@ -128,9 +132,7 @@ export class Editor {
   polySides = 6;
   polyStar = false;
   rectRadius = 0;
-  textDefaults: Omit<TextShape, 'kind' | 'text'> = {
-    font: 'Arial', size: 10, bold: false, italic: false, upper: false, align: 'left', hSpace: 0, vSpace: 0,
-  };
+  textDefaults: Omit<TextShape, 'kind' | 'text'> = { ...DEFAULT_TEXT_DEFAULTS };
   cursor: Pt = { x: 0, y: 0 };
   /** Linienwerkzeug: Pfad im Entstehen (Weltkoordinaten) */
   draft: SubPath | null = null;
@@ -138,6 +140,9 @@ export class Editor {
   continuedFrom: Obj | null = null;
   nodeHover: NodeHover | null = null;
   segHover: SegHover | null = null;
+  /** S6-Follow-up: Hilfslinie aus dem Objekte-Panel hervorheben (Hover flüchtig, Pin per Klick); Index in doc.guides, nicht persistent */
+  guideHover: number | null = null;
+  guidePin: number | null = null;
   /** Ausgewählte Knoten des Knotenziels als "Unterpfad:Index" */
   nodeSel = new Set<string>();
   nodeSelObj: Obj | null = null;
@@ -169,6 +174,51 @@ export class Editor {
   suppressContextMenu = false;
   /** Drag with the right mouse button pans the view (opt-in, Edit → Settings → Mouse and keyboard) */
   rightPan = loadRightPan();
+  /** Eigenes Dunkel für die Arbeitsfläche, unabhängig vom UI-Design (opt-in, Default: Design folgen) */
+  canvasDark = loadCanvasDark();
+  /** Vom UI-Design vorgegebener Dunkel-Wert; wirksam ist canvasDark || themeDark */
+  themeDark = false;
+  /** Griff- und Knotengröße in px (Default 8 = heutiges Aussehen) */
+  handleSize = loadHandleSize();
+  /** Vollbild-Fadenkreuz an der Zeigerposition (opt-in) */
+  showCrosshair = loadShowCrosshair();
+  /** Kreuz in der Bettmitte (opt-in) */
+  bedCenterCross = loadBedCenterCross();
+  /** Zeiger auf der Fläche (für das Fadenkreuz; pointerleave setzt zurück) */
+  cursorOnCanvas = false;
+  /** Inverted mouse-wheel zoom direction (opt-in, Edit → Settings → Mouse and keyboard) */
+  zoomInverted = loadZoomInverted();
+  /** Werkzeugschalter über Neustarts merken (Opt-in, Edit → Settings → Maus und Tastatur) */
+  rememberToolOptions = loadRememberToolOptions();
+  /** Nach dem Zeichnen zur Auswahl wechseln (Edit → Settings → Maus und Tastatur) */
+  selectAfterDraw = loadSelectAfterDraw();
+  /** Schrittweiten der Pfeiltasten in mm (Edit → Settings → Maus und Tastatur) */
+  nudgeSteps: NudgeSteps = loadNudgeSteps();
+  /** Klick-Auswahltoleranz in px (Edit → Settings → Maus und Tastatur) */
+  clickTolerance = loadClickTolerance();
+  /** Fangdistanzen in px, normal und mit Alt (Edit → Settings → Arbeitsfläche und Fangen) */
+  snapTolerance: SnapTolerance = loadSnapTolerance();
+  /** Importiertes nach dem Import auswählen (Opt-out, an) */
+  importAutoSelect = loadImportAutoSelect();
+  /** Import in Bettmitte legen (Opt-in, aus) */
+  importCenterInBed = loadImportCenterInBed();
+  /** Hinweise zu übersprungenen Inhalten anzeigen (Opt-out, an) */
+  importSkippedNote = loadImportSkippedNote();
+  /** Importiertes automatisch gruppieren (Opt-out, an) */
+  importAutoGroup = loadImportAutoGroup();
+  /** SVG-Auflösung für einheitenlose/px-Maße (Opt-out, 96 DPI) */
+  svgDpi: SvgDpi = loadSvgDpi();
+  /** DXF-Einheit als Fallback in mm (Opt-out, 1 = mm) */
+  dxfFallbackUnitMm = loadDxfFallbackUnit();
+  /** Auto-Close-Toleranz in mm beim Import (Opt-out, 0.005; 0 = nur exakt schließen) */
+  importCloseToleranceMm = loadImportCloseTolerance();
+  /** Versteckte Ebenen/Formen importieren (Opt-out, an = heutiges Verhalten) */
+  importHiddenLayers = loadImportHiddenLayers();
+  /** Klick-Toleranz ändern und merken */
+  setClickTolerance(v: number) {
+    if (!saveClickTolerance(v)) throw new Error(t('Einstellung konnte nicht gespeichert werden.'));
+    this.clickTolerance = v;
+  }
   onCanvasContext: ((event: MouseEvent) => void) | null = null;
   hint = '';
 
@@ -191,6 +241,8 @@ export class Editor {
   dpr = 1;
   private listeners = new Set<(what: 'doc' | 'sel' | 'view' | 'tool') => void>();
   saveTimer = 0;
+  /** Intervall-Timer für Auto-save (0 = aus); Neustart über setAutosaveInterval */
+  autoSaveTimer = 0;
   textEditor: ((o: Obj, isNew: boolean) => void) | null = null;
   /** Einfügen aus der System-Zwischenablage (Bilder, SVG); true = verarbeitet */
   externalPaste: ((data: DataTransfer) => Promise<boolean>) | null = null;
@@ -265,10 +317,10 @@ export class Editor {
   }
 
   // Befehle: Löschen, Kopieren, Einfügen, Transformieren, Formparameter
-  /** Rasterarray-Dialog öffnen (Ctrl+Shift+A, von der Oberfläche gesetzt) */
-  onGridArray: (() => void) | null = null;
   /** Datei > Importieren (von der Oberfläche gesetzt) */
   onImport: (() => void) | null = null;
+  /** Tastenkürzel ausführen (von der Oberfläche gesetzt, #453); true = Taste verarbeitet */
+  onCommandKey: ((e: KeyboardEvent) => boolean) | null = null;
 
   // QR-Codes, variabler Text, Text und Text auf Pfad
   /** Doppelklick auf einen QR-Code: Dialog zum Bearbeiten öffnen */
@@ -302,6 +354,8 @@ export class Editor {
   checkIgnored = new Set<string>();
   /** Lage auf dem Bett prüfen? (von laser.ts gesetzt: nicht bei Start ab Benutzer-Ursprung/Position oder mit Drehachse) */
   checkBedApplies: () => boolean = () => true;
+  /** Manuelle Schnittreihenfolge laut Geräte-Schaltern? (von laser.ts gesetzt: alle drei Optimierungen aus) */
+  manualOrder: () => boolean = () => false;
 
   // Zeichnen der Arbeitsfläche
   get colors() {
@@ -318,6 +372,9 @@ export class Editor {
     this.loadSnapSettings();
     this.loadGridSettings();
     this.loadBoolSettings();
+    this.loadToolOptions();
+    this.loadTextDefaults();
+    restartAutosaveTimer(this);
     // Texte werden mit den Schriftkonturen gezeichnet; nach dem Laden einer Schrift neu zeichnen
     onFontLoaded(() => this.emit('sel'));
     onImageReady(() => this.redraw());
@@ -335,7 +392,12 @@ export class Editor {
     canvas.addEventListener('pointercancel', (e) => this.cancelPointerDrag(e));
     canvas.addEventListener('lostpointercapture', (e) => this.cancelPointerDrag(e));
     canvas.addEventListener('pointerleave', () => {
-      if (this.drag || (!this.nodeHover && !this.segHover && !this.snapHit && !this.alignGuides.length)) return;
+      const hideCrosshair = this.cursorOnCanvas && this.showCrosshair;
+      this.cursorOnCanvas = false;
+      if (this.drag || (!this.nodeHover && !this.segHover && !this.snapHit && !this.alignGuides.length)) {
+        if (hideCrosshair) this.redraw();
+        return;
+      }
       this.nodeHover = this.segHover = null;
       this.clearSnap();
       this.redraw();
@@ -500,7 +562,7 @@ export class Editor {
   }
   /** Oberstes Objekt der Ebene 0 unter dem Weltpunkt. */
   hitTest(p: Pt): Obj | null {
-    const tol = 4 / this.view.zoom;
+    const tol = (this.clickTolerance ?? DEFAULT_CLICK_TOLERANCE_PX) / this.view.zoom;
     for (let i = this.doc.objs.length - 1; i >= 0; i--) {
       const top = this.doc.objs[i];
       if (!this.selectable(top)) continue;
@@ -531,11 +593,36 @@ export class Editor {
     const b = this.selBounds();
     if (!b) return -1;
     const hs = this.handlePoints(b);
+    const tol = Math.max(5, this.handleSize / 2 + 1);
     for (let i = 0; i < 8; i++) {
       if (this.rotateMode && i % 2 === 1) continue;
-      if (Math.abs(hs[i].x - sx) <= 5 && Math.abs(hs[i].y - sy) <= 5) return i;
+      if (Math.abs(hs[i].x - sx) <= tol && Math.abs(hs[i].y - sy) <= tol) return i;
     }
     return -1;
+  }
+  /** Genau ein wählbares Rechteck: Ziel des Eckenradius-Griffs (Zahlenfeld bleibt Quelle der Wahrheit). */
+  rectRadiusTarget(): Obj | null {
+    if (this.sel.length !== 1 || this.rotateMode || this.tool !== 'select') return null;
+    const o = this.sel[0];
+    if (o.shape.kind !== 'rect' || !this.selectable(o)) return null;
+    return o;
+  }
+  /** Griffposition in Bildschirmpixeln: auf der Diagonalen im Abstand des Radius von der Ecke. */
+  rectRadiusScreen(): Pt | null {
+    const o = this.rectRadiusTarget();
+    if (!o || o.shape.kind !== 'rect') return null;
+    const s = o.shape;
+    const limit = Math.min(Math.abs(s.w), Math.abs(s.h)) / 2;
+    const corners = s.corners ?? [s.r, s.r, s.r, s.r];
+    const r = Math.max(0, Math.min(Math.max(...corners), Number.isFinite(limit) ? limit : 0));
+    return this.toScreen(apply(o.m, r, r));
+  }
+  /** 24px-Trefferfläche für den Eckenradius-Griff. */
+  hitRectRadius(sx: number, sy: number): boolean {
+    const p = this.rectRadiusScreen();
+    if (!p) return false;
+    const tol = Math.max(12, this.handleSize / 2 + 1);
+    return Math.abs(p.x - sx) <= tol && Math.abs(p.y - sy) <= tol;
   }
   /** Bereich knapp außerhalb der Eckgriffe: dort dreht Ziehen die Auswahl auch im Skaliermodus. */
   hitRotateZone(sx: number, sy: number): boolean {
@@ -571,11 +658,13 @@ export class Editor {
   // ---------- Werkzeuge ----------
 
   setTool(t: Tool) {
+    // Re-selecting Shaper must not discard its active editing session.
+    if (t === 'shaper' && this.tool === 'shaper' && this.shaperEdit) return;
     if (t !== 'builder') this.builderSession = null;
-    // Eine neue Werkzeugwahl beendet die Nachbearbeitung der letzten Shaper-Operation
+    if (this.drag) this.cancelDrag();
+    // Erst das Verlassen des Werkzeugs beendet die Shaper-Nachbearbeitung.
     this.shaperEdit = null;
     this.shaperCloseHint = null;
-    if (this.drag) this.cancelDrag();
     if (this.draft) this.finishDraft();
     // Werkzeugwechsel verwirft einen laufenden Bogen (Esc bleibt die bewusste Abbruchtaste).
     this.arcDraft = null;
@@ -616,6 +705,7 @@ export interface Editor
     EditorCommands,
     EditorObjects,
     EditorText,
+    EditorToolOptions,
     EditorGenerators,
     EditorParams,
     EditorNest,
@@ -625,6 +715,7 @@ export interface Editor
     EditorWarp,
     EditorNotes,
     EditorImages,
+    EditorImageHandles,
     EditorTabs,
     EditorRelations,
     EditorSketch,
@@ -653,6 +744,7 @@ const PARTS = [
   EditorCommands,
   EditorObjects,
   EditorText,
+  EditorToolOptions,
   EditorGenerators,
   EditorParams,
   EditorNest,
@@ -662,6 +754,7 @@ const PARTS = [
   EditorWarp,
   EditorNotes,
   EditorImages,
+  EditorImageHandles,
   EditorTabs,
   EditorRelations,
   EditorSketch,

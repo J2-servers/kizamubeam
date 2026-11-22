@@ -6,16 +6,19 @@ const PRE = 'kizamubeam.';
 
 /** Allgemeine Einstellungen: Aussehen, Sprache, Fangen, Raster, zuletzt benutzte Werte der Dialoge */
 export const SETTINGS_KEYS = [
-  'theme', 'lang', 'snap', 'grid', 'boolean', 'updateChannel', 'updateAuto', 'fontFavorites', 'fontAutoInstall', 'imagePresets', 'check',
+  'theme', 'lang', 'snap', 'snapPrev', 'grid', 'boolean', 'updateChannel', 'updateAuto', 'fontFavorites', 'fontAutoInstall', 'imagePresets', 'check',
   'nest', 'joints', 'hinges', 'slots', 'qr', 'barcode', 'printcut', 'jigfill', 'focustest', 'materialtest', 'warp', 'calib', 'view3d',
-  'workpieces', 'overlap-picker', 'rightPan', 'patternfill', 'uiTypography', 'electricityTariff', 'electricityCurrency',
+  'workpieces', 'overlap-picker', 'rightPan', 'zoomInverted', 'rememberToolOptions', 'toolOptions',
+  'selectAfterDraw', 'textDefaults', 'nudgeSteps', 'shortcuts', 'clickTolerance', 'snapTolerance', 'canvasDark', 'handleSize',
+  'crosshair', 'bedCenterCross', 'importAutoSelect', 'importCenterInBed', 'importSkippedNote', 'importAutoGroup', 'svgDpi', 'dxfFallbackUnit', 'importCloseTolerance', 'importHiddenLayers', 'canvasFilled', 'imageSmoothing', 'curveQuality', 'cutOrderApply', 'patternfill', 'uiTypography', 'electricityTariff', 'electricityCurrency',
+  'cutSelectedDefault', 'jobOriginDefault', 'layerCategories',
   // Fenster „Produkt erstellen“: Anbieter, Modelle, Aufwand, Dicke, Arbeitsfläche (ohne Schlüssel, die sind lokal)
   'criar.settings',
 ].map((k) => PRE + k);
 /** Schlüssel mit diesem Anfang zählen auch zu den Einstellungen (letzte Werte der Generatoren und der Werkzeuge aus Erweiterungen) */
 export const SETTINGS_PREFIXES = [PRE + 'gen.', PRE + 'tool.'];
 /** Oberfläche: Fenster, Leisten, Werkzeugkasten */
-export const UI_KEYS = ['layout', 'toolbars', 'objectsPanel', 'apps'].map((k) => PRE + k);
+export const UI_KEYS = ['layout', 'toolbars', 'objectsPanel', 'apps', 'groupedTabs', 'tabPages'].map((k) => PRE + k);
 export const CAMERA_KEYS = [PRE + 'camera'];
 /** Bereiche mit eigenem Speicherort */
 export const DEVICES_KEY = PRE + 'devices';
@@ -27,7 +30,7 @@ const PACKS_STORE = PRE + 'packs';
  * Sicherungen der FluidNC-Konfiguration, altes Einzelgerät, Abgleich selbst, Dialogpositionen und -größen (hängen am Bildschirm), ausgeschaltete und geprüfte Erweiterungen und ihre Netzwerk-Freigaben (je Rechner), API-Schlüssel der KI-Anbieter (Fenster „Produkt erstellen“). Jeder Schlüssel im Code muss in
  * einer dieser Listen stehen (npm run test:sync prüft das).
  */
-export const LOCAL_KEYS = ['autosave', 'tabs', 'updateLastCheck', 'setupOffered', 'fluidBackups', 'materialtest.last', 'device', 'sync', 'syncKnown', 'syncFp', 'syncExport', 'dialogPos', 'dialogSize', 'previewSidebarWidth', 'packs.disabled', 'packs.verified', 'pluginNet', 'pluginNetOff', 'criar.keys'].map(
+export const LOCAL_KEYS = ['autosave', 'autosaveInterval', 'tabs', 'updateLastCheck', 'setupOffered', 'fluidBackups', 'materialtest.last', 'device', 'sync', 'syncKnown', 'syncFp', 'syncExport', 'dialogPos', 'dialogSize', 'previewSidebarWidth', 'packs.disabled', 'packs.verified', 'pluginNet', 'pluginNetOff', 'firePending', 'fireOverlayInPanel', 'criar.keys'].map(
   (k) => PRE + k,
 );
 export const BROWSER_STORES = [TEMPLATES_STORE, PACKS_STORE];
@@ -153,7 +156,7 @@ const materialsAdapter: Adapter = {
         else list.push(e);
       }
     }
-    setItem(MATERIALS_KEY, JSON.stringify({ format: 'kizamubeam-materials', version: 1, entries: list }));
+    setItem(MATERIALS_KEY, JSON.stringify({ format: 'kizamubeam-materials', version: 2, entries: list }));
   },
 };
 

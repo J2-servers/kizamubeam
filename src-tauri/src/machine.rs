@@ -110,6 +110,7 @@ pub async fn machine_connect(
     ruida_jog_port: Option<u16>,
     ruida_magic: Option<String>,
     ruida_origin: Option<String>,
+    dtr: Option<bool>,
 ) -> Result<(), String> {
     // Ältere Oberflächen schicken keinen Puffer; unter 64 und über 16 KiB ist sicher ein Tippfehler
     let rx_buffer = rx_buffer.unwrap_or(crate::stream::RX_BUFFER).clamp(64, 16384);
@@ -139,7 +140,7 @@ pub async fn machine_connect(
                 if port.trim().is_empty() {
                     return Err("Keine Schnittstelle gewählt".into());
                 }
-                let p = crate::serial_transport::open(port.trim(), baud.max(9600))
+                let p = crate::serial_transport::open(port.trim(), baud.max(9600), dtr)
                     .map_err(|e| format!("{}: {e}", port.trim()))?;
                 let tr = crate::ruida_link::SerialRuidaTransport::new(p);
                 let streamer = crate::ruida_link::RuidaStreamer::connect(tr, events, busy, rcfg)?;
@@ -163,7 +164,7 @@ pub async fn machine_connect(
             if port.trim().is_empty() {
                 return Err("Keine Schnittstelle gewählt".into());
             }
-            let p = crate::serial_transport::open(port.trim(), baud)
+            let p = crate::serial_transport::open(port.trim(), baud, dtr)
                 .map_err(|e| format!("{}: {e}", port.trim()))?;
             std::thread::spawn(move || Streamer::new(p, events, busy, Protocol { telnet: false, sync, realtime, poll, rx_buffer }).with_serial_retries().run(rx));
         }
@@ -190,19 +191,29 @@ pub async fn machine_connect(
 }
 
 #[tauri::command]
-pub async fn machine_disconnect(state: State<'_, Machine>) -> Result<(), String> {
-    if let Some(tx) = state.tx.lock().unwrap().take() {
+pub async fn machine_disconnect(state: State<'_, Machine>, fire_session: Option<u64>, fire_smoothie: Option<bool>) -> Result<(), String> {
+    let tx = state.tx.lock().map_err(|e| e.to_string())?.take();
+    if let Some(tx) = tx {
+        if let Some(session) = fire_session {
+            let (reply, received) = channel();
+            // Taking tx prevents late invocations from targeting the closing connection.
+            if tx.send(Cmd::FireClose { session, smoothie: fire_smoothie == Some(true), reply }).is_err() { return Ok(()); }
+            return fire_response(received).await;
+        }
         let _ = tx.send(Cmd::Close);
     }
     Ok(())
 }
 
 #[tauri::command]
-pub async fn machine_send(state: State<'_, Machine>, line: String) -> Result<(), String> {
+pub async fn machine_send(state: State<'_, Machine>, line: String, fire_session: Option<u64>) -> Result<(), String> {
     if state.busy.load(Ordering::SeqCst) {
         return Err("Während ein Job läuft, sind keine Befehle möglich.".into());
     }
-    state.send(Cmd::Line(line))
+    state.send(match fire_session {
+        Some(session) => Cmd::FireLine { session, line },
+        None => Cmd::Line(line),
+    })
 }
 
 #[tauri::command]
@@ -250,6 +261,20 @@ pub async fn machine_resume(state: State<'_, Machine>) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn machine_stop(state: State<'_, Machine>) -> Result<(), String> {
-    state.send(Cmd::Stop)
+pub async fn machine_stop(state: State<'_, Machine>, fire_session: Option<u64>, fire_smoothie: Option<bool>) -> Result<(), String> {
+    if let Some(session) = fire_session {
+        let (reply, received) = channel();
+        state.send(Cmd::FireStop { session, smoothie: fire_smoothie == Some(true), reply })?;
+        // A timeout would let confirmation race an activation still waiting in native code.
+        // Smoothie replies only after the off ACK. Teardown drops the reply;
+        // write errors also tear down its queue.
+        fire_response(received).await
+    } else {
+        state.send(Cmd::Stop)
+    }
+}
+
+async fn fire_response(received: std::sync::mpsc::Receiver<Result<(), String>>) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || received.recv().map_err(|_| "Verbindung getrennt".to_string())?)
+        .await.map_err(|e| e.to_string())?
 }

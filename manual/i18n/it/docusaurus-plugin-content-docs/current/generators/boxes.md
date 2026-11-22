@@ -17,7 +17,7 @@ Entrambi i generatori di scatole si trovano in **Casella degli strumenti → Sca
 | **Spessore del materiale** | Spessore del pannello. Misuralo: i pannelli sono raramente spessi quanto dichiarato. |
 | **Su** | **Aperta** o **Chiusa (coperchio con dita)**. |
 | **Larghezza delle dita** | Larghezza minima delle dita. Ogni bordo riceve un numero dispari di dita della stessa larghezza. |
-| **Gioco di accoppiamento** | Ogni dito diventa più stretto di questo valore; negativo = accoppiamento a pressione. |
+| **Gioco di accoppiamento totale** | Gioco totale delle dita: ogni fessura è più larga del suo dito di questo valore, metà per lato; negativo = accoppiamento a pressione. |
 | **Kerf** | Larghezza del taglio laser; i contorni vengono spostati verso l’esterno della metà. |
 
 ![Finestra di creazione della scatola: dimensioni interne di 120 × 90 × 60 mm, spessore del materiale 3 mm, aperta in alto, larghezza delle dita, gioco di accoppiamento e kerf; l’anteprima mostra le cinque parti e, sotto, le dimensioni esterne risultanti e i campi per bordo](/img/box-dialog-en.webp)
@@ -34,13 +34,13 @@ Metti testo o immagini su una parete e raggruppali con essa, oppure appoggiali s
 
 1. Misura lo spessore del materiale con un calibro in più punti e inserisci la media.
 2. Parti con gioco 0 e il kerf del tuo laser (da 0,1 a 0,2 mm per un laser a diodo su compensato).
-3. Taglia la scatola. Se è troppo stretta, aumenta il gioco a passi di 0,05 mm; se è lenta, riducilo.
+3. Taglia la scatola. Se è troppo stretta, aumenta il gioco a passi di 0,1 mm; se è lenta, riducilo.
 
 La [calibrazione dell’accoppiamento](../features/materials-tests.md#calibrate-fit) trova questi valori per un materiale con un solo test, e le nuove scatole li adottano poi automaticamente.
 
 ## Scatola con giunti a pettine e divisori
 
-Una scatola aperta o chiusa con divisori che si incrociano. Questo generatore è **sperimentale**: controlla le parti nella vista 3D e su un ritaglio prima di tagliare il materiale buono.
+Una scatola aperta o chiusa con divisori che si incrociano.
 
 ![Scatola con divisori: le otto parti con le asole per i divisori sulla pagina e la vista 3D con la scatola montata, tre scomparti in larghezza (quello centrale largo il doppio) e due in profondità](/img/box-dividers-3d-en.webp)
 
@@ -52,4 +52,4 @@ Una scatola aperta o chiusa con divisori che si incrociano. Questo generatore è
 | **Divisori più bassi della scatola** | Di quanto i divisori sono più bassi delle pareti. |
 | **Kerf** | Larghezza del taglio laser. |
 
-**Larghezza delle dita** e **Gioco di accoppiamento** si trovano in **Avanzate**. Le parti e i loro fori stanno su un livello comune.
+**Larghezza delle dita** e **Gioco di accoppiamento totale** si trovano in **Avanzate**. Le parti e i loro fori stanno su un livello comune.

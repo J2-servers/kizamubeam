@@ -2,7 +2,7 @@
 // Ein Eintrag hält die Bearbeitungseinstellungen eines Layers und wahlweise die Bild-Einstellungen.
 // Gespeichert wird im Browser-Speicher der App; Austausch über .kzm-Dateien (JSON, früher .lwm). LightBurn-
 // Bibliotheken (.clb) lassen sich einlesen, soweit ihre Felder hier eine Entsprechung haben.
-import { CutSettings, cutSettings, defaultCutSettings, normalizeCut, defaultImageLayer, legacyImageValues, stripImageOutput, defaultTabs, DitherMode, ImageLayer, Layer, LayerMode } from './model';
+import { cleanLayerType, CutSettings, cutSettings, defaultCutSettings, layerTypeName, normalizeCut, defaultImageLayer, legacyImageValues, stripImageOutput, defaultTabs, DitherMode, ImageLayer, Layer, LayerMode } from './model';
 import { dec, t } from './i18n';
 import { cleanLook } from './view3d/looks';
 
@@ -31,7 +31,7 @@ export interface MaterialEntry {
 export interface MaterialFit {
   /** Gemessene Breite der Schnittfuge (mm); null = nicht gemessen */
   kerf: number | null;
-  /** Bestes Spiel je Seite für zwei gelaserte Teile ineinander (Zinken, Zapfen in Loch), gezeichnet */
+  /** Bestes Gesamtspiel (beide Seiten zusammen) für zwei gelaserte Teile ineinander (Zinken, Zapfen in Loch), gezeichnet */
   pair: number;
   /** Beste Schlitzbreite über der Nenndicke th für eine Platte dieses Materials, gezeichnet */
   slot: number;
@@ -39,20 +39,32 @@ export interface MaterialFit {
   th: number;
   /** Datum (ISO) */
   date: string;
+  /**
+   * 2 (#402): pair ist das Gesamtspiel. Ohne die Marke (Bibliotheken, Erweiterungen und Synchronisierung von vorher)
+   * ist es das Spiel je Seite; sanitizeFit verdoppelt es dann einmal und setzt die Marke.
+   */
+  v?: 2;
 }
+
+/** The calibrated play of a pair fit per side (MaterialFit.pair is the total play, #402) */
+export const pairSide = (f: Pick<MaterialFit, 'pair'>) => f.pair / 2;
 
 function sanitizeFit(f: unknown): MaterialFit | undefined {
   const o = f as Partial<MaterialFit> | undefined;
   if (!o || typeof o !== 'object') return undefined;
   const n = (v: unknown) => (typeof v === 'number' && isFinite(v) ? v : null);
-  const pair = n(o.pair), slot = n(o.slot), th = n(o.th);
-  if (pair === null || slot === null || th === null || th <= 0) return undefined;
+  const pairRaw = n(o.pair), slot = n(o.slot), th = n(o.th);
+  if (pairRaw === null || slot === null || th === null || th <= 0) return undefined;
   const kerf = n(o.kerf);
-  return { kerf: kerf !== null && kerf >= 0 ? kerf : null, pair, slot, th, date: typeof o.date === 'string' ? o.date : '' };
+  // Je Seite (ohne Marke) → Gesamtspiel, einmal; die Marke bleibt, damit ein erneutes Laden nicht noch einmal verdoppelt
+  const pair = o.v === 2 ? pairRaw : Math.round(2 * pairRaw * 1e6) / 1e6;
+  return { kerf: kerf !== null && kerf >= 0 ? kerf : null, pair, slot, th, date: typeof o.date === 'string' ? o.date : '', v: 2 };
 }
 
 const STORE_KEY = 'kizamubeam.materials';
 const FORMAT = 'kizamubeam-materials';
+/** 2 (#402): pair of a calibration is the total play; every fit carries the mark itself (MaterialFit.v), so entries of a version 1 file or sync are told apart one by one */
+const VERSION = 2;
 
 const newEntryId = () => `m${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
@@ -63,6 +75,8 @@ function sanitize(e: Partial<MaterialEntry>): MaterialEntry | null {
   normalizeCut(settings);
   settings.look = cleanLook(e.settings.look);
   if (!settings.look) delete settings.look;
+  settings.layerType = cleanLayerType(e.settings.layerType);
+  if (!settings.layerType) delete settings.layerType;
   const th = Number(e.thickness);
   return {
     id: typeof e.id === 'string' && e.id ? e.id : newEntryId(),
@@ -97,7 +111,7 @@ class Library {
   }
   private changed() {
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({ format: FORMAT, version: 1, entries: this.entries }));
+      localStorage.setItem(STORE_KEY, JSON.stringify({ format: FORMAT, version: VERSION, entries: this.entries }));
     } catch {
       /* nicht speicherbar, z. B. privates Fenster */
     }
@@ -160,7 +174,7 @@ class Library {
     this.changed();
   }
   serialize(): string {
-    return JSON.stringify({ format: FORMAT, version: 1, entries: this.entries }, null, 1);
+    return JSON.stringify({ format: FORMAT, version: VERSION, entries: this.entries }, null, 1);
   }
 }
 
@@ -177,13 +191,15 @@ export const fitSummary = (f: MaterialFit) => {
   const v = (x: number) => dec((Math.round(x * 100) / 100).toFixed(2));
   return [
     f.kerf !== null ? t('Schnittfuge {k} mm', { k: v(f.kerf) }) : '',
-    t('Zapfen in Loch {c} mm je Seite', { c: v(f.pair) }),
+    t('Zapfen in Loch {c} mm gesamt', { c: v(f.pair) }),
     t('Schlitz {w} mm für {th} mm', { w: v(f.th + f.slot), th: v(f.th) }),
     f.date,
   ].filter(Boolean).join(' · ');
 };
-export const settingsSummary = (s: CutSettings) =>
-  `${s.mode === 'fill' ? t('Füllen') : t('Linie')}, ${fmt(s.speed)} mm/min, ${fmt(s.power)} %${s.passes > 1 ? `, ${s.passes}×` : ''}`;
+export const settingsSummary = (s: CutSettings) => {
+  const type = cleanLayerType(s.layerType);
+  return `${type ? `${layerTypeName(type)}, ` : ''}${s.mode === 'fill' ? t('Füllen') : t('Linie')}, ${fmt(s.speed)} mm/min, ${fmt(s.power)} %${s.passes > 1 ? `, ${s.passes}×` : ''}`;
+};
 
 /** Neuer Eintrag aus den Einstellungen eines Layers */
 export function entryFromLayer(L: Layer, withImg: boolean): Pick<MaterialEntry, 'settings' | 'img'> {
@@ -195,7 +211,8 @@ export function entryFromLayer(L: Layer, withImg: boolean): Pick<MaterialEntry, 
  * older entries that kept image speed and power separately apply those to the layer
  */
 export function layerPatch(e: MaterialEntry, imagesOnly = false): Partial<Layer> {
-  // Ohne eigenes Aussehen im Eintrag gilt wieder das automatische (aus dem Materialnamen)
+  // Ohne eigenes Aussehen im Eintrag gilt wieder das automatische (aus dem Materialnamen). Ohne Layer-Art im Eintrag
+  // behält der Layer seine (#265)
   const p: Partial<Layer> = { look: undefined, sub: undefined, ...structuredClone(e.settings), material: e.id, name: entryLabel(e) };
   if (e.img) {
     if (imagesOnly) Object.assign(p, legacyImageValues(e.img));
@@ -206,7 +223,10 @@ export function layerPatch(e: MaterialEntry, imagesOnly = false): Partial<Layer>
 
 /** Weichen die Einstellungen des Layers vom Eintrag ab? */
 export function differsFrom(L: Layer, e: MaterialEntry): boolean {
-  if (JSON.stringify(cutSettings(L)) !== JSON.stringify(cutSettings(e.settings))) return true;
+  const own = cutSettings(L);
+  // Ein Eintrag ohne Layer-Art lässt die des Layers stehen (layerPatch), das ist keine Abweichung
+  if (!e.settings.layerType) delete own.layerType;
+  if (JSON.stringify(own) !== JSON.stringify(cutSettings(e.settings))) return true;
   return !!e.img && JSON.stringify(L.img) !== JSON.stringify(stripImageOutput(e.img));
 }
 

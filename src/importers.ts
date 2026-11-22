@@ -163,11 +163,17 @@ export function nearestLayer(rgb: [number, number, number] | null): number {
 
 const UNIT_MM: Record<string, number> = { mm: 1, cm: 10, in: 25.4, pt: 25.4 / 72, pc: 25.4 / 6, px: 25.4 / 96, '': 25.4 / 96 };
 
-function lengthMm(v: string | null): number | null {
+/** Illustrator-Dateien an Namensraum, Generator oder Kommentar erkennen (für die Auto-DPI-Wahl) */
+function isIllustratorSvg(root: Element, text: string): boolean {
+  if (root.getAttributeNames().some((n) => n === 'xmlns:i' || n.startsWith('xmlns:i:'))) return true;
+  return /adobe illustrator/i.test(root.getAttribute('generator') ?? '') || /adobe illustrator/i.test(text.slice(0, 4000));
+}
+function lengthMm(v: string | null, pxMm = 25.4 / 96): number | null {
   if (!v) return null;
   const m = /^\s*([-+]?[\d.]+(?:e[-+]?\d+)?)\s*(mm|cm|in|pt|pc|px|%)?\s*$/i.exec(v);
   if (!m || m[2] === '%') return null;
-  return parseFloat(m[1]) * UNIT_MM[(m[2] ?? '').toLowerCase()];
+  const u = (m[2] ?? '').toLowerCase();
+  return parseFloat(m[1]) * (u === 'px' || u === '' ? pxMm : UNIT_MM[u]);
 }
 
 /** Zahlenliste aus Attributen wie points oder viewBox */
@@ -426,7 +432,27 @@ function sanitizeSvgText(input: string): string {
   return s;
 }
 
-export function importSvg(text: string): ImportResult {
+export type SvgDpi = '96' | '72' | 'auto';
+
+/** Standard-Auto-Close-Toleranz beim Import in mm (bisheriges Verhalten, falls nichts eingestellt) */
+export const DEFAULT_CLOSE_TOLERANCE = 0.005;
+
+export interface ImportParseOptions {
+  /** Hinweise zu übersprungenen Inhalten (z. B. Texte) in notes aufnehmen; Formen werden so oder so übersprungen */
+  reportSkipped?: boolean;
+  /** Auflösung größenloser SVG-Einheiten (px); 'auto' nimmt 72 DPI bei Illustrator-Dateien, sonst 96 */
+  svgDpi?: SvgDpi;
+  /** DXF-Einheit in mm pro Einheit, wenn $INSUNITS fehlt oder unbekannt ist (Default 1 = mm) */
+  dxfFallbackUnit?: number;
+  /** Auto-Close-Toleranz in mm beim Zusammenfügen offener Linienzüge (Default 0.005); 0 = nur exakt schließen */
+  closeTolerance?: number;
+  /** Versteckte Ebenen/Elemente mit importieren (Default true = heutiges Verhalten); aus = visibility:hidden (SVG) und gefrorene/ausgeschaltete DXF-Layer überspringen, display:none bleibt immer geskippt */
+  importHiddenLayers?: boolean;
+}
+
+export function importSvg(text: string, opts?: ImportParseOptions): ImportResult {
+  const reportSkipped = opts?.reportSkipped ?? true;
+  const importHidden = opts?.importHiddenLayers ?? true;
   const safeText = sanitizeSvgText(text);
   const doc = new DOMParser().parseFromString(safeText, 'image/svg+xml');
   const root = doc.documentElement;
@@ -436,13 +462,15 @@ export function importSvg(text: string): ImportResult {
   const notes: string[] = [];
   let skippedText = 0;
 
-  // Seitenmaßstab: Benutzereinheiten → mm
+  // Seitenmaßstab: Benutzereinheiten → mm. Illustrator speichert 72 DPI, sonst 96.
+  const dpi = opts?.svgDpi ?? '96';
+  const pxMm = dpi === '72' ? 25.4 / 72 : dpi === 'auto' && isIllustratorSvg(root, text) ? 25.4 / 72 : 25.4 / 96;
   const vb = nums(root.getAttribute('viewBox'));
-  const wmm = lengthMm(root.getAttribute('width')),
-    hmm = lengthMm(root.getAttribute('height'));
-  let base: Mat = [25.4 / 96, 0, 0, 25.4 / 96, 0, 0];
+  const wmm = lengthMm(root.getAttribute('width'), pxMm),
+    hmm = lengthMm(root.getAttribute('height'), pxMm);
+  let base: Mat = [pxMm, 0, 0, pxMm, 0, 0];
   if (vb.length === 4 && vb[2] > 0 && vb[3] > 0) {
-    const sx = wmm !== null ? wmm / vb[2] : hmm !== null ? hmm / vb[3] : 25.4 / 96;
+    const sx = wmm !== null ? wmm / vb[2] : hmm !== null ? hmm / vb[3] : pxMm;
     const sy = hmm !== null ? hmm / vb[3] : sx;
     const s = Math.min(sx, sy); // preserveAspectRatio xMidYMid meet (Standard)
     base = [s, 0, 0, s, -vb[0] * s, -vb[1] * s];
@@ -477,7 +505,7 @@ export function importSvg(text: string): ImportResult {
     if (['defs', 'clipPath', 'mask', 'symbol', 'metadata', 'title', 'desc', 'style', 'script', 'pattern', 'marker', 'linearGradient', 'radialGradient', 'filter', 'foreignObject'].includes(name))
       return;
     const st = styleOf(el, pst);
-    if (st.display === 'none') return;
+    if (st.display === 'none' || (!importHidden && st.visibility === 'hidden')) return;
     const mm = mul(m, parseTransform(el.getAttribute('transform')));
     const pb = new PathBuilder();
     switch (name) {
@@ -554,7 +582,7 @@ export function importSvg(text: string): ImportResult {
         const w = attr(el, 'width'),
           h = attr(el, 'height');
         if (!href.startsWith('data:image/') || w <= 0 || h <= 0) {
-          notes.push(t('Verknüpftes Bild übersprungen (nur eingebettete Bilder werden übernommen).'));
+          if (reportSkipped) notes.push(t('Verknüpftes Bild übersprungen (nur eingebettete Bilder werden übernommen).'));
           return;
         }
         items.push({ kind: 'image', href, m: mul(mul(base, mm), [w, 0, 0, h, attr(el, 'x'), attr(el, 'y')]), layer: layerFor(st) });
@@ -570,7 +598,7 @@ export function importSvg(text: string): ImportResult {
     if (pb.subs.length) items.push({ kind: 'path', subs: transformSubs(pb.subs, mul(base, mm)), layer: layerFor(st) });
   };
   walk(root, IDENT, {}, 0);
-  if (skippedText) notes.push(tn('{n} Text übersprungen (in der Quelldatei vorher in Pfade umwandeln).', '{n} Texte übersprungen (in der Quelldatei vorher in Pfade umwandeln).', skippedText));
+  if (skippedText && reportSkipped) notes.push(tn('{n} Text übersprungen (in der Quelldatei vorher in Pfade umwandeln).', '{n} Texte übersprungen (in der Quelldatei vorher in Pfade umwandeln).', skippedText));
   return { items: items.filter((it) => it.kind === 'image' || it.subs.length), notes: [...new Set(notes)] };
 }
 
@@ -600,13 +628,18 @@ function dxfPairs(text: string): [number, string][] {
 
 const INSUNITS_MM: Record<number, number> = { 1: 25.4, 2: 304.8, 4: 1, 5: 10, 6: 1000, 8: 0.0000254, 9: 0.0254, 10: 914.4 };
 
-export function importDxf(text: string): ImportResult {
+export function importDxf(text: string, opts?: ImportParseOptions): ImportResult {
+  const reportSkipped = opts?.reportSkipped ?? true;
+  const importHidden = opts?.importHiddenLayers ?? true;
+  const fallback = opts?.dxfFallbackUnit && Number.isFinite(opts.dxfFallbackUnit) && opts.dxfFallbackUnit > 0 ? opts.dxfFallbackUnit : 1;
   const pairs = dxfPairs(text);
   if (!pairs.some(([c, v]) => c === 0 && v === 'SECTION')) throw new Error(t('Keine gültige DXF-Datei'));
-  let unit = 1;
+  let unit = fallback;
   const layerColor = new Map<string, number>();
   // Echtfarben (Gruppencode 420, ab AutoCAD 2004) gehen vor dem Farbindex
   const layerTrue = new Map<string, [number, number, number]>();
+  // Gefrorene (Gruppe 70, Bit 0) oder ausgeschaltete (Farbe 62 negativ) Layer
+  const layerHidden = new Set<string>();
   const blocks = new Map<string, { base: Pt; ents: DxfEnt[] }>();
   const entities: DxfEnt[] = [];
   const notes: string[] = [];
@@ -647,6 +680,8 @@ export function importDxf(text: string): ImportResult {
         const tc = e.g.find(([k]) => k === 420)?.[1];
         if (name && col) layerColor.set(name, Math.abs(parseInt(col, 10)));
         if (name && tc) layerTrue.set(name, trueColor(tc));
+        const flags = parseInt(e.g.find(([k]) => k === 70)?.[1] ?? '0', 10);
+        if (name && ((Number.isFinite(flags) && (flags & 1) !== 0) || (col !== undefined && parseInt(col, 10) < 0))) layerHidden.add(name);
       }
       continue;
     }
@@ -680,7 +715,7 @@ export function importDxf(text: string): ImportResult {
   }
   // Einheit aus dem Kopf
   const hdr = pairs.findIndex(([c, v]) => c === 9 && v === '$INSUNITS');
-  if (hdr >= 0) unit = INSUNITS_MM[parseInt(pairs[hdr + 1]?.[1] ?? '4', 10)] ?? 1;
+  if (hdr >= 0) unit = INSUNITS_MM[parseInt(pairs[hdr + 1]?.[1] ?? '4', 10)] ?? fallback;
 
   const items: ImportedPath[] = [];
   const skipped = new Map<string, number>();
@@ -690,6 +725,7 @@ export function importDxf(text: string): ImportResult {
       return p ? parseFloat(p[1]) : d;
     };
     const lname = e.g.find(([c]) => c === 8)?.[1] ?? '0';
+    if (!importHidden && layerHidden.has(lname)) return;
     let aci = get(62, 256);
     const tc = e.g.find(([c]) => c === 420)?.[1];
     let rgb: [number, number, number] | null = tc !== undefined ? trueColor(tc) : null;
@@ -788,8 +824,9 @@ export function importDxf(text: string): ImportResult {
   };
   // Einheit anwenden, y bleibt nach oben (der Aufrufer spiegelt am Bett)
   for (const e of entities) emit(e, [unit, 0, 0, unit, 0, 0], null, null, 0);
-  if (skipped.size) notes.push(t('Übersprungen: {list}.', { list: [...skipped].map(([what, n]) => `${n}× ${what}`).join(', ') }));
-  return { items: joinPaths(items), notes, yUp: true };
+  if (skipped.size && reportSkipped) notes.push(t('Übersprungen: {list}.', { list: [...skipped].map(([what, n]) => `${n}× ${what}`).join(', ') }));
+  const closeTol = opts?.closeTolerance ?? DEFAULT_CLOSE_TOLERANCE;
+  return { items: joinPaths(items, closeTol > 0 ? closeTol : 1e-9), notes, yUp: true };
 }
 
 function polyBulge(pb: PathBuilder, vs: { x: number; y: number; b: number }[], closed: boolean) {

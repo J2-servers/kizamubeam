@@ -486,7 +486,9 @@ test('Box: Validierung', () => {
   const lvl = (o: Partial<BoxParams>, l: string) => BOX.validate(box(o) as never).filter((i) => i.level === l);
   assert.equal(lvl({}, 'error').length, 0);
   assert.ok(lvl({ height: 10, thickness: 3 }, 'error').length, 'zu dick nicht erkannt');
-  assert.ok(lvl({ clearance: 1, finger: 3 }, 'error').length, 'Spiel zu groß nicht erkannt');
+  // Total play (#402): a finger loses half of it, so at half the finger width nothing is left of a field between them
+  assert.ok(lvl({ clearance: 1.5, finger: 3 }, 'error').length, 'Spiel zu groß nicht erkannt');
+  assert.equal(lvl({ clearance: 1.4, finger: 3 }, 'error').length, 0, 'Spiel knapp unter der Grenze');
   assert.ok(lvl({ finger: 2 }, 'warn').length, 'schmale Zinken nicht gewarnt');
 });
 
@@ -594,8 +596,17 @@ function shelfCheck(o: Partial<ShelfParams>, samples = 6000) {
   const th = p.thickness;
   const sx = sideCenters(p);
   const zs = shelfHeights(p);
-  const inSide = (k: number, X: number, Y: number, Z: number) => Math.abs(X - sx[k]) < th / 2 && inside(parts.get(`side${k + 1}`)![0], Y - p.depth / 2, Z - p.height / 2);
-  const inBoard = (i: number, X: number, Y: number, Z: number) => Z > zs[i] && Z < zs[i] + th && inside(parts.get(`board${i + 1}`)![0], X - p.width / 2, p.depth / 2 - Y);
+  // A point in space in the plate of a part: through its pose (#463: side 1 and the top board lie turned over)
+  const poses = SHELF.poses!(p as never, th)!.poses;
+  const inPart = (key: string, X: number, Y: number, Z: number) => {
+    const q = poses[key], d = [X - q.o[0], Y - q.o[1], Z - q.o[2]];
+    const at = (w: number[]) => d[0] * w[0] + d[1] * w[1] + d[2] * w[2];
+    const h = at(q.n);
+    // flatten() gives y up
+    return h > 0 && h < th && inside(parts.get(key)![0], at(q.u), -at(q.v));
+  };
+  const inSide = (k: number, X: number, Y: number, Z: number) => inPart(`side${k + 1}`, X, Y, Z);
+  const inBoard = (i: number, X: number, Y: number, Z: number) => inPart(`board${i + 1}`, X, Y, Z);
   let seed = 5;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
   let double = 0,
@@ -620,7 +631,7 @@ function shelfCheck(o: Partial<ShelfParams>, samples = 6000) {
 }
 
 test('Steckregal: Seiten und Böden greifen ohne Überschneidung und ohne Lücke ineinander', () => {
-  for (const o of [{}, { shelves: 5, width: 420, depth: 200, height: 600, thickness: 6, overhang: 0 }, { shelves: 1, topGap: 0 }]) {
+  for (const o of [{}, { shelves: 5, width: 420, depth: 200, height: 600, thickness: 6, overhang: 0 }, { shelves: 1, topGap: 0 }, { faces: 'legacy' }, { shelves: 4, faces: 'legacy' }]) {
     const r = shelfCheck(o);
     assert.deepEqual(r, { double: 0, empty: 0, gaps: 0 }, JSON.stringify(o));
   }
